@@ -14,7 +14,6 @@
             </div>
             <h1>Sistema Pós Vendas</h1>
             
-            <!-- Mensagem de erro -->
             <div id="mensagemErro" class="mensagem-erro" style="display: none;"></div>
             
             <form id="loginForm">
@@ -41,32 +40,27 @@
     </div>
 
     <script>
-        // Função para mostrar mensagem de erro
+        const API_URL = 'https://sistema-pos-vendas.onrender.com';
+
         function mostrarErro(mensagem) {
             const erroDiv = document.getElementById('mensagemErro');
             erroDiv.textContent = mensagem;
             erroDiv.style.display = 'block';
-            
-            // Esconder a mensagem após 5 segundos
             setTimeout(() => {
                 erroDiv.style.display = 'none';
             }, 5000);
         }
 
-        // Função para esconder mensagem de erro
         function esconderErro() {
             const erroDiv = document.getElementById('mensagemErro');
             erroDiv.style.display = 'none';
         }
 
-        // FUNÇÃO PARA FAZER LOGIN AUTOMÁTICO
         async function fazerLoginAutomatico(username, password) {
             try {
-                const response = await fetch('http://localhost:3000/login', {
+                const response = await fetch(`${API_URL}/login`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
                 });
                 
@@ -89,15 +83,12 @@
                     localStorage.removeItem('senhaSalva');
                     localStorage.removeItem('manterConectado');
                     localStorage.removeItem('sessaoAtiva');
-                    console.log('Login automático falhou - dados inválidos');
                 }
             } catch (error) {
                 console.error('Erro no login automático:', error);
-                // Se o servidor não estiver rodando, não faz nada
             }
         }
 
-        // VERIFICAR SE DEVE FAZER LOGIN AUTOMÁTICO
         window.addEventListener('DOMContentLoaded', async () => {
             const manterConectado = localStorage.getItem('manterConectado') === 'true';
             const loginSalvo = localStorage.getItem('loginSalvo');
@@ -124,36 +115,29 @@
             }
         });
 
-        // SUBMETER FORMULÁRIO DE LOGIN
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            // Esconder mensagem de erro anterior
             esconderErro();
             
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const manterConectado = document.getElementById('manterConectado').checked;
             
-            // Desabilitar botão para evitar múltiplos cliques
             const submitButton = e.target.querySelector('button[type="submit"]');
             const textoOriginal = submitButton.textContent;
             submitButton.textContent = '⏳ Entrando...';
             submitButton.disabled = true;
             
             try {
-                const response = await fetch('http://localhost:3000/login', {
+                const response = await fetch(`${API_URL}/login`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
                 });
                 
                 const data = await response.json();
                 
                 if (response.ok && data.success) {
-                    // Salvar dados se "Manter-me conectado" estiver marcado
                     if (manterConectado) {
                         localStorage.setItem('loginSalvo', username);
                         localStorage.setItem('senhaSalva', password);
@@ -164,34 +148,28 @@
                         localStorage.removeItem('manterConectado');
                     }
                     
-                    // Salvar sessão atual
                     localStorage.setItem('userRole', data.role);
                     localStorage.setItem('userName', data.nome);
                     localStorage.setItem('usuarioLogado', username);
                     localStorage.setItem('sessaoAtiva', 'true');
                     localStorage.setItem('ultimoAcesso', new Date().getTime());
                     
-                    // Redirecionar conforme o tipo
                     if (data.role === 'admin') {
                         window.location.href = 'admin.html';
                     } else {
                         window.location.href = 'posvenda.html';
                     }
                 } else {
-                    // Mostrar mensagem de erro amigável
                     mostrarErro('❌ Não foi possível realizar o login. Verifique seu usuário e senha e tente novamente.');
                     submitButton.textContent = textoOriginal;
                     submitButton.disabled = false;
-                    
-                    // Limpar o campo de senha por segurança
                     document.getElementById('password').value = '';
                     document.getElementById('password').focus();
                 }
             } catch (error) {
                 console.error('Erro:', error);
-                // Verificar se é erro de conexão com o servidor
                 if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-                    mostrarErro('🔌 Erro de conexão com o servidor. Verifique se o servidor está rodando (node backend/server.js)');
+                    mostrarErro('🔌 Erro de conexão com o servidor. Verifique se o servidor está rodando.');
                 } else {
                     mostrarErro('⚠️ Ocorreu um erro inesperado. Tente novamente mais tarde.');
                 }

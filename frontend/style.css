@@ -66,10 +66,10 @@ body {
 }
 
 .logo-pequena {
-    width: 60px;
+    width: 100px;
     height: 60px;
     object-fit: contain;
-    border-radius: 8px;
+    border-radius: 6px;
 }
 
 /* ==================== TÍTULOS ==================== */

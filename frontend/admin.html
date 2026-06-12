@@ -28,823 +28,140 @@
                 </ul>
             </div>
 
-            <!-- ABA 1: DASHBOARD -->
             <div id="dashboard" class="tab-content ativo">
                 <div class="stats">
-                    <div class="stat-card">
-                        <h3>Total de Visitas Mensais</h3>
-                        <p id="totalVisitas">0</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Visitas Realizadas Hoje</h3>
-                        <p id="totalVisitasHoje">0</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Total de Empresas Cadastradas</h3>
-                        <p id="totalEmpresasCadastradas">0</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Taxa de Conformidade</h3>
-                        <p id="taxaConformidade">0%</p>
-                    </div>
+                    <div class="stat-card"><h3>Total de Visitas Mensais</h3><p id="totalVisitas">0</p></div>
+                    <div class="stat-card"><h3>Visitas Realizadas Hoje</h3><p id="totalVisitasHoje">0</p></div>
+                    <div class="stat-card"><h3>Total de Empresas Cadastradas</h3><p id="totalEmpresasCadastradas">0</p></div>
+                    <div class="stat-card"><h3>Taxa de Conformidade</h3><p id="taxaConformidade">0%</p></div>
                 </div>
-
                 <div class="tabela-container">
                     <h3>📊 Desempenho por Consultor</h3>
-                    <div style="overflow-x: auto;">
-                        <table id="tabelaDesempenho">
-                            <thead>
-                                <tr>
-                                    <th>Consultor</th>
-                                    <th>Empresas Cadastradas</th>
-                                    <th>Empresas Visitadas</th>
-                                    <th>Convertido em Vendas</th>
-                                </tr>
-                            </thead>
-                            <tbody id="corpoDesempenho">
-                                <tr><td colspan="4">Carregando dados...</td</tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <table id="tabelaDesempenho"><thead><tr><th>Consultor</th><th>Empresas Cadastradas</th><th>Empresas Visitadas</th><th>Convertido em Vendas</th></tr></thead><tbody id="corpoDesempenho"><tr><td colspan="4">Carregando...</td></tr></tbody></table>
                 </div>
             </div>
 
-            <!-- ABA 2: PÓS VENDAS -->
             <div id="posvendas" class="tab-content">
                 <div class="tabela-container">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                         <h3 style="margin: 0;">📋 Controle de Pós Vendas</h3>
-                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                            <button onclick="abrirModalNovoRegistro()" class="btn-adicionar">➕ Novo Registro</button>
-                            <div class="dropdown">
-                                <button onclick="toggleDropdown()" class="btn-importar-dropdown">📂 Importar ▼</button>
-                                <div id="dropdownMenu" class="dropdown-content">
-                                    <a href="#" onclick="importarExcelPosVenda(); fecharDropdown(); return false;">📎 Importar Excel</a>
-                                    <a href="#" onclick="baixarModeloExcel(); fecharDropdown(); return false;">📄 Baixar Modelo</a>
-                                </div>
-                            </div>
-                        </div>
+                        <div><button onclick="abrirModalNovoRegistro()" class="btn-adicionar">➕ Novo Registro</button>
+                        <div class="dropdown" style="display: inline-block; margin-left: 10px;"><button onclick="toggleDropdown()" class="btn-importar-dropdown">📂 Importar ▼</button>
+                        <div id="dropdownMenu" class="dropdown-content"><a href="#" onclick="importarExcelPosVenda(); fecharDropdown(); return false;">📎 Importar Excel</a><a href="#" onclick="baixarModeloExcel(); fecharDropdown(); return false;">📄 Baixar Modelo</a></div></div></div>
                     </div>
-                    <div style="overflow-x: auto;">
-                        <table id="tabelaPosVendas">
-                            <thead>
-                                <tr>
-                                    <th>CONSULTOR</th>
-                                    <th>RAZAO SOCIAL</th>
-                                    <th>CNPJ</th>
-                                    <th>CIDADE</th>
-                                    <th>TELEFONE</th>
-                                    <th>RESPONSAVEL</th>
-                                    <th>CONTABILIDADE</th>
-                                    <th>DATA ENTREGUE</th>
-                                    <th>RETORNO</th>
-                                    <th>OBSERVAÇÃO</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="corpoTabelaPosVendas">
-                                <tr><td colspan="11">Carregando dados...</td</tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <table id="tabelaPosVendas"><thead><tr><th>CONSULTOR</th><th>RAZAO SOCIAL</th><th>CNPJ</th><th>CIDADE</th><th>TELEFONE</th><th>RESPONSAVEL</th><th>CONTABILIDADE</th><th>DATA ENTREGUE</th><th>RETORNO</th><th>OBSERVAÇÃO</th><th>Ações</th></tr></thead><tbody id="corpoTabelaPosVendas"><tr><td colspan="11">Carregando...</td></tr></tbody></table>
                 </div>
             </div>
 
-            <!-- ABA 3: RESULTADO -->
             <div id="resultado" class="tab-content">
                 <div class="tabela-container">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
-                        <h3 style="margin: 0;">📋 Resultados Pós Vendas</h3>
-                        <button onclick="exportarExcel()" class="btn-exportar-pequeno">📎 Exportar Excel</button>
-                    </div>
-                    <div style="overflow-x: auto;">
-                        <table id="tabelaRespostas">
-                            <thead>
-                                <tr>
-                                    <th>DATA</th>
-                                    <th>CONSULTOR</th>
-                                    <th>CNPJ</th>
-                                    <th>EMPRESA</th>
-                                    <th>POS VENDA</th>
-                                    <th>AET</th>
-                                    <th>NR 06</th>
-                                    <th>CIPA</th>
-                                    <th>PERIODICO</th>
-                                    <th>EPIS</th>
-                                    <th>NOTA VISITA</th>
-                                    <th>VENDEDOR</th>
-                                    <th>VENDIDO</th>
-                                    <th>OBS</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="corpoTabela">
-                                <tr><td colspan="15">Carregando dados...</td</tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;"><h3 style="margin: 0;">📋 Resultados Pós Vendas</h3><button onclick="exportarExcel()" class="btn-exportar-pequeno">📎 Exportar Excel</button></div>
+                    <table id="tabelaRespostas"><thead><tr><th>DATA</th><th>CONSULTOR</th><th>CNPJ</th><th>EMPRESA</th><th>POS VENDA</th><th>AET</th><th>NR 06</th><th>CIPA</th><th>PERIODICO</th><th>EPIS</th><th>NOTA VISITA</th><th>VENDEDOR</th><th>VENDIDO</th><th>OBS</th><th>Ações</th></tr></thead><tbody id="corpoTabela"><tr><td colspan="15">Carregando...</td></tr></tbody></table>
                 </div>
             </div>
 
-            <!-- ABA 4: CADASTRO -->
             <div id="cadastro" class="tab-content">
-                <div class="section">
-                    <h3>➕ Adicionar Novo Usuário</h3>
-                    <div class="form-cadastro">
-                        <div class="input-group"><label>Usuário (login):</label><input type="text" id="novoUsuario" placeholder="ex: maria"></div>
-                        <div class="input-group"><label>Nome completo:</label><input type="text" id="novoNome" placeholder="ex: Maria Silva"></div>
-                        <div class="input-group"><label>Senha:</label><input type="password" id="novaSenha" placeholder="Digite uma senha"></div>
-                        <div class="input-group"><label>Tipo de Acesso:</label><select id="novoTipo"><option value="pos">📝 Pós Vendas</option><option value="admin">👑 Administrador</option></select></div>
-                    </div>
-                    <button onclick="adicionarUsuario()" class="btn-submit">➕ Adicionar Usuário</button>
-                </div>
-                <div class="tabela-container">
-                    <h3>📋 Usuários Cadastrados</h3>
-                    <table id="tabelaUsuarios">
-                        <thead><tr><th>Usuário</th><th>Nome</th><th>Tipo</th><th>Senha</th><th>Ações</th></tr></thead>
-                        <tbody id="corpoUsuarios"><tr><td colspan="5">Carregando usuários...</td></tr></tbody>
-                    </table>
-                </div>
+                <div class="section"><h3>➕ Adicionar Novo Usuário</h3>
+                <div class="form-cadastro"><div class="input-group"><label>Usuário:</label><input type="text" id="novoUsuario" placeholder="ex: maria"></div>
+                <div class="input-group"><label>Nome:</label><input type="text" id="novoNome" placeholder="ex: Maria Silva"></div>
+                <div class="input-group"><label>Senha:</label><input type="password" id="novaSenha" placeholder="Digite uma senha"></div>
+                <div class="input-group"><label>Tipo:</label><select id="novoTipo"><option value="pos">📝 Pós Vendas</option><option value="admin">👑 Administrador</option></select></div></div>
+                <button onclick="adicionarUsuario()" class="btn-submit">➕ Adicionar Usuário</button></div>
+                <div class="tabela-container"><h3>📋 Usuários Cadastrados</h3>
+                <table id="tabelaUsuarios"><thead><tr><th>Usuário</th><th>Nome</th><th>Tipo</th><th>Senha</th><th>Ações</th></tr></thead><tbody id="corpoUsuarios"><tr><td colspan="5">Carregando...</td></tr></tbody></table></div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL PARA NOVO REGISTRO (Pós Vendas) -->
-    <div id="modalNovoRegistro" class="modal">
-        <div class="modal-content">
-            <div class="modal-header"><h3>➕ Novo Registro de Pós Venda</h3><span class="modal-fechar" onclick="fecharModalNovoRegistro()">&times;</span></div>
-            <div class="modal-body">
-                <div class="form-cadastro-modal">
-                    <div class="input-group"><label>CONSULTOR:*</label>
-                        <select id="modalConsultor">
-                            <option value="">Selecione um consultor...</option>
-                        </select>
-                    </div>
-                    <div class="input-group"><label>RAZÃO SOCIAL:*</label><input type="text" id="modalRazaoSocial" placeholder="Nome da empresa"></div>
-                    <div class="input-group"><label>CNPJ:</label><input type="text" id="modalCnpj" placeholder="00.000.000/0001-00"></div>
-                    <div class="input-group"><label>CIDADE:</label><input type="text" id="modalCidade" placeholder="Cidade"></div>
-                    <div class="input-group"><label>TELEFONE:</label><input type="text" id="modalTelefone" placeholder="(00) 00000-0000"></div>
-                    <div class="input-group"><label>RESPONSÁVEL:</label><input type="text" id="modalResponsavel" placeholder="Nome do responsável"></div>
-                    <div class="input-group"><label>CONTABILIDADE:</label><input type="text" id="modalContabilidade" placeholder="Contabilidade responsável"></div>
-                    <div class="input-group"><label>DATA ENTREGUE:</label><input type="date" id="modalDataEntregue"></div>
-                    <div class="input-group"><label>RETORNO:</label><input type="date" id="modalRetorno"></div>
-                    <div class="input-group full-width"><label>OBSERVAÇÃO:</label><textarea id="modalObservacao" rows="3" placeholder="Observações adicionais..."></textarea></div>
-                </div>
-            </div>
-            <div class="modal-footer"><button onclick="fecharModalNovoRegistro()" class="btn-cancelar">Cancelar</button><button onclick="salvarNovoRegistro()" class="btn-salvar-modal">💾 Salvar Registro</button></div>
-        </div>
-    </div>
+    <div id="modalNovoRegistro" class="modal"><div class="modal-content"><div class="modal-header"><h3>➕ Novo Registro</h3><span class="modal-fechar" onclick="fecharModalNovoRegistro()">&times;</span></div><div class="modal-body"><div class="form-cadastro-modal"><div class="input-group"><label>CONSULTOR:</label><select id="modalConsultor"></select></div><div class="input-group"><label>RAZÃO SOCIAL:</label><input type="text" id="modalRazaoSocial"></div><div class="input-group"><label>CNPJ:</label><input type="text" id="modalCnpj"></div><div class="input-group"><label>CIDADE:</label><input type="text" id="modalCidade"></div><div class="input-group"><label>TELEFONE:</label><input type="text" id="modalTelefone"></div><div class="input-group"><label>RESPONSAVEL:</label><input type="text" id="modalResponsavel"></div><div class="input-group"><label>CONTABILIDADE:</label><input type="text" id="modalContabilidade"></div><div class="input-group"><label>DATA ENTREGUE:</label><input type="date" id="modalDataEntregue"></div><div class="input-group"><label>RETORNO:</label><input type="date" id="modalRetorno"></div><div class="input-group full-width"><label>OBS:</label><textarea id="modalObservacao" rows="3"></textarea></div></div></div><div class="modal-footer"><button onclick="fecharModalNovoRegistro()" class="btn-cancelar">Cancelar</button><button onclick="salvarNovoRegistro()" class="btn-salvar-modal">💾 Salvar</button></div></div></div>
 
-    <!-- MODAL PARA EDITAR REGISTRO (Pós Vendas) -->
-    <div id="modalEditarRegistro" class="modal">
-        <div class="modal-content">
-            <div class="modal-header"><h3>✏️ Editar Registro de Pós Venda</h3><span class="modal-fechar" onclick="fecharModalEditarRegistro()">&times;</span></div>
-            <div class="modal-body">
-                <div class="form-cadastro-modal">
-                    <div class="input-group"><label>CONSULTOR:*</label>
-                        <select id="editConsultor">
-                            <option value="">Selecione um consultor...</option>
-                        </select>
-                    </div>
-                    <div class="input-group"><label>RAZÃO SOCIAL:*</label><input type="text" id="editRazaoSocial" placeholder="Nome da empresa"></div>
-                    <div class="input-group"><label>CNPJ:</label><input type="text" id="editCnpj" placeholder="00.000.000/0001-00"></div>
-                    <div class="input-group"><label>CIDADE:</label><input type="text" id="editCidade" placeholder="Cidade"></div>
-                    <div class="input-group"><label>TELEFONE:</label><input type="text" id="editTelefone" placeholder="(00) 00000-0000"></div>
-                    <div class="input-group"><label>RESPONSÁVEL:</label><input type="text" id="editResponsavel" placeholder="Nome do responsável"></div>
-                    <div class="input-group"><label>CONTABILIDADE:</label><input type="text" id="editContabilidade" placeholder="Contabilidade responsável"></div>
-                    <div class="input-group"><label>DATA ENTREGUE:</label><input type="date" id="editDataEntregue"></div>
-                    <div class="input-group"><label>RETORNO:</label><input type="date" id="editRetorno"></div>
-                    <div class="input-group full-width"><label>OBSERVAÇÃO:</label><textarea id="editObservacao" rows="3" placeholder="Observações adicionais..."></textarea></div>
-                </div>
-            </div>
-            <div class="modal-footer"><button onclick="fecharModalEditarRegistro()" class="btn-cancelar">Cancelar</button><button onclick="salvarEdicaoRegistro()" class="btn-salvar-modal">💾 Salvar Alterações</button></div>
-        </div>
-    </div>
+    <div id="modalEditarRegistro" class="modal"><div class="modal-content"><div class="modal-header"><h3>✏️ Editar Registro</h3><span class="modal-fechar" onclick="fecharModalEditarRegistro()">&times;</span></div><div class="modal-body"><div class="form-cadastro-modal"><div class="input-group"><label>CONSULTOR:</label><select id="editConsultor"></select></div><div class="input-group"><label>RAZÃO SOCIAL:</label><input type="text" id="editRazaoSocial"></div><div class="input-group"><label>CNPJ:</label><input type="text" id="editCnpj"></div><div class="input-group"><label>CIDADE:</label><input type="text" id="editCidade"></div><div class="input-group"><label>TELEFONE:</label><input type="text" id="editTelefone"></div><div class="input-group"><label>RESPONSAVEL:</label><input type="text" id="editResponsavel"></div><div class="input-group"><label>CONTABILIDADE:</label><input type="text" id="editContabilidade"></div><div class="input-group"><label>DATA ENTREGUE:</label><input type="date" id="editDataEntregue"></div><div class="input-group"><label>RETORNO:</label><input type="date" id="editRetorno"></div><div class="input-group full-width"><label>OBS:</label><textarea id="editObservacao" rows="3"></textarea></div></div></div><div class="modal-footer"><button onclick="fecharModalEditarRegistro()" class="btn-cancelar">Cancelar</button><button onclick="salvarEdicaoRegistro()" class="btn-salvar-modal">💾 Salvar</button></div></div></div>
 
-    <!-- MODAL PARA EDITAR RESPOSTA (Resultado) -->
-    <div id="modalEditarResposta" class="modal">
-        <div class="modal-content">
-            <div class="modal-header"><h3>✏️ Editar Resposta do Questionário</h3><span class="modal-fechar" onclick="fecharModalEditarResposta()">&times;</span></div>
-            <div class="modal-body">
-                <div class="form-cadastro-modal">
-                    <div class="input-group"><label>DATA:</label><input type="text" id="editData" readonly style="background:#f0f0f0"></div>
-                    <div class="input-group"><label>CONSULTOR:</label><input type="text" id="editConsultorResposta" placeholder="Consultor"></div>
-                    <div class="input-group"><label>CNPJ:</label><input type="text" id="editCnpjResposta" placeholder="CNPJ"></div>
-                    <div class="input-group"><label>EMPRESA:</label><input type="text" id="editEmpresaResposta" placeholder="Empresa"></div>
-                    <div class="input-group"><label>POS VENDA:</label><input type="text" id="editPosVenda" value="SIM" readonly style="background:#f0f0f0"></div>
-                    <div class="input-group"><label>AET:</label>
-                        <select id="editAet">
-                            <option value="SIM">SIM</option>
-                            <option value="NÃO">NÃO</option>
-                        </select>
-                    </div>
-                    <div class="input-group"><label>NR 06:</label>
-                        <select id="editNr06">
-                            <option value="SIM">SIM</option>
-                            <option value="NÃO">NÃO</option>
-                        </select>
-                    </div>
-                    <div class="input-group"><label>CIPA:</label>
-                        <select id="editCipa">
-                            <option value="SIM">SIM</option>
-                            <option value="NÃO">NÃO</option>
-                        </select>
-                    </div>
-                    <div class="input-group"><label>PERIODICO:</label>
-                        <select id="editPeriodico">
-                            <option value="SIM">SIM</option>
-                            <option value="NÃO">NÃO</option>
-                        </select>
-                    </div>
-                    <div class="input-group"><label>EPIS:</label>
-                        <select id="editEpis">
-                            <option value="SIM">SIM</option>
-                            <option value="NÃO">NÃO</option>
-                        </select>
-                    </div>
-                    <div class="input-group"><label>NOTA VISITA:</label><input type="text" id="editNotaVisita" placeholder="Nota da visita"></div>
-                    <div class="input-group"><label>VENDEDOR:</label><input type="text" id="editVendedor" placeholder="Nome do vendedor"></div>
-                    <div class="input-group"><label>VENDIDO:</label>
-                        <select id="editVendido">
-                            <option value="">Selecione</option>
-                            <option value="SIM">SIM</option>
-                            <option value="NÃO">NÃO</option>
-                            <option value="EM NEGOCIAÇÃO">EM NEGOCIAÇÃO</option>
-                        </select>
-                    </div>
-                    <div class="input-group full-width"><label>OBS:</label><textarea id="editObsResposta" rows="3" placeholder="Observações..."></textarea></div>
-                </div>
-            </div>
-            <div class="modal-footer"><button onclick="fecharModalEditarResposta()" class="btn-cancelar">Cancelar</button><button onclick="salvarEdicaoResposta()" class="btn-salvar-modal">💾 Salvar Alterações</button></div>
-        </div>
-    </div>
+    <div id="modalEditarResposta" class="modal"><div class="modal-content"><div class="modal-header"><h3>✏️ Editar Resposta</h3><span class="modal-fechar" onclick="fecharModalEditarResposta()">&times;</span></div><div class="modal-body"><div class="form-cadastro-modal"><div class="input-group"><label>DATA:</label><input type="text" id="editData" readonly></div><div class="input-group"><label>CONSULTOR:</label><input type="text" id="editConsultorResposta"></div><div class="input-group"><label>CNPJ:</label><input type="text" id="editCnpjResposta"></div><div class="input-group"><label>EMPRESA:</label><input type="text" id="editEmpresaResposta"></div><div class="input-group"><label>POS VENDA:</label><input type="text" id="editPosVenda" value="SIM" readonly></div><div class="input-group"><label>AET:</label><select id="editAet"><option>SIM</option><option>NÃO</option></select></div><div class="input-group"><label>NR 06:</label><select id="editNr06"><option>SIM</option><option>NÃO</option></select></div><div class="input-group"><label>CIPA:</label><select id="editCipa"><option>SIM</option><option>NÃO</option></select></div><div class="input-group"><label>PERIODICO:</label><select id="editPeriodico"><option>SIM</option><option>NÃO</option></select></div><div class="input-group"><label>EPIS:</label><select id="editEpis"><option>SIM</option><option>NÃO</option></select></div><div class="input-group"><label>NOTA VISITA:</label><input type="text" id="editNotaVisita"></div><div class="input-group"><label>VENDEDOR:</label><input type="text" id="editVendedor"></div><div class="input-group"><label>VENDIDO:</label><select id="editVendido"><option value="">Selecione</option><option>SIM</option><option>NÃO</option><option>EM NEGOCIAÇÃO</option></select></div><div class="input-group full-width"><label>OBS:</label><textarea id="editObsResposta" rows="3"></textarea></div></div></div><div class="modal-footer"><button onclick="fecharModalEditarResposta()" class="btn-cancelar">Cancelar</button><button onclick="salvarEdicaoResposta()" class="btn-salvar-modal">💾 Salvar</button></div></div></div>
 
     <script>
+        const API_URL = 'https://sistema-pos-vendas.onrender.com';
+        
         const userRole = localStorage.getItem('userRole');
         if (userRole !== 'admin') window.location.href = 'login.html';
 
-        let dadosAtuais = [], dadosPosVenda = [];
-        let indiceEditando = null;
-        let indiceEditandoResposta = null;
-        let listaConsultores = [];
+        let dadosAtuais = [], dadosPosVenda = [], indiceEditando = null, indiceEditandoResposta = null, listaConsultores = [];
 
-        function formatarData(data) {
-            if (!data || data === '-') return '-';
-            if (data.includes('/')) return data;
-            const partes = data.split('-');
-            if (partes.length === 3) {
-                return `${partes[2]}/${partes[1]}/${partes[0]}`;
-            }
-            return data;
-        }
+        function converterDataParaInput(data) { if (!data || data === '-') return ''; if (data.includes('-')) return data; const partes = data.split('/'); if (partes.length === 3) return `${partes[2]}-${partes[1]}-${partes[0]}`; return data; }
+        function converterDataParaDate(dataStr) { if (!dataStr) return null; if (dataStr.includes(',')) { const partes = dataStr.split(','); const dataParte = partes[0].trim(); const dataArray = dataParte.split('/'); if (dataArray.length === 3) return new Date(`${dataArray[2]}-${dataArray[1]}-${dataArray[0]}`); } return new Date(dataStr); }
 
-        function converterDataParaInput(data) {
-            if (!data || data === '-') return '';
-            if (data.includes('-')) return data;
-            const partes = data.split('/');
-            if (partes.length === 3) {
-                return `${partes[2]}-${partes[1]}-${partes[0]}`;
-            }
-            return data;
-        }
-
-        // Função para converter data do formato "12/06/2026, 15:18:49" para Date
-        function converterDataParaDate(dataStr) {
-            if (!dataStr) return null;
-            if (dataStr instanceof Date) return dataStr;
-            if (dataStr.includes(',')) {
-                const partes = dataStr.split(',');
-                const dataParte = partes[0].trim();
-                const horaParte = partes[1].trim();
-                const dataArray = dataParte.split('/');
-                if (dataArray.length === 3) {
-                    return new Date(`${dataArray[2]}-${dataArray[1]}-${dataArray[0]}T${horaParte}`);
-                }
-            }
-            return new Date(dataStr);
-        }
-
-        async function carregarConsultores() {
-            try {
-                const response = await fetch('http://localhost:3000/buscar-usuarios');
-                const usuarios = await response.json();
-                listaConsultores = usuarios.filter(u => u.tipo === 'pos').map(u => u.nome);
-                
-                const modalSelect = document.getElementById('modalConsultor');
-                const editSelect = document.getElementById('editConsultor');
-                
-                modalSelect.innerHTML = '<option value="">Selecione um consultor...</option>';
-                editSelect.innerHTML = '<option value="">Selecione um consultor...</option>';
-                
-                listaConsultores.forEach(consultor => {
-                    modalSelect.innerHTML += `<option value="${consultor}">${consultor}</option>`;
-                    editSelect.innerHTML += `<option value="${consultor}">${consultor}</option>`;
-                });
-            } catch (error) {
-                console.error('Erro ao carregar consultores:', error);
-            }
-        }
+        async function carregarConsultores() { try { const response = await fetch(`${API_URL}/buscar-usuarios`); const usuarios = await response.json(); listaConsultores = usuarios.filter(u => u.tipo === 'pos').map(u => u.nome); const modalSelect = document.getElementById('modalConsultor'); const editSelect = document.getElementById('editConsultor'); modalSelect.innerHTML = '<option value="">Selecione...</option>'; editSelect.innerHTML = '<option value="">Selecione...</option>'; listaConsultores.forEach(c => { modalSelect.innerHTML += `<option value="${c}">${c}</option>`; editSelect.innerHTML += `<option value="${c}">${c}</option>`; }); } catch(e) { console.error(e); } }
 
         function toggleDropdown() { const d = document.getElementById('dropdownMenu'); d.style.display = d.style.display === 'block' ? 'none' : 'block'; }
         function fecharDropdown() { document.getElementById('dropdownMenu').style.display = 'none'; }
 
-        window.onclick = function(e) {
-            if (!e.target.matches('.btn-importar-dropdown')) document.getElementById('dropdownMenu').style.display = 'none';
-            if (e.target === document.getElementById('modalNovoRegistro')) fecharModalNovoRegistro();
-            if (e.target === document.getElementById('modalEditarRegistro')) fecharModalEditarRegistro();
-            if (e.target === document.getElementById('modalEditarResposta')) fecharModalEditarResposta();
-        }
+        window.onclick = function(e) { if (!e.target.matches('.btn-importar-dropdown')) document.getElementById('dropdownMenu').style.display = 'none'; if (e.target === document.getElementById('modalNovoRegistro')) fecharModalNovoRegistro(); if (e.target === document.getElementById('modalEditarRegistro')) fecharModalEditarRegistro(); if (e.target === document.getElementById('modalEditarResposta')) fecharModalEditarResposta(); }
 
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('ativo'));
-                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('ativo'));
-                this.classList.add('ativo');
-                document.getElementById(this.getAttribute('data-tab')).classList.add('ativo');
-                if (this.getAttribute('data-tab') === 'posvendas') carregarPosVendas();
-                if (this.getAttribute('data-tab') === 'dashboard') carregarDashboard();
-            });
-        });
+        document.querySelectorAll('.nav-link').forEach(link => { link.addEventListener('click', function(e) { e.preventDefault(); document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('ativo')); document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('ativo')); this.classList.add('ativo'); document.getElementById(this.getAttribute('data-tab')).classList.add('ativo'); if (this.getAttribute('data-tab') === 'posvendas') carregarPosVendas(); if (this.getAttribute('data-tab') === 'dashboard') carregarDashboard(); }); });
 
-        function logout() {
-            const manter = confirm('Deseja manter seus dados salvos para o próximo acesso?');
-            if (!manter) { localStorage.removeItem('loginSalvo'); localStorage.removeItem('senhaSalva'); localStorage.removeItem('manterConectado'); }
-            localStorage.removeItem('userRole'); localStorage.removeItem('userName'); localStorage.removeItem('usuarioLogado');
-            localStorage.removeItem('sessaoAtiva'); localStorage.removeItem('ultimoAcesso');
-            window.location.href = 'login.html';
-        }
+        function logout() { const manter = confirm('Manter dados salvos?'); if (!manter) { localStorage.removeItem('loginSalvo'); localStorage.removeItem('senhaSalva'); localStorage.removeItem('manterConectado'); } localStorage.removeItem('userRole'); localStorage.removeItem('userName'); localStorage.removeItem('usuarioLogado'); localStorage.removeItem('sessaoAtiva'); localStorage.removeItem('ultimoAcesso'); window.location.href = 'login.html'; }
+        function mostrarNotificacao(mensagem) { let n = document.getElementById('notificacao'); if (!n) { n = document.createElement('div'); n.id = 'notificacao'; n.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#48bb78;color:white;padding:10px 20px;border-radius:5px;z-index:9999'; document.body.appendChild(n); } n.textContent = mensagem; n.style.display = 'block'; setTimeout(() => n.style.display = 'none', 3000); }
 
-        function mostrarNotificacao(mensagem) {
-            let n = document.getElementById('notificacao');
-            if (!n) { n = document.createElement('div'); n.id = 'notificacao'; n.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#48bb78;color:white;padding:10px 20px;border-radius:5px;z-index:9999'; document.body.appendChild(n); }
-            n.textContent = mensagem; n.style.display = 'block';
-            setTimeout(() => n.style.display = 'none', 3000);
-        }
-
-        // ==================== DASHBOARD ====================
         async function carregarDashboard() {
             try {
-                const responseRespostas = await fetch('http://localhost:3000/buscar-respostas');
-                const respostas = await responseRespostas.json();
+                const respostas = await (await fetch(`${API_URL}/buscar-respostas`)).json();
+                const posVendas = await (await fetch(`${API_URL}/buscar-pos-vendas`)).json();
+                const usuarios = await (await fetch(`${API_URL}/buscar-usuarios`)).json();
                 
-                const responsePosVendas = await fetch('http://localhost:3000/buscar-pos-vendas');
-                const posVendas = await responsePosVendas.json();
-                
-                const responseUsuarios = await fetch('http://localhost:3000/buscar-usuarios');
-                const usuarios = await responseUsuarios.json();
-                
-                console.log('Respostas carregadas:', respostas.length);
-                
-                // Total de Visitas Mensais (mês atual)
-                const mesAtual = new Date().getMonth();
-                const anoAtual = new Date().getFullYear();
-                
-                const visitasMensais = respostas.filter(r => {
-                    const data = converterDataParaDate(r.dataHora);
-                    return data && data.getMonth() === mesAtual && data.getFullYear() === anoAtual;
-                }).length;
+                const mesAtual = new Date().getMonth(), anoAtual = new Date().getFullYear();
+                const visitasMensais = respostas.filter(r => { const d = converterDataParaDate(r.dataHora); return d && d.getMonth() === mesAtual && d.getFullYear() === anoAtual; }).length;
                 document.getElementById('totalVisitas').textContent = visitasMensais;
                 
-                // Visitas Realizadas Hoje
-                const hoje = new Date();
-                const hojeStr = `${hoje.getDate().toString().padStart(2,'0')}/${(hoje.getMonth()+1).toString().padStart(2,'0')}/${hoje.getFullYear()}`;
-                
-                const visitasHoje = respostas.filter(r => {
-                    if (!r.dataHora) return false;
-                    let dataResposta;
-                    if (r.dataHora.includes(',')) {
-                        dataResposta = r.dataHora.split(',')[0];
-                    } else {
-                        const data = new Date(r.dataHora);
-                        dataResposta = `${data.getDate().toString().padStart(2,'0')}/${(data.getMonth()+1).toString().padStart(2,'0')}/${data.getFullYear()}`;
-                    }
-                    return dataResposta === hojeStr;
-                }).length;
+                const hoje = new Date(); const hojeStr = `${hoje.getDate().toString().padStart(2,'0')}/${(hoje.getMonth()+1).toString().padStart(2,'0')}/${hoje.getFullYear()}`;
+                const visitasHoje = respostas.filter(r => { if (!r.dataHora) return false; return r.dataHora.includes(',') ? r.dataHora.split(',')[0] === hojeStr : new Date(r.dataHora).toLocaleDateString('pt-BR') === hojeStr; }).length;
                 document.getElementById('totalVisitasHoje').textContent = visitasHoje;
                 
-                console.log('Hoje:', hojeStr, 'Visitas hoje:', visitasHoje);
-                
-                // Total de Empresas Cadastradas (CNPJ únicos)
-                const cnpjsUnicos = new Set();
-                posVendas.forEach(p => {
-                    if (p.cnpj && p.cnpj.trim() !== '') {
-                        cnpjsUnicos.add(p.cnpj);
-                    }
-                });
+                const cnpjsUnicos = new Set(); posVendas.forEach(p => { if (p.cnpj && p.cnpj.trim()) cnpjsUnicos.add(p.cnpj); });
                 document.getElementById('totalEmpresasCadastradas').textContent = cnpjsUnicos.size;
                 
-                // Taxa de Conformidade
                 const conformidade = respostas.filter(r => r.pergunta1 === 'SIM').length;
-                const taxa = respostas.length > 0 ? Math.round((conformidade / respostas.length) * 100) : 0;
-                document.getElementById('taxaConformidade').textContent = taxa + '%';
+                document.getElementById('taxaConformidade').textContent = respostas.length ? Math.round((conformidade/respostas.length)*100)+'%' : '0%';
                 
-                // Tabela de Desempenho por Consultor
                 const consultoresPos = usuarios.filter(u => u.tipo === 'pos').map(u => u.nome);
-                
                 const corpo = document.getElementById('corpoDesempenho');
-                if (!consultoresPos.length) {
-                    corpo.innerHTML = '<tr><td colspan="4">Nenhum consultor cadastrado</td>';
-                } else {
-                    corpo.innerHTML = '';
-                    for (const consultor of consultoresPos) {
-                        const empresasCadastradas = posVendas.filter(p => p.consultor === consultor).length;
-                        const empresasVisitadas = respostas.filter(r => r.vendedor === consultor).length;
-                        const convertidas = respostas.filter(r => r.vendedor === consultor && r.vendido === 'SIM').length;
-                        
-                        const row = corpo.insertRow();
-                        row.insertCell(0).innerHTML = consultor;
-                        row.insertCell(1).innerHTML = empresasCadastradas;
-                        row.insertCell(2).innerHTML = empresasVisitadas;
-                        row.insertCell(3).innerHTML = convertidas;
-                    }
-                }
-                
-            } catch (error) {
-                console.error('Erro ao carregar dashboard:', error);
-            }
+                if (!consultoresPos.length) corpo.innerHTML = '<td><td colspan="4">Nenhum consultor</td>';
+                else { corpo.innerHTML = ''; for (const c of consultoresPos) { const row = corpo.insertRow(); row.insertCell(0).innerHTML = c; row.insertCell(1).innerHTML = posVendas.filter(p => p.consultor === c).length; row.insertCell(2).innerHTML = respostas.filter(r => r.vendedor === c).length; row.insertCell(3).innerHTML = respostas.filter(r => r.vendedor === c && r.vendido === 'SIM').length; } }
+            } catch(e) { console.error(e); }
         }
 
-        // ==================== MODAIS PÓS VENDAS ====================
-        function abrirModalNovoRegistro() {
-            document.getElementById('modalConsultor').value = '';
-            document.getElementById('modalRazaoSocial').value = '';
-            document.getElementById('modalCnpj').value = '';
-            document.getElementById('modalCidade').value = '';
-            document.getElementById('modalTelefone').value = '';
-            document.getElementById('modalResponsavel').value = '';
-            document.getElementById('modalContabilidade').value = '';
-            document.getElementById('modalDataEntregue').value = '';
-            document.getElementById('modalRetorno').value = '';
-            document.getElementById('modalObservacao').value = '';
-            document.getElementById('modalNovoRegistro').style.display = 'flex';
-        }
+        function abrirModalNovoRegistro() { ['modalConsultor','modalRazaoSocial','modalCnpj','modalCidade','modalTelefone','modalResponsavel','modalContabilidade','modalDataEntregue','modalRetorno','modalObservacao'].forEach(id => document.getElementById(id).value = ''); document.getElementById('modalNovoRegistro').style.display = 'flex'; }
         function fecharModalNovoRegistro() { document.getElementById('modalNovoRegistro').style.display = 'none'; }
+        async function salvarNovoRegistro() { const consultor = document.getElementById('modalConsultor').value, razaoSocial = document.getElementById('modalRazaoSocial').value.trim(); if (!consultor || !razaoSocial) { alert('Preencha consultor e razão social!'); return; } const registro = { consultor, razaoSocial, cnpj: document.getElementById('modalCnpj').value.trim(), cidade: document.getElementById('modalCidade').value.trim(), telefone: document.getElementById('modalTelefone').value.trim(), responsavel: document.getElementById('modalResponsavel').value.trim(), contabilidade: document.getElementById('modalContabilidade').value.trim(), dataEntregue: document.getElementById('modalDataEntregue').value, retorno: document.getElementById('modalRetorno').value, observacao: document.getElementById('modalObservacao').value.trim() }; const response = await fetch(`${API_URL}/adicionar-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ registro }) }); if ((await response.json()).success) { mostrarNotificacao('✅ Adicionado!'); fecharModalNovoRegistro(); carregarPosVendas(); carregarDashboard(); } else alert('❌ Erro'); }
 
-        async function salvarNovoRegistro() {
-            const consultor = document.getElementById('modalConsultor').value;
-            const razaoSocial = document.getElementById('modalRazaoSocial').value.trim();
-            if (!consultor) { alert('⚠️ Selecione um CONSULTOR!'); return; }
-            if (!razaoSocial) { alert('⚠️ A RAZÃO SOCIAL é obrigatória!'); return; }
-            const registro = {
-                consultor: consultor,
-                razaoSocial: razaoSocial,
-                cnpj: document.getElementById('modalCnpj').value.trim(),
-                cidade: document.getElementById('modalCidade').value.trim(),
-                telefone: document.getElementById('modalTelefone').value.trim(),
-                responsavel: document.getElementById('modalResponsavel').value.trim(),
-                contabilidade: document.getElementById('modalContabilidade').value.trim(),
-                dataEntregue: document.getElementById('modalDataEntregue').value,
-                retorno: document.getElementById('modalRetorno').value,
-                observacao: document.getElementById('modalObservacao').value.trim()
-            };
-            const response = await fetch('http://localhost:3000/adicionar-pos-venda', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ registro }) });
-            const data = await response.json();
-            if (data.success) { mostrarNotificacao('✅ Registro adicionado!'); fecharModalNovoRegistro(); carregarPosVendas(); carregarDashboard(); }
-            else alert('❌ Erro ao adicionar');
-        }
-
-        function abrirModalEditarRegistro(index) {
-            indiceEditando = index;
-            const item = dadosPosVenda[index];
-            document.getElementById('editConsultor').value = item.consultor || '';
-            document.getElementById('editRazaoSocial').value = item.razaoSocial || '';
-            document.getElementById('editCnpj').value = item.cnpj || '';
-            document.getElementById('editCidade').value = item.cidade || '';
-            document.getElementById('editTelefone').value = item.telefone || '';
-            document.getElementById('editResponsavel').value = item.responsavel || '';
-            document.getElementById('editContabilidade').value = item.contabilidade || '';
-            document.getElementById('editDataEntregue').value = converterDataParaInput(item.dataEntregue || '');
-            document.getElementById('editRetorno').value = converterDataParaInput(item.retorno || '');
-            document.getElementById('editObservacao').value = item.observacao || '';
-            document.getElementById('modalEditarRegistro').style.display = 'flex';
-        }
+        function abrirModalEditarRegistro(index) { indiceEditando = index; const item = dadosPosVenda[index]; document.getElementById('editConsultor').value = item.consultor || ''; document.getElementById('editRazaoSocial').value = item.razaoSocial || ''; document.getElementById('editCnpj').value = item.cnpj || ''; document.getElementById('editCidade').value = item.cidade || ''; document.getElementById('editTelefone').value = item.telefone || ''; document.getElementById('editResponsavel').value = item.responsavel || ''; document.getElementById('editContabilidade').value = item.contabilidade || ''; document.getElementById('editDataEntregue').value = converterDataParaInput(item.dataEntregue); document.getElementById('editRetorno').value = converterDataParaInput(item.retorno); document.getElementById('editObservacao').value = item.observacao || ''; document.getElementById('modalEditarRegistro').style.display = 'flex'; }
         function fecharModalEditarRegistro() { document.getElementById('modalEditarRegistro').style.display = 'none'; indiceEditando = null; }
+        async function salvarEdicaoRegistro() { const consultor = document.getElementById('editConsultor').value, razaoSocial = document.getElementById('editRazaoSocial').value.trim(); if (!consultor || !razaoSocial) { alert('Preencha consultor e razão social!'); return; } const registro = { consultor, razaoSocial, cnpj: document.getElementById('editCnpj').value.trim(), cidade: document.getElementById('editCidade').value.trim(), telefone: document.getElementById('editTelefone').value.trim(), responsavel: document.getElementById('editResponsavel').value.trim(), contabilidade: document.getElementById('editContabilidade').value.trim(), dataEntregue: document.getElementById('editDataEntregue').value, retorno: document.getElementById('editRetorno').value, observacao: document.getElementById('editObservacao').value.trim() }; const response = await fetch(`${API_URL}/salvar-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ registro, index: indiceEditando }) }); if ((await response.json()).success) { mostrarNotificacao('✅ Atualizado!'); fecharModalEditarRegistro(); carregarPosVendas(); carregarDashboard(); } else alert('❌ Erro'); }
 
-        async function salvarEdicaoRegistro() {
-            const consultor = document.getElementById('editConsultor').value;
-            const razaoSocial = document.getElementById('editRazaoSocial').value.trim();
-            if (!consultor) { alert('⚠️ Selecione um CONSULTOR!'); return; }
-            if (!razaoSocial) { alert('⚠️ A RAZÃO SOCIAL é obrigatória!'); return; }
-            const registro = {
-                consultor: consultor,
-                razaoSocial: razaoSocial,
-                cnpj: document.getElementById('editCnpj').value.trim(),
-                cidade: document.getElementById('editCidade').value.trim(),
-                telefone: document.getElementById('editTelefone').value.trim(),
-                responsavel: document.getElementById('editResponsavel').value.trim(),
-                contabilidade: document.getElementById('editContabilidade').value.trim(),
-                dataEntregue: document.getElementById('editDataEntregue').value,
-                retorno: document.getElementById('editRetorno').value,
-                observacao: document.getElementById('editObservacao').value.trim()
-            };
-            const response = await fetch('http://localhost:3000/salvar-pos-venda', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ registro, index: indiceEditando }) });
-            const data = await response.json();
-            if (data.success) { mostrarNotificacao('✅ Registro atualizado!'); fecharModalEditarRegistro(); carregarPosVendas(); carregarDashboard(); }
-            else alert('❌ Erro ao salvar');
-        }
+        async function carregarPosVendas() { try { const response = await fetch(`${API_URL}/buscar-pos-vendas`); dadosPosVenda = await response.json(); const tbody = document.getElementById('corpoTabelaPosVendas'); if (!dadosPosVenda.length) tbody.innerHTML = '<tr><td colspan="11">Nenhum registro</td>'; else { tbody.innerHTML = ''; dadosPosVenda.forEach((item, idx) => { const row = tbody.insertRow(); row.insertCell(0).innerHTML = item.consultor || '-'; row.insertCell(1).innerHTML = item.razaoSocial || '-'; row.insertCell(2).innerHTML = item.cnpj || '-'; row.insertCell(3).innerHTML = item.cidade || '-'; row.insertCell(4).innerHTML = item.telefone || '-'; row.insertCell(5).innerHTML = item.responsavel || '-'; row.insertCell(6).innerHTML = item.contabilidade || '-'; row.insertCell(7).innerHTML = item.dataEntregue ? item.dataEntregue.split('-').reverse().join('/') : '-'; row.insertCell(8).innerHTML = item.retorno ? item.retorno.split('-').reverse().join('/') : '-'; row.insertCell(9).innerHTML = item.observacao || '-'; const actionCell = row.insertCell(10); actionCell.className = 'acoes-botoes'; actionCell.innerHTML = `<button onclick="abrirModalEditarRegistro(${idx})" class="btn-editar">✏️</button><button onclick="excluirRegistroPosVenda(${idx})" class="btn-excluir">🗑️</button>`; }); } } catch(e) { console.error(e); document.getElementById('corpoTabelaPosVendas').innerHTML = '<table><td colspan="11">Erro</td>'; } }
 
-        async function carregarPosVendas() {
-            try {
-                const response = await fetch('http://localhost:3000/buscar-pos-vendas');
-                dadosPosVenda = await response.json();
-                const tbody = document.getElementById('corpoTabelaPosVendas');
-                if (!dadosPosVenda.length) {
-                    tbody.innerHTML = '<tr><td colspan="11">Nenhum registro encontrado. Clique em "Novo Registro" para adicionar.</td>';
-                } else {
-                    tbody.innerHTML = '';
-                    dadosPosVenda.forEach((item, idx) => {
-                        const row = tbody.insertRow();
-                        row.insertCell(0).innerHTML = item.consultor || '-';
-                        row.insertCell(1).innerHTML = item.razaoSocial || '-';
-                        row.insertCell(2).innerHTML = item.cnpj || '-';
-                        row.insertCell(3).innerHTML = item.cidade || '-';
-                        row.insertCell(4).innerHTML = item.telefone || '-';
-                        row.insertCell(5).innerHTML = item.responsavel || '-';
-                        row.insertCell(6).innerHTML = item.contabilidade || '-';
-                        row.insertCell(7).innerHTML = formatarData(item.dataEntregue || '-');
-                        row.insertCell(8).innerHTML = formatarData(item.retorno || '-');
-                        row.insertCell(9).innerHTML = item.observacao || '-';
-                        const actionCell = row.insertCell(10);
-                        actionCell.className = 'acoes-botoes';
-                        actionCell.innerHTML = `<button onclick="abrirModalEditarRegistro(${idx})" class="btn-editar" title="Editar">✏️</button><button onclick="excluirRegistroPosVenda(${idx})" class="btn-excluir" title="Excluir">🗑️</button>`;
-                    });
-                }
-            } catch(e) { 
-                console.error(e); 
-                document.getElementById('corpoTabelaPosVendas').innerHTML = '<tr><td colspan="11">Erro ao carregar dados</td>';
-            }
-        }
+        async function excluirRegistroPosVenda(idx) { if (confirm('Excluir?')) { const response = await fetch(`${API_URL}/excluir-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ index: idx }) }); if ((await response.json()).success) { mostrarNotificacao('✅ Excluído!'); carregarPosVendas(); carregarDashboard(); } else alert('❌ Erro'); } }
 
-        async function excluirRegistroPosVenda(idx) {
-            if (confirm('Tem certeza que deseja excluir este registro?')) {
-                const response = await fetch('http://localhost:3000/excluir-pos-venda', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ index: idx }) });
-                if ((await response.json()).success) { mostrarNotificacao('✅ Registro excluído!'); carregarPosVendas(); carregarDashboard(); }
-                else alert('❌ Erro ao excluir');
-            }
-        }
+        function baixarModeloExcel() { const modelo = [{ 'CONSULTOR':'','RAZAO SOCIAL':'','CNPJ':'','CIDADE':'','TELEFONE':'','RESPONSAVEL':'','CONTABILIDADE':'','DATA ENTREGUE':'','RETORNO':'','OBSERVAÇÃO':'' }]; const ws = XLSX.utils.json_to_sheet(modelo); ws['!cols'] = [{wch:20},{wch:30},{wch:18},{wch:20},{wch:15},{wch:20},{wch:25},{wch:15},{wch:15},{wch:40}]; const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'MODELO'); XLSX.writeFile(wb, 'modelo_pos_vendas.xlsx'); mostrarNotificacao('📄 Modelo baixado!'); }
 
-        function baixarModeloExcel() {
-            const modelo = [{ 
-                'CONSULTOR': '',
-                'RAZAO SOCIAL': '',
-                'CNPJ': '',
-                'CIDADE': '',
-                'TELEFONE': '',
-                'RESPONSAVEL': '',
-                'CONTABILIDADE': '',
-                'DATA ENTREGUE': '',
-                'RETORNO': '',
-                'OBSERVAÇÃO': ''
-            }];
-            const ws = XLSX.utils.json_to_sheet(modelo);
-            ws['!cols'] = [{wch:20},{wch:30},{wch:18},{wch:20},{wch:15},{wch:20},{wch:25},{wch:15},{wch:15},{wch:40}];
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'MODELO_POS_VENDAS');
-            XLSX.writeFile(wb, 'modelo_pos_vendas.xlsx');
-            mostrarNotificacao('📄 Modelo baixado!');
-        }
+        function importarExcelPosVenda() { fecharDropdown(); const input = document.createElement('input'); input.type = 'file'; input.accept = '.xlsx, .xls'; input.onchange = async function(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = async function(e) { try { const data = new Uint8Array(e.target.result); const workbook = XLSX.read(data, { type: 'array' }); const sheet = workbook.Sheets[workbook.SheetNames[0]]; const jsonData = XLSX.utils.sheet_to_json(sheet); let importados = 0; for (const row of jsonData) { const consultor = row['CONSULTOR'] || ''; const razaoSocial = row['RAZAO SOCIAL'] || ''; if (consultor && razaoSocial && razaoSocial.trim()) { await fetch(`${API_URL}/adicionar-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ registro: { consultor, razaoSocial, cnpj: row['CNPJ']||'', cidade: row['CIDADE']||'', telefone: row['TELEFONE']||'', responsavel: row['RESPONSAVEL']||'', contabilidade: row['CONTABILIDADE']||'', dataEntregue: row['DATA ENTREGUE']||'', retorno: row['RETORNO']||'', observacao: row['OBSERVAÇÃO']||'' } }) }); importados++; } } mostrarNotificacao(`✅ ${importados} importados!`); carregarPosVendas(); carregarDashboard(); } catch(e) { console.error(e); alert('Erro ao importar'); } }; reader.readAsArrayBuffer(file); }; input.click(); }
 
-        function importarExcelPosVenda() {
-            fecharDropdown();
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.xlsx, .xls';
-            input.onchange = async function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = async function(e) {
-                    try {
-                        const data = new Uint8Array(e.target.result);
-                        const workbook = XLSX.read(data, { type: 'array' });
-                        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const jsonData = XLSX.utils.sheet_to_json(sheet);
-                        let importados = 0;
-                        for (const row of jsonData) {
-                            const consultor = row['CONSULTOR'] || '';
-                            const razaoSocial = row['RAZAO SOCIAL'] || row['RAZAO_SOCIAL'] || '';
-                            if (consultor && razaoSocial && razaoSocial.trim()) {
-                                let dataEntregue = row['DATA ENTREGUE'] || '';
-                                let retorno = row['RETORNO'] || '';
-                                if (dataEntregue && dataEntregue.includes('/')) {
-                                    const partes = dataEntregue.split('/');
-                                    dataEntregue = `${partes[2]}-${partes[1]}-${partes[0]}`;
-                                }
-                                if (retorno && retorno.includes('/')) {
-                                    const partes = retorno.split('/');
-                                    retorno = `${partes[2]}-${partes[1]}-${partes[0]}`;
-                                }
-                                await fetch('http://localhost:3000/adicionar-pos-venda', { 
-                                    method: 'POST', 
-                                    headers: { 'Content-Type': 'application/json' }, 
-                                    body: JSON.stringify({ registro: { 
-                                        consultor: consultor,
-                                        razaoSocial: razaoSocial, 
-                                        cnpj: row['CNPJ']||'', 
-                                        cidade: row['CIDADE']||'', 
-                                        telefone: row['TELEFONE']||'', 
-                                        responsavel: row['RESPONSAVEL']||'', 
-                                        contabilidade: row['CONTABILIDADE']||'', 
-                                        dataEntregue: dataEntregue, 
-                                        retorno: retorno, 
-                                        observacao: row['OBSERVAÇÃO']||'' 
-                                    } }) 
-                                });
-                                importados++;
-                            }
-                        }
-                        mostrarNotificacao(`✅ ${importados} registros importados!`);
-                        carregarPosVendas();
-                        carregarDashboard();
-                    } catch(e) { console.error(e); alert('Erro ao importar'); }
-                };
-                reader.readAsArrayBuffer(file);
-            };
-            input.click();
-        }
+        function abrirModalEditarResposta(index) { indiceEditandoResposta = index; const item = dadosAtuais[index]; document.getElementById('editData').value = item.dataHora || ''; document.getElementById('editConsultorResposta').value = item.vendedor || ''; document.getElementById('editCnpjResposta').value = item.cnpj || ''; document.getElementById('editEmpresaResposta').value = item.empresa || ''; document.getElementById('editAet').value = item.pergunta9 || 'NÃO'; document.getElementById('editNr06').value = item.pergunta7 || 'NÃO'; document.getElementById('editCipa').value = item.pergunta8 || 'NÃO'; document.getElementById('editPeriodico').value = item.pergunta3 || 'NÃO'; document.getElementById('editEpis').value = item.pergunta4 || 'NÃO'; document.getElementById('editNotaVisita').value = item.notaVisita || ''; document.getElementById('editVendedor').value = item.vendedorNome || ''; document.getElementById('editVendido').value = item.vendido || ''; document.getElementById('editObsResposta').value = item.observacoes || ''; document.getElementById('modalEditarResposta').style.display = 'flex'; }
+        function fecharModalEditarResposta() { document.getElementById('modalEditarResposta').style.display = 'none'; indiceEditandoResposta = null; }
+        async function salvarEdicaoResposta() { if (indiceEditandoResposta === null) return; const item = dadosAtuais[indiceEditandoResposta]; item.vendedor = document.getElementById('editConsultorResposta').value; item.cnpj = document.getElementById('editCnpjResposta').value; item.empresa = document.getElementById('editEmpresaResposta').value; item.pergunta9 = document.getElementById('editAet').value; item.pergunta7 = document.getElementById('editNr06').value; item.pergunta8 = document.getElementById('editCipa').value; item.pergunta3 = document.getElementById('editPeriodico').value; item.pergunta4 = document.getElementById('editEpis').value; item.notaVisita = document.getElementById('editNotaVisita').value; item.vendedorNome = document.getElementById('editVendedor').value; item.vendido = document.getElementById('editVendido').value; item.observacoes = document.getElementById('editObsResposta').value; const response = await fetch(`${API_URL}/salvar-todos-dados`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dados: dadosAtuais }) }); if ((await response.json()).success) { mostrarNotificacao('✅ Atualizado!'); fecharModalEditarResposta(); carregarDados(); carregarDashboard(); } else alert('❌ Erro'); }
+        async function excluirResposta(index) { if (confirm('Excluir resposta?')) { dadosAtuais.splice(index, 1); const response = await fetch(`${API_URL}/salvar-todos-dados`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dados: dadosAtuais }) }); if ((await response.json()).success) { mostrarNotificacao('✅ Excluído!'); carregarDados(); carregarDashboard(); } else alert('❌ Erro'); } }
 
-        // ==================== FUNÇÕES RESULTADO ====================
+        async function carregarDados() { try { const response = await fetch(`${API_URL}/buscar-respostas`); dadosAtuais = await response.json(); const tbody = document.getElementById('corpoTabela'); if (!dadosAtuais.length) tbody.innerHTML = '<tr><td colspan="15">Nenhuma resposta</td>'; else { tbody.innerHTML = ''; dadosAtuais.forEach((d, idx) => { const row = tbody.insertRow(); row.insertCell(0).innerHTML = d.dataHora || '-'; row.insertCell(1).innerHTML = d.vendedor || '-'; row.insertCell(2).innerHTML = d.cnpj || '-'; row.insertCell(3).innerHTML = d.empresa || '-'; row.insertCell(4).innerHTML = 'SIM'; row.insertCell(5).innerHTML = d.pergunta9 || '-'; row.insertCell(6).innerHTML = d.pergunta7 || '-'; row.insertCell(7).innerHTML = d.pergunta8 || '-'; row.insertCell(8).innerHTML = d.pergunta3 || '-'; row.insertCell(9).innerHTML = d.pergunta4 || '-'; row.insertCell(10).innerHTML = d.notaVisita || '-'; row.insertCell(11).innerHTML = d.vendedorNome || '-'; row.insertCell(12).innerHTML = d.vendido || '-'; row.insertCell(13).innerHTML = d.observacoes || '-'; const actionCell = row.insertCell(14); actionCell.className = 'acoes-botoes'; actionCell.innerHTML = `<button onclick="abrirModalEditarResposta(${idx})" class="btn-editar">✏️</button><button onclick="excluirResposta(${idx})" class="btn-excluir">🗑️</button>`; }); } window.dadosExportacao = dadosAtuais; await carregarUsuarios(); await carregarConsultores(); } catch(e) { console.error(e); document.getElementById('corpoTabela').innerHTML = '<tr><td colspan="15">Erro</td>'; } }
+
+        function exportarExcel() { if (!dadosAtuais?.length) { alert('Sem dados'); return; } const dadosExcel = dadosAtuais.map(d => ({ 'DATA': d.dataHora || '', 'CONSULTOR': d.vendedor || '', 'CNPJ': d.cnpj || '', 'EMPRESA': d.empresa || '', 'POS VENDA': 'SIM', 'AET': d.pergunta9 || '', 'NR 06': d.pergunta7 || '', 'CIPA': d.pergunta8 || '', 'PERIODICO': d.pergunta3 || '', 'EPIS': d.pergunta4 || '', 'NOTA VISITA': d.notaVisita || '', 'VENDEDOR': d.vendedorNome || '', 'VENDIDO': d.vendido || '', 'OBS': d.observacoes || '' })); const ws = XLSX.utils.json_to_sheet(dadosExcel); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'RESULTADOS'); XLSX.writeFile(wb, `RESULTADOS_POS_VENDAS_${new Date().toISOString().split('T')[0]}.xlsx`); mostrarNotificacao('✅ Exportado!'); }
+
+        async function carregarUsuarios() { const response = await fetch(`${API_URL}/buscar-usuarios`); const usuarios = await response.json(); const corpo = document.getElementById('corpoUsuarios'); if (!usuarios.length) corpo.innerHTML = '<tr><td colspan="5">Nenhum</td>'; else corpo.innerHTML = usuarios.map(u => `<tr><td>${u.usuario}</td><td>${u.nome}</td><td>${u.tipo==='admin'?'👑 Admin':'📝 Pós Vendas'}</td><td>•••••• <button onclick="alert('Senha: ${u.senha}')" class="btn-ver-senha">👁️</button></td><td><button onclick="abrirModalAlterarSenha('${u.usuario}','${u.nome}')" class="btn-alterar-senha">🔑</button> <button onclick="excluirUsuario('${u.usuario}')" class="btn-excluir">🗑️</button></td></tr>`).join(''); }
+
+        function abrirModalAlterarSenha(usuario, nome) { const nova = prompt(`Nova senha para ${nome}:`); if (nova && nova.trim()) alterarSenha(usuario, nova); }
+        async function alterarSenha(u, s) { const r = await fetch(`${API_URL}/alterar-senha`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u, novaSenha:s})}); if((await r.json()).success){ alert('✅ Senha alterada!'); carregarUsuarios(); } else alert('❌ Erro'); }
+        async function adicionarUsuario() { const u=document.getElementById('novoUsuario').value.trim(), n=document.getElementById('novoNome').value.trim(), s=document.getElementById('novaSenha').value.trim(), t=document.getElementById('novoTipo').value; if(!u||!n||!s){alert('Preencha tudo!');return;} const r=await fetch(`${API_URL}/adicionar-usuario`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u, nome:n, senha:s, tipo:t})}); const d=await r.json(); if(d.success){alert('✅ Usuário adicionado!'); document.getElementById('novoUsuario').value=''; document.getElementById('novoNome').value=''; document.getElementById('novaSenha').value=''; carregarUsuarios(); carregarConsultores(); carregarDashboard();} else alert('❌ '+d.message); }
+        async function excluirUsuario(u) { if(u==='admin'){alert('Não exclui admin');return;} if(confirm(`Excluir ${u}?`)){const r=await fetch(`${API_URL}/excluir-usuario`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u})}); if((await r.json()).success){alert('✅ Excluído!');carregarUsuarios(); carregarConsultores(); carregarDashboard();} else alert('❌ Erro');} }
         
-        function abrirModalEditarResposta(index) {
-            indiceEditandoResposta = index;
-            const item = dadosAtuais[index];
-            document.getElementById('editData').value = item.dataHora || '';
-            document.getElementById('editConsultorResposta').value = item.vendedor || '';
-            document.getElementById('editCnpjResposta').value = item.cnpj || '';
-            document.getElementById('editEmpresaResposta').value = item.empresa || '';
-            document.getElementById('editAet').value = item.pergunta9 || 'NÃO';
-            document.getElementById('editNr06').value = item.pergunta7 || 'NÃO';
-            document.getElementById('editCipa').value = item.pergunta8 || 'NÃO';
-            document.getElementById('editPeriodico').value = item.pergunta3 || 'NÃO';
-            document.getElementById('editEpis').value = item.pergunta4 || 'NÃO';
-            document.getElementById('editNotaVisita').value = item.notaVisita || '';
-            document.getElementById('editVendedor').value = item.vendedorNome || '';
-            document.getElementById('editVendido').value = item.vendido || '';
-            document.getElementById('editObsResposta').value = item.observacoes || '';
-            document.getElementById('modalEditarResposta').style.display = 'flex';
-        }
-
-        function fecharModalEditarResposta() {
-            document.getElementById('modalEditarResposta').style.display = 'none';
-            indiceEditandoResposta = null;
-        }
-
-        async function salvarEdicaoResposta() {
-            if (indiceEditandoResposta === null) return;
-            
-            const item = dadosAtuais[indiceEditandoResposta];
-            item.vendedor = document.getElementById('editConsultorResposta').value;
-            item.cnpj = document.getElementById('editCnpjResposta').value;
-            item.empresa = document.getElementById('editEmpresaResposta').value;
-            item.pergunta9 = document.getElementById('editAet').value;
-            item.pergunta7 = document.getElementById('editNr06').value;
-            item.pergunta8 = document.getElementById('editCipa').value;
-            item.pergunta3 = document.getElementById('editPeriodico').value;
-            item.pergunta4 = document.getElementById('editEpis').value;
-            item.notaVisita = document.getElementById('editNotaVisita').value;
-            item.vendedorNome = document.getElementById('editVendedor').value;
-            item.vendido = document.getElementById('editVendido').value;
-            item.observacoes = document.getElementById('editObsResposta').value;
-            
-            const response = await fetch('http://localhost:3000/salvar-todos-dados', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ dados: dadosAtuais })
-            });
-            
-            const data = await response.json();
-            if (data.success) {
-                mostrarNotificacao('✅ Resposta atualizada com sucesso!');
-                fecharModalEditarResposta();
-                carregarDados();
-                carregarDashboard();
-            } else {
-                alert('❌ Erro ao salvar alterações');
-            }
-        }
-
-        async function excluirResposta(index) {
-            if (confirm('Tem certeza que deseja excluir esta resposta?')) {
-                dadosAtuais.splice(index, 1);
-                const response = await fetch('http://localhost:3000/salvar-todos-dados', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ dados: dadosAtuais })
-                });
-                const data = await response.json();
-                if (data.success) {
-                    mostrarNotificacao('✅ Resposta excluída com sucesso!');
-                    carregarDados();
-                    carregarDashboard();
-                } else {
-                    alert('❌ Erro ao excluir');
-                }
-            }
-        }
-
-        async function carregarDados() {
-            try {
-                const response = await fetch('http://localhost:3000/buscar-respostas');
-                dadosAtuais = await response.json();
-                console.log('Dados carregados para resultado:', dadosAtuais.length);
-                
-                const tbody = document.getElementById('corpoTabela');
-                if (!dadosAtuais.length) {
-                    tbody.innerHTML = '<tr><td colspan="15">Nenhuma resposta encontrada</td>';
-                } else {
-                    tbody.innerHTML = '';
-                    dadosAtuais.forEach((d, idx) => {
-                        const row = tbody.insertRow();
-                        row.insertCell(0).innerHTML = d.dataHora || '-';
-                        row.insertCell(1).innerHTML = d.vendedor || '-';
-                        row.insertCell(2).innerHTML = d.cnpj || '-';
-                        row.insertCell(3).innerHTML = d.empresa || '-';
-                        row.insertCell(4).innerHTML = 'SIM';
-                        row.insertCell(5).innerHTML = d.pergunta9 || '-';
-                        row.insertCell(6).innerHTML = d.pergunta7 || '-';
-                        row.insertCell(7).innerHTML = d.pergunta8 || '-';
-                        row.insertCell(8).innerHTML = d.pergunta3 || '-';
-                        row.insertCell(9).innerHTML = d.pergunta4 || '-';
-                        row.insertCell(10).innerHTML = d.notaVisita || '-';
-                        row.insertCell(11).innerHTML = d.vendedorNome || '-';
-                        row.insertCell(12).innerHTML = d.vendido || '-';
-                        row.insertCell(13).innerHTML = d.observacoes || '-';
-                        const actionCell = row.insertCell(14);
-                        actionCell.className = 'acoes-botoes';
-                        actionCell.innerHTML = `<button onclick="abrirModalEditarResposta(${idx})" class="btn-editar" title="Editar">✏️</button><button onclick="excluirResposta(${idx})" class="btn-excluir" title="Excluir">🗑️</button>`;
-                    });
-                }
-                
-                window.dadosExportacao = dadosAtuais;
-                await carregarUsuarios();
-                await carregarConsultores();
-            } catch (error) {
-                console.error('Erro ao carregar dados:', error);
-                document.getElementById('corpoTabela').innerHTML = '<tr><td colspan="15">Erro ao carregar dados</td>';
-            }
-        }
-
-        function exportarExcel() {
-            if (!dadosAtuais || dadosAtuais.length === 0) {
-                alert('Não há dados para exportar!');
-                return;
-            }
-            
-            console.log('Exportando dados:', dadosAtuais.length);
-            
-            const dadosExcel = dadosAtuais.map(d => ({
-                'DATA': d.dataHora || '',
-                'CONSULTOR': d.vendedor || '',
-                'CNPJ': d.cnpj || '',
-                'EMPRESA': d.empresa || '',
-                'POS VENDA': 'SIM',
-                'AET': d.pergunta9 || '',
-                'NR 06': d.pergunta7 || '',
-                'CIPA': d.pergunta8 || '',
-                'PERIODICO': d.pergunta3 || '',
-                'EPIS': d.pergunta4 || '',
-                'NOTA VISITA': d.notaVisita || '',
-                'VENDEDOR': d.vendedorNome || '',
-                'VENDIDO': d.vendido || '',
-                'OBS': d.observacoes || ''
-            }));
-            
-            const ws = XLSX.utils.json_to_sheet(dadosExcel);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'RESULTADOS');
-            
-            const dataAtual = new Date().toISOString().split('T')[0];
-            XLSX.writeFile(wb, `RESULTADOS_POS_VENDAS_${dataAtual}.xlsx`);
-            
-            mostrarNotificacao('✅ Planilha exportada com sucesso!');
-        }
-
-        async function carregarUsuarios() {
-            const response = await fetch('http://localhost:3000/buscar-usuarios');
-            const usuarios = await response.json();
-            const corpo = document.getElementById('corpoUsuarios');
-            if (!usuarios.length) corpo.innerHTML = '<tr><td colspan="5">Nenhum usuário</td>';
-            else corpo.innerHTML = usuarios.map(u => `
-                <tr>
-                    <td>${u.usuario}</td>
-                    <td>${u.nome}</td>
-                    <td>${u.tipo==='admin'?'👑 Administrador':'📝 Pós Vendas'}</td>
-                    <td>•••••• <button onclick="alert('Senha: ${u.senha}')" class="btn-ver-senha">👁️</button></td>
-                    <td><button onclick="abrirModalAlterarSenha('${u.usuario}','${u.nome}')" class="btn-alterar-senha">🔑 Alterar</button> <button onclick="excluirUsuario('${u.usuario}')" class="btn-excluir">🗑️</button></td>
-                 `
-            ).join('');
-        }
-
-        function abrirModalAlterarSenha(usuario, nome) { const nova = prompt(`Nova senha para ${nome} (${usuario}):`); if (nova && nova.trim()) alterarSenha(usuario, nova); else if (nova==='') alert('Senha não pode ficar vazia'); }
-        async function alterarSenha(u, s) { const r = await fetch('http://localhost:3000/alterar-senha',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u, novaSenha:s})}); if((await r.json()).success){ alert('✅ Senha alterada!'); carregarUsuarios(); } else alert('❌ Erro'); }
-        async function adicionarUsuario() { const u=document.getElementById('novoUsuario').value.trim(), n=document.getElementById('novoNome').value.trim(), s=document.getElementById('novaSenha').value.trim(), t=document.getElementById('novoTipo').value; if(!u||!n||!s){alert('Preencha tudo!');return;} const r=await fetch('http://localhost:3000/adicionar-usuario',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u, nome:n, senha:s, tipo:t})}); const d=await r.json(); if(d.success){alert('✅ Usuário adicionado!'); document.getElementById('novoUsuario').value=''; document.getElementById('novoNome').value=''; document.getElementById('novaSenha').value=''; carregarUsuarios(); carregarConsultores(); carregarDashboard();} else alert('❌ '+d.message); }
-        async function excluirUsuario(u) { if(u==='admin'){alert('Não pode excluir admin principal');return;} if(confirm(`Excluir ${u}?`)){const r=await fetch('http://localhost:3000/excluir-usuario',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u})}); if((await r.json()).success){alert('✅ Excluído!');carregarUsuarios(); carregarConsultores(); carregarDashboard();} else alert('❌ Erro');} }
-        
-        window.dadosExportacao = []; 
-        carregarDados(); 
-        carregarPosVendas();
-        carregarDashboard();
+        window.dadosExportacao = []; carregarDados(); carregarPosVendas(); carregarDashboard();
     </script>
 </body>
 </html>
