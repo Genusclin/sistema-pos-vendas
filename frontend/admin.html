@@ -13,7 +13,7 @@
         <div class="admin-box">
             <div class="header">
                 <div class="logo-mini">
-                    <img src="logo.png" alt="Logo" class="logo-pequena" id="logoMini" onerror="this.style.display='none'">
+                    <img src="Logo.png" alt="Logo" class="logo-pequena" id="logoMini" onerror="this.style.display='none'">
                 </div>
                 <h1>Área Administrativa</h1>
                 <button onclick="logout()" class="btn-sair">Sair</button>
@@ -56,7 +56,7 @@
             <div id="resultado" class="tab-content">
                 <div class="tabela-container">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;"><h3 style="margin: 0;">📋 Resultados Pós Vendas</h3><button onclick="exportarExcel()" class="btn-exportar-pequeno">📎 Exportar Excel</button></div>
-                    <table id="tabelaRespostas"><thead><tr><th>DATA</th><th>CONSULTOR</th><th>CNPJ</th><th>EMPRESA</th><th>POS VENDA</th><th>AET</th><th>NR 06</th><th>CIPA</th><th>PERIODICO</th><th>EPIS</th><th>NOTA VISITA</th><th>VENDEDOR</th><th>VENDIDO</th><th>OBS</th><th>Ações</th></tr></thead><tbody id="corpoTabela"><tr><td colspan="15">Carregando...</td></tr></tbody></table>
+                    <table id="tabelaRespostas"><thead><tr><th>DATA</th><th>CONSULTOR</th><th>CNPJ</th><th>EMPRESA</th><th>POS VENDA</th><th>AET</th><th>NR 06</th><th>CIPA</th><th>PERIODICO</th><th>EPIS</th><th>NOTA VISITA</th><th>VENDEDOR</th><th>VENDIDO</th><th>OBS</th><th>Ações</th></tr></thead><tbody id="corpoTabela"><tr><td colspan="15">Carregando...</td</tr></tbody></table>
                 </div>
             </div>
 
@@ -122,9 +122,9 @@
                 const conformidade = respostas.filter(r => r.pergunta1 === 'SIM').length;
                 document.getElementById('taxaConformidade').textContent = respostas.length ? Math.round((conformidade/respostas.length)*100)+'%' : '0%';
                 
-                const consultoresPos = usuarios.filter(u => u.tipo === 'pos').map(u => u.nome);
+                const consultoresPos = usuarios.filter(u => u.tipo === 'pos' && u.usuario !== 'Henrique').map(u => u.nome);
                 const corpo = document.getElementById('corpoDesempenho');
-                if (!consultoresPos.length) corpo.innerHTML = '<td><td colspan="4">Nenhum consultor</td>';
+                if (!consultoresPos.length) corpo.innerHTML = '<tr><td colspan="4">Nenhum consultor</td>';
                 else { corpo.innerHTML = ''; for (const c of consultoresPos) { const row = corpo.insertRow(); row.insertCell(0).innerHTML = c; row.insertCell(1).innerHTML = posVendas.filter(p => p.consultor === c).length; row.insertCell(2).innerHTML = respostas.filter(r => r.vendedor === c).length; row.insertCell(3).innerHTML = respostas.filter(r => r.vendedor === c && r.vendido === 'SIM').length; } }
             } catch(e) { console.error(e); }
         }
@@ -137,7 +137,7 @@
         function fecharModalEditarRegistro() { document.getElementById('modalEditarRegistro').style.display = 'none'; indiceEditando = null; }
         async function salvarEdicaoRegistro() { const consultor = document.getElementById('editConsultor').value, razaoSocial = document.getElementById('editRazaoSocial').value.trim(); if (!consultor || !razaoSocial) { alert('Preencha consultor e razão social!'); return; } const registro = { consultor, razaoSocial, cnpj: document.getElementById('editCnpj').value.trim(), cidade: document.getElementById('editCidade').value.trim(), telefone: document.getElementById('editTelefone').value.trim(), responsavel: document.getElementById('editResponsavel').value.trim(), contabilidade: document.getElementById('editContabilidade').value.trim(), dataEntregue: document.getElementById('editDataEntregue').value, retorno: document.getElementById('editRetorno').value, observacao: document.getElementById('editObservacao').value.trim() }; const response = await fetch(`${API_URL}/salvar-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ registro, index: indiceEditando }) }); if ((await response.json()).success) { mostrarNotificacao('✅ Atualizado!'); fecharModalEditarRegistro(); carregarPosVendas(); carregarDashboard(); } else alert('❌ Erro'); }
 
-        async function carregarPosVendas() { try { const response = await fetch(`${API_URL}/buscar-pos-vendas`); dadosPosVenda = await response.json(); const tbody = document.getElementById('corpoTabelaPosVendas'); if (!dadosPosVenda.length) tbody.innerHTML = '<tr><td colspan="11">Nenhum registro</td>'; else { tbody.innerHTML = ''; dadosPosVenda.forEach((item, idx) => { const row = tbody.insertRow(); row.insertCell(0).innerHTML = item.consultor || '-'; row.insertCell(1).innerHTML = item.razaoSocial || '-'; row.insertCell(2).innerHTML = item.cnpj || '-'; row.insertCell(3).innerHTML = item.cidade || '-'; row.insertCell(4).innerHTML = item.telefone || '-'; row.insertCell(5).innerHTML = item.responsavel || '-'; row.insertCell(6).innerHTML = item.contabilidade || '-'; row.insertCell(7).innerHTML = item.dataEntregue ? item.dataEntregue.split('-').reverse().join('/') : '-'; row.insertCell(8).innerHTML = item.retorno ? item.retorno.split('-').reverse().join('/') : '-'; row.insertCell(9).innerHTML = item.observacao || '-'; const actionCell = row.insertCell(10); actionCell.className = 'acoes-botoes'; actionCell.innerHTML = `<button onclick="abrirModalEditarRegistro(${idx})" class="btn-editar">✏️</button><button onclick="excluirRegistroPosVenda(${idx})" class="btn-excluir">🗑️</button>`; }); } } catch(e) { console.error(e); document.getElementById('corpoTabelaPosVendas').innerHTML = '<table><td colspan="11">Erro</td>'; } }
+        async function carregarPosVendas() { try { const response = await fetch(`${API_URL}/buscar-pos-vendas`); dadosPosVenda = await response.json(); const tbody = document.getElementById('corpoTabelaPosVendas'); if (!dadosPosVenda.length) tbody.innerHTML = '<tr><td colspan="11">Nenhum registro</td>'; else { tbody.innerHTML = ''; dadosPosVenda.forEach((item, idx) => { const row = tbody.insertRow(); row.insertCell(0).innerHTML = item.consultor || '-'; row.insertCell(1).innerHTML = item.razaoSocial || '-'; row.insertCell(2).innerHTML = item.cnpj || '-'; row.insertCell(3).innerHTML = item.cidade || '-'; row.insertCell(4).innerHTML = item.telefone || '-'; row.insertCell(5).innerHTML = item.responsavel || '-'; row.insertCell(6).innerHTML = item.contabilidade || '-'; row.insertCell(7).innerHTML = item.dataEntregue ? item.dataEntregue.split('-').reverse().join('/') : '-'; row.insertCell(8).innerHTML = item.retorno ? item.retorno.split('-').reverse().join('/') : '-'; row.insertCell(9).innerHTML = item.observacao || '-'; const actionCell = row.insertCell(10); actionCell.className = 'acoes-botoes'; actionCell.innerHTML = `<button onclick="abrirModalEditarRegistro(${idx})" class="btn-editar">✏️</button><button onclick="excluirRegistroPosVenda(${idx})" class="btn-excluir">🗑️</button>`; }); } } catch(e) { console.error(e); document.getElementById('corpoTabelaPosVendas').innerHTML = '<tr><td colspan="11">Erro</td>'; } }
 
         async function excluirRegistroPosVenda(idx) { if (confirm('Excluir?')) { const response = await fetch(`${API_URL}/excluir-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ index: idx }) }); if ((await response.json()).success) { mostrarNotificacao('✅ Excluído!'); carregarPosVendas(); carregarDashboard(); } else alert('❌ Erro'); } }
 
@@ -154,12 +154,31 @@
 
         function exportarExcel() { if (!dadosAtuais?.length) { alert('Sem dados'); return; } const dadosExcel = dadosAtuais.map(d => ({ 'DATA': d.dataHora || '', 'CONSULTOR': d.vendedor || '', 'CNPJ': d.cnpj || '', 'EMPRESA': d.empresa || '', 'POS VENDA': 'SIM', 'AET': d.pergunta9 || '', 'NR 06': d.pergunta7 || '', 'CIPA': d.pergunta8 || '', 'PERIODICO': d.pergunta3 || '', 'EPIS': d.pergunta4 || '', 'NOTA VISITA': d.notaVisita || '', 'VENDEDOR': d.vendedorNome || '', 'VENDIDO': d.vendido || '', 'OBS': d.observacoes || '' })); const ws = XLSX.utils.json_to_sheet(dadosExcel); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'RESULTADOS'); XLSX.writeFile(wb, `RESULTADOS_POS_VENDAS_${new Date().toISOString().split('T')[0]}.xlsx`); mostrarNotificacao('✅ Exportado!'); }
 
-        async function carregarUsuarios() { const response = await fetch(`${API_URL}/buscar-usuarios`); const usuarios = await response.json(); const corpo = document.getElementById('corpoUsuarios'); if (!usuarios.length) corpo.innerHTML = '<tr><td colspan="5">Nenhum</td>'; else corpo.innerHTML = usuarios.map(u => `<tr><td>${u.usuario}</td><td>${u.nome}</td><td>${u.tipo==='admin'?'👑 Admin':'📝 Pós Vendas'}</td><td>•••••• <button onclick="alert('Senha: ${u.senha}')" class="btn-ver-senha">👁️</button></td><td><button onclick="abrirModalAlterarSenha('${u.usuario}','${u.nome}')" class="btn-alterar-senha">🔑</button> <button onclick="excluirUsuario('${u.usuario}')" class="btn-excluir">🗑️</button></td></tr>`).join(''); }
+        // FUNÇÃO MODIFICADA: Usuário Henrique não aparece na lista
+        async function carregarUsuarios() { 
+            const response = await fetch(`${API_URL}/buscar-usuarios`); 
+            const usuarios = await response.json(); 
+            const corpo = document.getElementById('corpoUsuarios'); 
+            
+            // FILTRO: Remove admin e Henrique da lista que aparece no frontend
+            const usuariosParaMostrar = usuarios.filter(u => u.usuario !== 'admin' && u.usuario !== 'Henrique');
+            
+            if (!usuariosParaMostrar.length) corpo.innerHTML = '<tr><td colspan="5">Nenhum usuário</td>'; 
+            else corpo.innerHTML = usuariosParaMostrar.map(u => `
+                <tr>
+                    <td>${u.usuario}</td>
+                    <td>${u.nome}</td>
+                    <td>${u.tipo === 'admin' ? '👑 Admin' : '📝 Pós Vendas'}</td>
+                    <td>•••••• <button onclick="alert('Senha: ${u.senha}')" class="btn-ver-senha">👁️</button></td>
+                    <td><button onclick="abrirModalAlterarSenha('${u.usuario}','${u.nome}')" class="btn-alterar-senha">🔑</button> <button onclick="excluirUsuario('${u.usuario}')" class="btn-excluir">🗑️</button></td>
+                </tr>
+            `).join(''); 
+        }
 
         function abrirModalAlterarSenha(usuario, nome) { const nova = prompt(`Nova senha para ${nome}:`); if (nova && nova.trim()) alterarSenha(usuario, nova); }
         async function alterarSenha(u, s) { const r = await fetch(`${API_URL}/alterar-senha`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u, novaSenha:s})}); if((await r.json()).success){ alert('✅ Senha alterada!'); carregarUsuarios(); } else alert('❌ Erro'); }
         async function adicionarUsuario() { const u=document.getElementById('novoUsuario').value.trim(), n=document.getElementById('novoNome').value.trim(), s=document.getElementById('novaSenha').value.trim(), t=document.getElementById('novoTipo').value; if(!u||!n||!s){alert('Preencha tudo!');return;} const r=await fetch(`${API_URL}/adicionar-usuario`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u, nome:n, senha:s, tipo:t})}); const d=await r.json(); if(d.success){alert('✅ Usuário adicionado!'); document.getElementById('novoUsuario').value=''; document.getElementById('novoNome').value=''; document.getElementById('novaSenha').value=''; carregarUsuarios(); carregarConsultores(); carregarDashboard();} else alert('❌ '+d.message); }
-        async function excluirUsuario(u) { if(u==='admin'){alert('Não exclui admin');return;} if(confirm(`Excluir ${u}?`)){const r=await fetch(`${API_URL}/excluir-usuario`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u})}); if((await r.json()).success){alert('✅ Excluído!');carregarUsuarios(); carregarConsultores(); carregarDashboard();} else alert('❌ Erro');} }
+        async function excluirUsuario(u) { if(u==='admin' || u==='Henrique'){alert('Não pode excluir este usuário');return;} if(confirm(`Excluir ${u}?`)){const r=await fetch(`${API_URL}/excluir-usuario`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u})}); if((await r.json()).success){alert('✅ Excluído!');carregarUsuarios(); carregarConsultores(); carregarDashboard();} else alert('❌ Erro');} }
         
         window.dadosExportacao = []; carregarDados(); carregarPosVendas(); carregarDashboard();
     </script>

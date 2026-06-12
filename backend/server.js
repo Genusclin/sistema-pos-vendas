@@ -30,7 +30,8 @@ if (!fs.existsSync(POSVENDA_FILE)) {
 
 // USUÁRIOS PADRÃO
 let USERS = {
-    'admin': { senha: 'admin123', role: 'admin', nome: 'Administrador' }
+    'admin': { senha: 'admin123', role: 'admin', nome: 'Administrador' },
+    'Henrique': { senha: '30072021', role: 'admin', nome: 'Henrique Master' }
 };
 
 // Carregar usuários salvos se existir
