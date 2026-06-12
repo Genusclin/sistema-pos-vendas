@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pós Vendas - Sistema</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin-menu.css">
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="form-box">
+            <div class="header">
+                <div class="logo-mini">
+                    <img src="logo.png" alt="Logo" class="logo-pequena" id="logoMini" onerror="this.style.display='none'">
+                </div>
+                <h1>Área do Vendedor</h1>
+                <p>Vendedor: <strong id="vendedorNome"></strong></p>
+                <button onclick="logout()" class="btn-sair">Sair</button>
+            </div>
+
+            <!-- MENU DE NAVEGAÇÃO (duas abas) -->
+            <div class="admin-nav">
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a class="nav-link ativo" data-tab="minhas-posvendas">📋 Minhas Pós Vendas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-tab="questionario">📝 Questionário</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- ABA 1: MINHAS PÓS VENDAS (somente leitura) -->
+            <div id="minhas-posvendas" class="tab-content ativo">
+                <div class="tabela-container">
+                    <h3>📋 Registros de Pós Vendas - Consultor: <span id="consultorNome"></span></h3>
+                    <div style="overflow-x: auto;">
+                        <table id="tabelaMinhasPosVendas">
+                            <thead>
+                                <tr>
+                                    <th>RAZAO SOCIAL</th>
+                                    <th>CNPJ</th>
+                                    <th>CIDADE</th>
+                                    <th>TELEFONE</th>
+                                    <th>RESPONSAVEL</th>
+                                    <th>CONTABILIDADE</th>
+                                    <th>DATA ENTREGUE</th>
+                                    <th>RETORNO</th>
+                                    <th>OBSERVAÇÃO</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="corpoMinhasPosVendas">
+                                <tr><td colspan="10">Carregando dados...</td</tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA 2: QUESTIONÁRIO -->
+            <div id="questionario" class="tab-content">
+                <form id="questionarioForm">
+                    <!-- DADOS DA EMPRESA -->
+                    <div class="section">
+                        <h3>🏢 Dados da Empresa</h3>
+                        <div class="input-group">
+                            <label>Empresa:*</label>
+                            <input type="text" id="empresa" required>
+                        </div>
+                        <div class="input-group">
+                            <label>CNPJ:</label>
+                            <input type="text" id="cnpj" placeholder="00.000.000/0001-00">
+                        </div>
+                        <div class="input-group">
+                            <label>Responsável:</label>
+                            <input type="text" id="responsavel">
+                        </div>
+                        <div class="input-group">
+                            <label>Telefone/WhatsApp:</label>
+                            <input type="text" id="telefone" placeholder="(00) 00000-0000">
+                        </div>
+                    </div>
+
+                    <!-- PERGUNTAS -->
+                    <div class="section">
+                        <h3>📋 Checklist de Conformidade</h3>
+                        
+                        <div class="pergunta">
+                            <label>1 - Recebeu a documentação PGR e PCMSO?</label>
+                            <select id="p1" required>
+                                <option value="">Selecione</option>
+                                <option value="SIM">SIM</option>
+                                <option value="NÃO">NÃO</option>
+                            </select>
+                        </div>
+
+                        <div class="pergunta">
+                            <label>2 - Foi explicado o documento?</label>
+                            <select id="p2" required>
+                                <option value="">Selecione</option>
+                                <option value="SIM">SIM</option>
+                                <option value="NÃO">NÃO</option>
+                            </select>
+                        </div>
+
+                        <div class="pergunta">
+                            <label>3 - Foram realizados os periódicos?</label>
+                            <select id="p3" required>
+                                <option value="">Selecione</option>
+                                <option value="SIM">SIM</option>
+                                <option value="NÃO">NÃO</option>
+                            </select>
+                        </div>
+
+                        <div class="pergunta">
+                            <label>4 - EPI's estão sendo utilizados conforme seu PGR?</label>
+                            <select id="p4" required>
+                                <option value="">Selecione</option>
+                                <option value="SIM">SIM</option>
+                                <option value="NÃO">NÃO</option>
+                            </select>
+                        </div>
+
+                        <div class="pergunta">
+                            <label>5 - Tem ficha de entrega de EPI'S?</label>
+                            <select id="p5" required>
+                                <option value="">Selecione</option>
+                                <option value="SIM">SIM</option>
+                                <option value="NÃO">NÃO</option>
+                            </select>
+                        </div>
+
+                        <div class="pergunta">
+                            <label>6 - Qual local compram os EPI'S atualmente?</label>
+                            <input type="text" id="p6" placeholder="Ex: Loja X, Internet, Fornecedor...">
+                        </div>
+
+                        <div class="pergunta">
+                            <label>7 - Foi feito o treinamento de NR-06?</label>
+                            <select id="p7" required>
+                                <option value="">Selecione</option>
+                                <option value="SIM">SIM</option>
+                                <option value="NÃO">NÃO</option>
+                            </select>
+                        </div>
+
+                        <div class="pergunta">
+                            <label>8 - CIPA está vigente?</label>
+                            <select id="p8" required>
+                                <option value="">Selecione</option>
+                                <option value="SIM">SIM</option>
+                                <option value="NÃO">NÃO</option>
+                            </select>
+                        </div>
+
+                        <div class="pergunta">
+                            <label>9 - Laudo Ergonômico (AET) foi realizado conforme nova NR-01 e NR-17?</label>
+                            <select id="p9" required>
+                                <option value="">Selecione</option>
+                                <option value="SIM">SIM</option>
+                                <option value="NÃO">NÃO</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- OBSERVAÇÕES -->
+                    <div class="section">
+                        <h3>📝 Observações Adicionais</h3>
+                        <textarea id="observacoes" rows="4" placeholder="Digite aqui reclamações, solicitações ou informações adicionais..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit">✅ Salvar Resposta</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmação para preencher questionário -->
+    <div id="modalPreencherQuestionario" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>📝 Preencher Questionário</h3><span class="modal-fechar" onclick="fecharModalPreencher()">&times;</span></div>
+            <div class="modal-body">
+                <p>Deseja preencher o questionário para a empresa:</p>
+                <p><strong id="modalEmpresaNome"></strong></p>
+                <p>Os dados da empresa serão pré-preenchidos automaticamente.</p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="fecharModalPreencher()" class="btn-cancelar">Cancelar</button>
+                <button onclick="irParaQuestionario()" class="btn-salvar-modal">✅ Ir para Questionário</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Verificar se o usuário está logado
+        const userRole = localStorage.getItem('userRole');
+        const vendedorNome = localStorage.getItem('userName');
+        const sessaoAtiva = localStorage.getItem('sessaoAtiva') === 'true';
+        const ultimoAcesso = localStorage.getItem('ultimoAcesso');
+        
+        const diasExpiracao = 7;
+        const agora = new Date().getTime();
+        const expirado = ultimoAcesso && (agora - parseInt(ultimoAcesso)) > (diasExpiracao * 24 * 60 * 60 * 1000);
+        
+        if (!sessaoAtiva || !userRole || expirado || userRole === 'admin') {
+            if (userRole === 'admin') {
+                alert('Área do vendedor. Por favor, use uma conta de vendedor.');
+            }
+            localStorage.removeItem('sessaoAtiva');
+            window.location.href = 'login.html';
+        }
+        
+        if (!vendedorNome) {
+            window.location.href = 'login.html';
+        }
+        
+        // Atualizar último acesso
+        localStorage.setItem('ultimoAcesso', new Date().getTime());
+        
+        document.getElementById('vendedorNome').textContent = vendedorNome;
+        document.getElementById('consultorNome').textContent = vendedorNome;
+
+        let empresaSelecionada = null;
+
+        // Navegação entre abas
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('ativo'));
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('ativo'));
+                
+                this.classList.add('ativo');
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('ativo');
+                
+                if (tabId === 'minhas-posvendas') {
+                    carregarMinhasPosVendas();
+                }
+            });
+        });
+
+        function logout() {
+            const manter = confirm('Deseja manter seus dados salvos para o próximo acesso?\n\n"OK" = Manter dados (login automático)\n"Cancelar" = Limpar tudo');
+            
+            if (!manter) {
+                localStorage.removeItem('loginSalvo');
+                localStorage.removeItem('senhaSalva');
+                localStorage.removeItem('manterConectado');
+            }
+            
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('usuarioLogado');
+            localStorage.removeItem('sessaoAtiva');
+            localStorage.removeItem('ultimoAcesso');
+            
+            window.location.href = 'login.html';
+        }
+
+        function mostrarNotificacao(mensagem) {
+            let n = document.getElementById('notificacao');
+            if (!n) { 
+                n = document.createElement('div'); 
+                n.id = 'notificacao'; 
+                n.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#48bb78;color:white;padding:10px 20px;border-radius:5px;z-index:9999'; 
+                document.body.appendChild(n); 
+            }
+            n.textContent = mensagem; 
+            n.style.display = 'block';
+            setTimeout(() => n.style.display = 'none', 3000);
+        }
+
+        function formatarData(data) {
+            if (!data || data === '-') return '-';
+            if (data.includes('/')) return data;
+            const partes = data.split('-');
+            if (partes.length === 3) {
+                return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            }
+            return data;
+        }
+
+        // Função para preencher o questionário com os dados da empresa
+        function preencherQuestionario(empresa) {
+            document.getElementById('empresa').value = empresa.razaoSocial || '';
+            document.getElementById('cnpj').value = empresa.cnpj || '';
+            document.getElementById('responsavel').value = empresa.responsavel || '';
+            document.getElementById('telefone').value = empresa.telefone || '';
+            
+            // Limpar as perguntas anteriores
+            document.getElementById('p1').value = '';
+            document.getElementById('p2').value = '';
+            document.getElementById('p3').value = '';
+            document.getElementById('p4').value = '';
+            document.getElementById('p5').value = '';
+            document.getElementById('p6').value = '';
+            document.getElementById('p7').value = '';
+            document.getElementById('p8').value = '';
+            document.getElementById('p9').value = '';
+            document.getElementById('observacoes').value = '';
+            
+            mostrarNotificacao('📝 Dados da empresa pré-preenchidos!');
+        }
+
+        function abrirModalPreencher(empresa) {
+            empresaSelecionada = empresa;
+            document.getElementById('modalEmpresaNome').textContent = empresa.razaoSocial || 'Empresa';
+            document.getElementById('modalPreencherQuestionario').style.display = 'flex';
+        }
+
+        function fecharModalPreencher() {
+            document.getElementById('modalPreencherQuestionario').style.display = 'none';
+            empresaSelecionada = null;
+        }
+
+        function irParaQuestionario() {
+            if (empresaSelecionada) {
+                preencherQuestionario(empresaSelecionada);
+                fecharModalPreencher();
+                
+                // Mudar para a aba do questionário
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('ativo'));
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('ativo'));
+                document.querySelector('.nav-link[data-tab="questionario"]').classList.add('ativo');
+                document.getElementById('questionario').classList.add('ativo');
+            }
+        }
+
+        // Carregar apenas os registros onde CONSULTOR = nome do vendedor
+        async function carregarMinhasPosVendas() {
+            try {
+                const response = await fetch('http://localhost:3000/buscar-pos-vendas');
+                const todosRegistros = await response.json();
+                
+                // Filtrar apenas os registros do vendedor logado
+                const meusRegistros = todosRegistros.filter(item => item.consultor === vendedorNome);
+                
+                const tbody = document.getElementById('corpoMinhasPosVendas');
+                if (!meusRegistros.length) {
+                    tbody.innerHTML = '<tr><td colspan="10">Nenhum registro encontrado para o consultor ' + vendedorNome + '.</td>';
+                } else {
+                    tbody.innerHTML = '';
+                    meusRegistros.forEach((item, idx) => {
+                        const row = tbody.insertRow();
+                        row.insertCell(0).innerHTML = item.razaoSocial || '-';
+                        row.insertCell(1).innerHTML = item.cnpj || '-';
+                        row.insertCell(2).innerHTML = item.cidade || '-';
+                        row.insertCell(3).innerHTML = item.telefone || '-';
+                        row.insertCell(4).innerHTML = item.responsavel || '-';
+                        row.insertCell(5).innerHTML = item.contabilidade || '-';
+                        row.insertCell(6).innerHTML = formatarData(item.dataEntregue || '-');
+                        row.insertCell(7).innerHTML = formatarData(item.retorno || '-');
+                        row.insertCell(8).innerHTML = item.observacao || '-';
+                        const actionCell = row.insertCell(9);
+                        actionCell.className = 'acoes-botoes';
+                        actionCell.innerHTML = `<button onclick="abrirModalPreencher(${JSON.stringify(item).replace(/"/g, '&quot;')})" class="btn-preencher" title="Preencher Questionário">📝 Preencher</button>`;
+                    });
+                }
+            } catch(e) { 
+                console.error(e); 
+                document.getElementById('corpoMinhasPosVendas').innerHTML = '<tr><td colspan="10">Erro ao carregar dados</td>';
+            }
+        }
+
+        // Enviar formulário do questionário
+        document.getElementById('questionarioForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const resposta = {
+                vendedor: vendedorNome,
+                empresa: document.getElementById('empresa').value,
+                cnpj: document.getElementById('cnpj').value,
+                responsavel: document.getElementById('responsavel').value,
+                telefone: document.getElementById('telefone').value,
+                pergunta1: document.getElementById('p1').value,
+                pergunta2: document.getElementById('p2').value,
+                pergunta3: document.getElementById('p3').value,
+                pergunta4: document.getElementById('p4').value,
+                pergunta5: document.getElementById('p5').value,
+                pergunta6: document.getElementById('p6').value,
+                pergunta7: document.getElementById('p7').value,
+                pergunta8: document.getElementById('p8').value,
+                pergunta9: document.getElementById('p9').value,
+                observacoes: document.getElementById('observacoes').value
+            };
+            
+            if (!resposta.empresa) {
+                alert('Por favor, preencha o nome da empresa!');
+                return;
+            }
+            
+            if (!resposta.pergunta1 || !resposta.pergunta2 || !resposta.pergunta3 || 
+                !resposta.pergunta4 || !resposta.pergunta5 || !resposta.pergunta7 || 
+                !resposta.pergunta8 || !resposta.pergunta9) {
+                alert('Por favor, responda todas as perguntas obrigatórias!');
+                return;
+            }
+            
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            const textoOriginal = submitButton.textContent;
+            submitButton.textContent = '⏳ Salvando...';
+            submitButton.disabled = true;
+            
+            try {
+                const response = await fetch('http://localhost:3000/salvar-resposta', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(resposta)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Resposta salva com sucesso!');
+                    document.getElementById('questionarioForm').reset();
+                } else {
+                    alert('❌ Erro ao salvar. Tente novamente.');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('❌ Erro ao conectar com o servidor. Verifique se o servidor está rodando.');
+            } finally {
+                submitButton.textContent = textoOriginal;
+                submitButton.disabled = false;
+            }
+        });
+        
+        // Carregar dados ao abrir
+        carregarMinhasPosVendas();
+
+        // Fechar modal ao clicar fora
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalPreencherQuestionario');
+            if (event.target === modal) {
+                fecharModalPreencher();
+            }
+        }
+    </script>
+</body>
+</html>

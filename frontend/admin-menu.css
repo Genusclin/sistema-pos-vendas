@@ -1,0 +1,63 @@
+/* Menu de navegação do admin */
+.admin-nav {
+    background: white;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 5px;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item {
+    flex: 1;
+}
+
+.nav-link {
+    display: block;
+    text-align: center;
+    padding: 12px 15px;
+    text-decoration: none;
+    color: #555;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.nav-link:hover {
+    background: #f0f0f0;
+    color: #667eea;
+}
+
+.nav-link.ativo {
+    background: #667eea;
+    color: white;
+}
+
+/* Conteúdo de cada aba */
+.tab-content {
+    display: none;
+}
+
+.tab-content.ativo {
+    display: block;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .nav-menu {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .nav-link {
+        padding: 10px;
+    }
+}

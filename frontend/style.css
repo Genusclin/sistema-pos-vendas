@@ -1,0 +1,925 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-image: url('fundo.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ==================== CAIXAS PRINCIPAIS ==================== */
+.login-box, .form-box, .admin-box {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+
+.login-box {
+    max-width: 400px;
+    margin: 50px auto;
+}
+
+/* ==================== LOGO ==================== */
+.logo-container {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.logo {
+    max-width: 180px;
+    max-height: 180px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 10px;
+    transition: transform 0.3s;
+}
+
+.logo:hover {
+    transform: scale(1.05);
+}
+
+.logo-fallback {
+    font-size: 80px;
+    text-align: center;
+    color: #667eea;
+}
+
+.logo-mini {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 15px;
+}
+
+.logo-pequena {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+/* ==================== TÍTULOS ==================== */
+.login-box h1 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #333;
+    font-size: 20px;
+    font-weight: normal;
+}
+
+.header {
+    position: relative;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #eee;
+}
+
+.header h1 {
+    color: #333;
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 24px;
+}
+
+.header p {
+    margin-top: 10px;
+    color: #666;
+}
+
+.header strong {
+    color: #667eea;
+}
+
+/* ==================== INPUTS ==================== */
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+    font-weight: 500;
+}
+
+.input-group input, 
+.pergunta input,
+.pergunta select,
+textarea,
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.input-group input:focus,
+.pergunta input:focus,
+.pergunta select:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+/* ==================== CHECKBOX ==================== */
+.checkbox-group {
+    margin: 15px 0;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-label input {
+    width: auto;
+    margin-right: 10px;
+    cursor: pointer;
+    transform: scale(1.1);
+}
+
+.checkbox-label span {
+    color: #555;
+    font-weight: normal;
+    font-size: 14px;
+}
+
+.checkbox-label:hover span {
+    color: #667eea;
+}
+
+/* ==================== MENSAGENS ==================== */
+.mensagem-erro {
+    background-color: #fed7d7;
+    color: #c53030;
+    border: 1px solid #fc8181;
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.mensagem-sucesso {
+    background-color: #c6f6d5;
+    color: #22543d;
+    border: 1px solid #9ae6b4;
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+}
+
+/* ==================== BOTÕES ==================== */
+button {
+    width: 100%;
+    padding: 12px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.1s;
+    margin-top: 5px;
+}
+
+button:hover {
+    background: #5a67d8;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+.btn-sair {
+    background: #e53e3e;
+    width: auto;
+    padding: 8px 20px;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    margin-top: 0;
+}
+
+.btn-sair:hover {
+    background: #c53030;
+}
+
+.btn-submit {
+    background: #48bb78;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.btn-submit:hover {
+    background: #38a169;
+}
+
+.btn-exportar {
+    background: #48bb78;
+    width: auto;
+    flex: 1;
+}
+
+.btn-exportar:hover {
+    background: #38a169;
+}
+
+.btn-exportar-pequeno {
+    background: #48bb78;
+    width: auto;
+    padding: 8px 16px;
+    font-size: 14px;
+    margin-top: 0;
+    border-radius: 5px;
+}
+
+.btn-exportar-pequeno:hover {
+    background: #38a169;
+}
+
+.btn-atualizar {
+    background: #ed8936;
+    width: auto;
+    flex: 1;
+}
+
+.btn-atualizar:hover {
+    background: #dd6b20;
+}
+
+.btn-excluir {
+    background: #e53e3e;
+    width: auto;
+    padding: 5px 10px;
+    font-size: 12px;
+    margin-top: 0;
+    margin-left: 5px;
+}
+
+.btn-excluir:hover {
+    background: #c53030;
+}
+
+.btn-alterar-senha {
+    background: #ed8936;
+    width: auto;
+    padding: 5px 10px;
+    font-size: 12px;
+    margin-top: 0;
+    margin-right: 5px;
+}
+
+.btn-alterar-senha:hover {
+    background: #dd6b20;
+}
+
+.btn-ver-senha {
+    background: #718096;
+    width: auto;
+    padding: 3px 8px;
+    font-size: 11px;
+    margin-top: 0;
+    margin-left: 5px;
+}
+
+.btn-ver-senha:hover {
+    background: #4a5568;
+}
+
+.btn-salvar-tudo {
+    background: #4299e1;
+    width: auto;
+    padding: 8px 16px;
+    font-size: 14px;
+    margin-top: 0;
+    border-radius: 5px;
+}
+
+.btn-salvar-tudo:hover {
+    background: #3182ce;
+}
+
+.btn-adicionar {
+    background: #4299e1;
+    width: auto;
+    padding: 8px 16px;
+    font-size: 14px;
+    margin-top: 0;
+    border-radius: 5px;
+}
+
+.btn-adicionar:hover {
+    background: #3182ce;
+}
+
+.btn-salvar {
+    background: #48bb78;
+    width: auto;
+    padding: 5px 10px;
+    font-size: 12px;
+    margin-top: 0;
+    margin-right: 5px;
+}
+
+.btn-salvar:hover {
+    background: #38a169;
+}
+
+.btn-importar {
+    background: #9c27b0;
+    width: auto;
+    padding: 8px 16px;
+    font-size: 14px;
+    margin-top: 0;
+    border-radius: 5px;
+}
+
+.btn-importar:hover {
+    background: #7b1fa2;
+}
+
+.btn-cancelar {
+    background: #718096;
+    width: auto;
+    padding: 10px 20px;
+    font-size: 14px;
+    margin-top: 0;
+    margin-right: 10px;
+}
+
+.btn-cancelar:hover {
+    background: #4a5568;
+}
+
+.btn-salvar-modal {
+    background: #48bb78;
+    width: auto;
+    padding: 10px 20px;
+    font-size: 14px;
+    margin-top: 0;
+}
+
+.btn-salvar-modal:hover {
+    background: #38a169;
+}
+
+/* ==================== CÉLULAS EDITÁVEIS ==================== */
+.editavel {
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.editavel:hover {
+    background-color: #e9f0ff !important;
+}
+
+td.editavel {
+    position: relative;
+}
+
+/* ==================== MODAL ==================== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    border-bottom: 2px solid #eee;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px 10px 0 0;
+}
+
+.modal-header h3 {
+    color: white;
+    margin: 0;
+    font-size: 20px;
+}
+
+.modal-fechar {
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.modal-fechar:hover {
+    transform: scale(1.2);
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+.modal-footer {
+    padding: 20px 25px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Formulário dentro do modal */
+.form-cadastro-modal {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-cadastro-modal .input-group {
+    margin-bottom: 0;
+}
+
+.form-cadastro-modal .full-width {
+    grid-column: span 2;
+}
+
+/* ==================== SEÇÕES E PERGUNTAS ==================== */
+.section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f7fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.section h3 {
+    margin-bottom: 20px;
+    color: #667eea;
+    font-size: 18px;
+}
+
+.pergunta {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 5px;
+    border: 1px solid #e2e8f0;
+    transition: box-shadow 0.3s;
+}
+
+.pergunta:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.pergunta label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 500;
+    color: #333;
+}
+
+.pergunta select {
+    width: auto;
+    min-width: 150px;
+}
+
+/* ==================== DASHBOARD (CARDS) ==================== */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-card h3 {
+    font-size: 14px;
+    margin-bottom: 10px;
+    opacity: 0.9;
+}
+
+.stat-card p {
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.acoes {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+/* ==================== TABELAS ==================== */
+.tabela-container {
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+.tabela-container h3 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+th {
+    background: #667eea;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+tr:hover {
+    background: #f7fafc;
+}
+
+.senha-oculta {
+    font-family: monospace;
+    letter-spacing: 2px;
+}
+
+/* ==================== FORMULÁRIO DE CADASTRO ==================== */
+.form-cadastro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-cadastro .input-group {
+    margin-bottom: 0;
+}
+
+.form-cadastro .input-group.full-width {
+    grid-column: span 2;
+}
+
+/* ==================== INFO (OCULTA) ==================== */
+.info {
+    display: none;
+}
+
+/* ==================== NOTIFICAÇÃO FLUTUANTE ==================== */
+#notificacao {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #48bb78;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    z-index: 9999;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    animation: fadeIn 0.3s ease;
+}
+
+/* ==================== RESPONSIVIDADE ==================== */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .login-box, .form-box, .admin-box {
+        padding: 20px;
+    }
+    
+    .form-box, .admin-box {
+        padding: 15px;
+    }
+    
+    th, td {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .pergunta select {
+        width: 100%;
+    }
+    
+    .btn-sair {
+        position: static;
+        margin-bottom: 20px;
+        width: 100%;
+    }
+    
+    .header {
+        text-align: center;
+    }
+    
+    .header h1 {
+        display: block;
+        margin-top: 10px;
+    }
+    
+    .logo-mini {
+        display: block;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    
+    .acoes {
+        flex-direction: column;
+    }
+    
+    .stats {
+        gap: 10px;
+    }
+    
+    .stat-card p {
+        font-size: 24px;
+    }
+    
+    .logo {
+        max-width: 150px;
+        max-height: 150px;
+    }
+    
+    .login-box h1 {
+        font-size: 18px;
+    }
+    
+    .logo-pequena {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .form-cadastro {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-cadastro-modal {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-cadastro-modal .full-width {
+        grid-column: span 1;
+    }
+    
+    .btn-alterar-senha, .btn-excluir {
+        margin-bottom: 5px;
+        width: 100%;
+    }
+    
+    td .btn-alterar-senha, td .btn-excluir {
+        display: block;
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    
+    .btn-exportar-pequeno, .btn-salvar-tudo, .btn-adicionar, .btn-importar {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 20px;
+    }
+    
+    .modal-header h3 {
+        font-size: 18px;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+    }
+    
+    .btn-cancelar, .btn-salvar-modal {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+}
+
+/* ==================== ANIMAÇÕES ==================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-box, .form-box, .admin-box, .mensagem-erro, .mensagem-sucesso, #notificacao, .modal {
+    animation: fadeIn 0.3s ease;
+}
+
+/* ==================== SCROLLBAR PERSONALIZADA ==================== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Scrollbar dentro do modal */
+.modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+/* ==================== DROPDOWN MENU ==================== */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.btn-importar-dropdown {
+    background: #9c27b0;
+    width: auto;
+    padding: 8px 16px;
+    font-size: 14px;
+    margin-top: 0;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-importar-dropdown:hover {
+    background: #7b1fa2;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 180px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.dropdown-content a {
+    color: #333;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 14px;
+    transition: background 0.3s;
+    cursor: pointer;
+}
+
+.dropdown-content a:hover {
+    background-color: #f0f0f0;
+    color: #9c27b0;
+}
+/* Botões de ação com emojis */
+.btn-editar {
+    background: #ed8936;
+    width: auto;
+    padding: 5px 10px;
+    font-size: 14px;
+    margin-top: 0;
+    margin-right: 5px;
+    border-radius: 5px;
+}
+
+.btn-editar:hover {
+    background: #dd6b20;
+}
+/* Botões de ação lado a lado */
+.acoes-botoes {
+    white-space: nowrap;
+    text-align: center;
+}
+
+.btn-editar {
+    background: #ed8936;
+    width: auto;
+    padding: 6px 12px;
+    font-size: 16px;
+    margin-top: 0;
+    margin-right: 5px;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+.btn-editar:hover {
+    background: #dd6b20;
+}
+
+.btn-excluir {
+    background: #e53e3e;
+    width: auto;
+    padding: 6px 12px;
+    font-size: 16px;
+    margin-top: 0;
+    display: inline-block;
+}
+
+.btn-excluir:hover {
+    background: #c53030;
+}
+/* Botão Preencher */
+.btn-preencher {
+    background: #4299e1;
+    width: auto;
+    padding: 5px 10px;
+    font-size: 12px;
+    margin-top: 0;
+    border-radius: 5px;
+}
+
+.btn-preencher:hover {
+    background: #3182ce;
+}
