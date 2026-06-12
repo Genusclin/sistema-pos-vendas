@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: sistema-pos-vendas
+    runtime: node
+    buildCommand: npm install
+    startCommand: node backend/server.js
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+    headers:
+      - path: /frontend/*
+        name: Content-Type
+        value: text/html
