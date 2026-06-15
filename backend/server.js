@@ -201,9 +201,14 @@ app.post('/adicionar-pos-venda', async (req, res) => {
 app.post('/salvar-pos-venda', async (req, res) => {
     try {
         const { registro, index } = req.body;
+        console.log('Salvando registro:', registro);
+        console.log('Índice:', index);
+        
         const result = await pool.query('SELECT id FROM pos_vendas ORDER BY id LIMIT 1 OFFSET $1', [index]);
+        console.log('Registro encontrado no banco:', result.rows);
+        
         if (result.rows.length > 0) {
-            await pool.query(`
+            const updateResult = await pool.query(`
                 UPDATE pos_vendas SET
                     consultor = $1, razao_social = $2, cnpj = $3, cidade = $4,
                     telefone = $5, responsavel = $6, contabilidade = $7,
@@ -212,8 +217,10 @@ app.post('/salvar-pos-venda', async (req, res) => {
             `, [registro.consultor, registro.razaoSocial, registro.cnpj, registro.cidade,
                 registro.telefone, registro.responsavel, registro.contabilidade,
                 registro.dataEntregue, registro.retorno, registro.observacao, result.rows[0].id]);
+            console.log('Update executado, linhas afetadas:', updateResult.rowCount);
+            res.json({ success: true });
         } else {
-            await pool.query(`
+            const insertResult = await pool.query(`
                 INSERT INTO pos_vendas (
                     consultor, razao_social, cnpj, cidade, telefone, responsavel,
                     contabilidade, data_entregue, retorno, observacao
@@ -221,11 +228,12 @@ app.post('/salvar-pos-venda', async (req, res) => {
             `, [registro.consultor, registro.razaoSocial, registro.cnpj, registro.cidade,
                 registro.telefone, registro.responsavel, registro.contabilidade,
                 registro.dataEntregue, registro.retorno, registro.observacao]);
+            console.log('Novo registro inserido');
+            res.json({ success: true });
         }
-        res.json({ success: true });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false });
+        console.error('Erro ao salvar pós venda:', error);
+        res.status(500).json({ success: false, error: error.message });
     }
 });
 
