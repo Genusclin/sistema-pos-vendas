@@ -249,7 +249,120 @@
 
         function baixarModeloExcel() { const modelo = [{ 'CONSULTOR':'','RAZAO SOCIAL':'','CNPJ':'','CIDADE':'','TELEFONE':'','RESPONSAVEL':'','CONTABILIDADE':'','DATA ENTREGUE':'','RETORNO':'','OBSERVAÇÃO':'' }]; const ws = XLSX.utils.json_to_sheet(modelo); ws['!cols'] = [{wch:20},{wch:30},{wch:18},{wch:20},{wch:15},{wch:20},{wch:25},{wch:15},{wch:15},{wch:40}]; const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'MODELO'); XLSX.writeFile(wb, 'modelo_pos_vendas.xlsx'); mostrarNotificacao('📄 Modelo baixado!'); }
 
-        function importarExcelPosVenda() { fecharDropdown(); const input = document.createElement('input'); input.type = 'file'; input.accept = '.xlsx, .xls'; input.onchange = async function(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = async function(e) { try { const data = new Uint8Array(e.target.result); const workbook = XLSX.read(data, { type: 'array' }); const sheet = workbook.Sheets[workbook.SheetNames[0]]; const jsonData = XLSX.utils.sheet_to_json(sheet); let importados = 0; for (const row of jsonData) { const consultor = row['CONSULTOR'] || ''; const razaoSocial = row['RAZAO SOCIAL'] || ''; if (consultor && razaoSocial && razaoSocial.trim()) { await fetch(`${API_URL}/adicionar-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ registro: { consultor, razaoSocial, cnpj: row['CNPJ']||'', cidade: row['CIDADE']||'', telefone: row['TELEFONE']||'', responsavel: row['RESPONSAVEL']||'', contabilidade: row['CONTABILIDADE']||'', dataEntregue: row['DATA ENTREGUE']||'', retorno: row['RETORNO']||'', observacao: row['OBSERVAÇÃO']||'' } }) }); importados++; } } mostrarNotificacao(`✅ ${importados} importados!`); carregarPosVendas(); carregarDashboard(); } catch(e) { console.error(e); alert('Erro ao importar'); } }; reader.readAsArrayBuffer(file); }; input.click(); }
+        function importarExcelPosVenda() {
+    fecharDropdown();
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.xlsx, .xls';
+    input.onchange = async function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(sheet);
+                
+                let importados = 0;
+                let erros = [];
+                
+                for (const row of jsonData) {
+                    const consultor = row['CONSULTOR'] || '';
+                    const razaoSocial = row['RAZAO SOCIAL'] || row['RAZAO_SOCIAL'] || '';
+                    
+                    if (consultor && razaoSocial && razaoSocial.trim()) {
+                        // FUNÇÃO PARA CONVERTER DATA EM QUALQUER FORMATO
+                        function converterData(dataStr) {
+                            if (!dataStr) return '';
+                            
+                            // Se já estiver no formato YYYY-MM-DD (Americano sem hora)
+                            if (dataStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                                return dataStr;
+                            }
+                            
+                            // Se estiver no formato DD/MM/YYYY (Brasileiro)
+                            if (dataStr.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                                const partes = dataStr.split('/');
+                                return `${partes[2]}-${partes[1]}-${partes[0]}`;
+                            }
+                            
+                            // Se estiver no formato YYYY-MM-DD HH:MM:SS (Americano com hora)
+                            if (dataStr.includes(' ')) {
+                                const dataParte = dataStr.split(' ')[0];
+                                if (dataParte.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                                    return dataParte;
+                                }
+                            }
+                            
+                            // Se estiver no formato DD/MM/YYYY HH:MM:SS
+                            if (dataStr.includes(' ') && dataStr.includes('/')) {
+                                const dataParte = dataStr.split(' ')[0];
+                                const partes = dataParte.split('/');
+                                if (partes.length === 3) {
+                                    return `${partes[2]}-${partes[1]}-${partes[0]}`;
+                                }
+                            }
+                            
+                            return dataStr;
+                        }
+                        
+                        const dataEntregue = converterData(row['DATA ENTREGUE'] || '');
+                        const retorno = converterData(row['RETORNO'] || '');
+                        
+                        const novoRegistro = {
+                            consultor: consultor,
+                            razaoSocial: razaoSocial,
+                            cnpj: row['CNPJ'] || '',
+                            cidade: row['CIDADE'] || '',
+                            telefone: row['TELEFONE'] || '',
+                            responsavel: row['RESPONSAVEL'] || '',
+                            contabilidade: row['CONTABILIDADE'] || '',
+                            dataEntregue: dataEntregue,
+                            retorno: retorno,
+                            observacao: row['OBSERVAÇÃO'] || ''
+                        };
+                        
+                        try {
+                            const response = await fetch(`${API_URL}/adicionar-pos-venda`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ registro: novoRegistro })
+                            });
+                            const result = await response.json();
+                            if (result.success) {
+                                importados++;
+                            } else {
+                                erros.push(razaoSocial);
+                            }
+                        } catch (err) {
+                            erros.push(razaoSocial);
+                        }
+                    }
+                }
+                
+                mostrarNotificacao(`✅ ${importados} registros importados! ${erros.length > 0 ? `(${erros.length} erros)` : ''}`);
+                
+                if (importados > 0) {
+                    await carregarPosVendas();
+                    await carregarDashboard();
+                }
+                
+                if (erros.length > 0) {
+                    console.log('Erros na importação:', erros);
+                }
+                
+            } catch(e) { 
+                console.error(e); 
+                alert('Erro ao importar: ' + e.message);
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    };
+    input.click();
+}
 
         function abrirModalEditarResposta(index) { indiceEditandoResposta = index; const item = dadosAtuais[index]; document.getElementById('editData').value = item.dataHora || ''; document.getElementById('editConsultorResposta').value = item.vendedor || ''; document.getElementById('editCnpjResposta').value = item.cnpj || ''; document.getElementById('editEmpresaResposta').value = item.empresa || ''; document.getElementById('editAet').value = item.pergunta9 || 'NÃO'; document.getElementById('editNr06').value = item.pergunta7 || 'NÃO'; document.getElementById('editCipa').value = item.pergunta8 || 'NÃO'; document.getElementById('editPeriodico').value = item.pergunta3 || 'NÃO'; document.getElementById('editEpis').value = item.pergunta4 || 'NÃO'; document.getElementById('editNotaVisita').value = item.notaVisita || ''; document.getElementById('editVendedor').value = item.vendedorNome || ''; document.getElementById('editVendido').value = item.vendido || ''; document.getElementById('editObsResposta').value = item.observacoes || ''; document.getElementById('modalEditarResposta').style.display = 'flex'; }
         function fecharModalEditarResposta() { document.getElementById('modalEditarResposta').style.display = 'none'; indiceEditandoResposta = null; }
