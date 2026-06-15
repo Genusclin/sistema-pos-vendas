@@ -322,48 +322,97 @@
                 const sheet = workbook.Sheets[workbook.SheetNames[0]];
                 const jsonData = XLSX.utils.sheet_to_json(sheet);
                 
-                let importados = 0;
-                let erros = [];
+                console.log('Dados lidos do Excel:', jsonData.length, 'linhas');
+                console.log('Primeira linha:', jsonData[0]);
                 
-                for (const row of jsonData) {
+                let importados = 0;
+                let ignorados = [];
+                
+                for (let i = 0; i < jsonData.length; i++) {
+                    const row = jsonData[i];
                     const consultor = row['CONSULTOR'] || '';
                     const razaoSocial = row['RAZAO SOCIAL'] || row['RAZAO_SOCIAL'] || '';
                     
-                    if (consultor && razaoSocial && razaoSocial.trim()) {
-                        // FUNÇÃO PARA CONVERTER DATA EM QUALQUER FORMATO
-                        function converterData(dataStr) {
-                            if (!dataStr) return '';
-                            
-                            // Se já estiver no formato YYYY-MM-DD (Americano sem hora)
-                            if (dataStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                                return dataStr;
-                            }
-                            
-                            // Se estiver no formato DD/MM/YYYY (Brasileiro)
-                            if (dataStr.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-                                const partes = dataStr.split('/');
-                                return `${partes[2]}-${partes[1]}-${partes[0]}`;
-                            }
-                            
-                            // Se estiver no formato YYYY-MM-DD HH:MM:SS (Americano com hora)
-                            if (dataStr.includes(' ')) {
-                                const dataParte = dataStr.split(' ')[0];
-                                if (dataParte.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                                    return dataParte;
-                                }
-                            }
-                            
-                            // Se estiver no formato DD/MM/YYYY HH:MM:SS
-                            if (dataStr.includes(' ') && dataStr.includes('/')) {
-                                const dataParte = dataStr.split(' ')[0];
-                                const partes = dataParte.split('/');
-                                if (partes.length === 3) {
-                                    return `${partes[2]}-${partes[1]}-${partes[0]}`;
-                                }
-                            }
-                            
-                            return dataStr;
+                    console.log(`Linha ${i+1}: Consultor="${consultor}", Razao="${razaoSocial}"`);
+                    
+                    if (!consultor) {
+                        ignorados.push(`Linha ${i+1}: Consultor vazio`);
+                        continue;
+                    }
+                    
+                    if (!razaoSocial) {
+                        ignorados.push(`Linha ${i+1}: Razão Social vazia`);
+                        continue;
+                    }
+                    
+                    function converterData(dataStr) {
+                        if (!dataStr) return '';
+                        if (typeof dataStr !== 'string') dataStr = String(dataStr);
+                        if (dataStr.match(/^\d{4}-\d{2}-\d{2}$/)) return dataStr;
+                        if (dataStr.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                            const partes = dataStr.split('/');
+                            return `${partes[2]}-${partes[1]}-${partes[0]}`;
                         }
+                        if (dataStr.includes(' ')) {
+                            const dataParte = dataStr.split(' ')[0];
+                            if (dataParte.match(/^\d{4}-\d{2}-\d{2}$/)) return dataParte;
+                        }
+                        return dataStr;
+                    }
+                    
+                    const novoRegistro = {
+                        consultor: consultor,
+                        razaoSocial: razaoSocial,
+                        cnpj: row['CNPJ'] || '',
+                        cidade: row['CIDADE'] || '',
+                        telefone: row['TELEFONE'] || '',
+                        responsavel: row['RESPONSAVEL'] || '',
+                        contabilidade: row['CONTABILIDADE'] || '',
+                        dataEntregue: converterData(row['DATA ENTREGUE'] || ''),
+                        retorno: converterData(row['RETORNO'] || ''),
+                        observacao: row['OBSERVAÇÃO'] || ''
+                    };
+                    
+                    console.log(`Enviando registro ${i+1}:`, novoRegistro);
+                    
+                    const response = await fetch(`${API_URL}/adicionar-pos-venda`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ registro: novoRegistro })
+                    });
+                    
+                    const result = await response.json();
+                    console.log(`Resposta ${i+1}:`, result);
+                    
+                    if (result.success) {
+                        importados++;
+                    } else {
+                        ignorados.push(`Linha ${i+1}: ${result.message || 'Erro desconhecido'}`);
+                    }
+                }
+                
+                console.log(`Importados: ${importados}, Ignorados: ${ignorados.length}`);
+                if (ignorados.length > 0) {
+                    console.log('Ignorados:', ignorados);
+                    alert(`⚠️ ${ignorados.length} linhas ignoradas.\n\nMotivos:\n${ignorados.slice(0,5).join('\n')}`);
+                }
+                
+                mostrarNotificacao(`✅ ${importados} registros importados! ${ignorados.length > 0 ? `(${ignorados.length} ignorados)` : ''}`);
+                
+                if (importados > 0) {
+                    await carregarPosVendas();
+                    await carregarDashboard();
+                }
+                
+            } catch(e) { 
+                console.error('Erro detalhado:', e); 
+                alert('Erro ao importar: ' + e.message);
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    };
+    input.click();
+}
                         
                         const dataEntregue = converterData(row['DATA ENTREGUE'] || '');
                         const retorno = converterData(row['RETORNO'] || '');
