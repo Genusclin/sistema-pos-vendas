@@ -102,7 +102,7 @@
             <div id="resultado" class="tab-content">
                 <div class="tabela-container">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;"><h3 style="margin: 0;">📋 Resultados Pós Vendas</h3><button onclick="exportarExcel()" class="btn-exportar-pequeno">📎 Exportar Excel</button></div>
-                    <table id="tabelaRespostas"><thead><tr><th>DATA</th><th>CONSULTOR</th><th>CNPJ</th><th>EMPRESA</th><th>POS VENDA</th><th>AET</th><th>NR 06</th><th>CIPA</th><th>PERIODICO</th><th>EPIS</th><th>NOTA VISITA</th><th>VENDEDOR</th><th>VENDIDO</th><th>OBS</th><th>Ações</th></tr></thead><tbody id="corpoTabela"><td><td colspan="15">Nenhuma resposta encontrada</td</tr></tbody></table>
+                    <table id="tabelaRespostas"><thead><tr><th>DATA</th><th>CONSULTOR</th><th>CNPJ</th><th>EMPRESA</th><th>POS VENDA</th><th>AET</th><th>NR 06</th><th>CIPA</th><th>PERIODICO</th><th>EPIS</th><th>NOTA VISITA</th><th>VENDEDOR</th><th>VENDIDO</th><th>OBS</th><th>Ações</th></tr></thead><tbody id="corpoTabela"><tr><td colspan="15">Nenhuma resposta encontrada</td</tr></tbody></table>
                 </div>
             </div>
 
@@ -115,7 +115,7 @@
                 <div class="input-group"><label>Tipo:</label><select id="novoTipo"><option value="pos">📝 Pós Vendas</option><option value="admin">👑 Administrador</option></select></div></div>
                 <button onclick="adicionarUsuario()" class="btn-submit">➕ Adicionar Usuário</button></div>
                 <div class="tabela-container"><h3>📋 Usuários Cadastrados</h3>
-                <table id="tabelaUsuarios"><thead><tr><th>Usuário</th><th>Nome</th><th>Tipo</th><th>Senha</th><th>Ações</th></tr></thead><tbody id="corpoUsuarios"><tr><td colspan="5">Carregando usuários...</td</tr></tbody></table></div>
+                <table id="tabelaUsuarios"><thead><tr><th>Usuário</th><th>Nome</th><th>Tipo</th><th>Senha</th><th>Ações</th></tr></thead><tbody id="corpoUsuarios"><td><td colspan="5">Carregando usuários...</td</tr></tbody></table></div>
             </div>
         </div>
     </div>
@@ -160,7 +160,6 @@
             return numero || '-';
         }
 
-        // Função para converter número do Excel para YYYY-MM-DD (input date)
         function converterNumeroExcelParaInput(numero) {
             if (!numero) return '';
             if (typeof numero === 'string') {
@@ -173,9 +172,7 @@
             }
             if (typeof numero === 'number' && !isNaN(numero) && numero > 40000) {
                 const data = new Date((numero - 25569) * 86400000);
-                if (!isNaN(data.getTime())) {
-                    return data.toISOString().split('T')[0];
-                }
+                if (!isNaN(data.getTime())) return data.toISOString().split('T')[0];
             }
             return '';
         }
@@ -233,14 +230,13 @@
             if (!confirm(`⚠️ Tem certeza que deseja excluir ${indices.length} registro(s)?\n\nEsta ação não pode ser desfeita.`)) return;
             indices.sort((a, b) => b - a);
             for (const idx of indices) {
-                const response = await fetch(`${API_URL}/excluir-pos-venda`, {
+                await fetch(`${API_URL}/excluir-pos-venda`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ index: idx })
                 });
-                if (!(await response.json()).success) alert(`❌ Erro ao excluir registro`);
             }
-            mostrarNotificacao(`✅ ${indices.length} registro(s) excluído(s) com sucesso!`);
+            mostrarNotificacao(`✅ ${indices.length} registro(s) excluído(s)!`);
             await carregarPosVendas();
             await carregarDashboard();
         }
@@ -249,7 +245,7 @@
             try { 
                 const response = await fetch(`${API_URL}/buscar-usuarios`); 
                 const usuarios = await response.json(); 
-                listaConsultores = usuarios.filter(u => u.tipo === 'pos' && u.usuario !== 'Henrique').map(u => u.nome); 
+                listaConsultores = usuarios.filter(u => u.tipo === 'pos' && u.usuario !== 'henrique').map(u => u.nome); 
                 const modalSelect = document.getElementById('modalConsultor'); 
                 const editSelect = document.getElementById('editConsultor'); 
                 modalSelect.innerHTML = '<option value="">Selecione...</option>'; 
@@ -322,11 +318,11 @@
                 const usuarios = await (await fetch(`${API_URL}/buscar-usuarios`)).json();
                 
                 const mesAtual = new Date().getMonth(), anoAtual = new Date().getFullYear();
-                const visitasMensais = respostas.filter(r => { const d = converterDataParaDate(r.dataHora); return d && d.getMonth() === mesAtual && d.getFullYear() === anoAtual; }).length;
+                const visitasMensais = respostas.filter(r => { const d = converterDataParaDate(r.data_hora); return d && d.getMonth() === mesAtual && d.getFullYear() === anoAtual; }).length;
                 document.getElementById('totalVisitas').textContent = visitasMensais;
                 
                 const hoje = new Date(); const hojeStr = `${hoje.getDate().toString().padStart(2,'0')}/${(hoje.getMonth()+1).toString().padStart(2,'0')}/${hoje.getFullYear()}`;
-                const visitasHoje = respostas.filter(r => { if (!r.dataHora) return false; return r.dataHora.includes(',') ? r.dataHora.split(',')[0] === hojeStr : new Date(r.dataHora).toLocaleDateString('pt-BR') === hojeStr; }).length;
+                const visitasHoje = respostas.filter(r => { if (!r.data_hora) return false; return r.data_hora.includes(',') ? r.data_hora.split(',')[0] === hojeStr : new Date(r.data_hora).toLocaleDateString('pt-BR') === hojeStr; }).length;
                 document.getElementById('totalVisitasHoje').textContent = visitasHoje;
                 
                 const cnpjsUnicos = new Set(); posVendas.forEach(p => { if (p.cnpj && p.cnpj.trim()) cnpjsUnicos.add(p.cnpj); });
@@ -335,7 +331,7 @@
                 const conformidade = respostas.filter(r => r.pergunta1 === 'SIM').length;
                 document.getElementById('taxaConformidade').textContent = respostas.length ? Math.round((conformidade/respostas.length)*100)+'%' : '0%';
                 
-                const consultoresPos = usuarios.filter(u => u.tipo === 'pos' && u.usuario !== 'Henrique').map(u => u.nome);
+                const consultoresPos = usuarios.filter(u => u.tipo === 'pos' && u.usuario !== 'henrique').map(u => u.nome);
                 const cadastradasPorConsultor = [], visitadasPorConsultor = [], convertidasPorConsultor = [], naoRespondidasPorConsultor = [];
                 
                 for (const c of consultoresPos) {
@@ -378,7 +374,7 @@
                 observacao: document.getElementById('modalObservacao').value.trim() 
             }; 
             const response = await fetch(`${API_URL}/adicionar-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ registro }) }); 
-            if ((await response.json()).success) { mostrarNotificacao('✅ Adicionado!'); fecharModalNovoRegistro(); carregarPosVendas(); carregarDashboard(); } 
+            if ((await response.json()).success) { mostrarNotificacao('✅ Adicionado!'); fecharModalNovoRegistro(); await carregarPosVendas(); await carregarDashboard(); } 
             else alert('❌ Erro ao adicionar'); 
         }
 
@@ -386,74 +382,75 @@
             indiceEditando = index; 
             const item = dadosPosVenda[index]; 
             document.getElementById('editConsultor').value = item.consultor || ''; 
-            document.getElementById('editRazaoSocial').value = item.razaoSocial || ''; 
+            document.getElementById('editRazaoSocial').value = item.razao_social || ''; 
             document.getElementById('editCnpj').value = item.cnpj || ''; 
             document.getElementById('editCidade').value = item.cidade || ''; 
             document.getElementById('editTelefone').value = item.telefone || ''; 
             document.getElementById('editResponsavel').value = item.responsavel || ''; 
             document.getElementById('editContabilidade').value = item.contabilidade || ''; 
-            document.getElementById('editDataEntregue').value = converterNumeroExcelParaInput(item.dataEntregue); 
+            document.getElementById('editDataEntregue').value = converterNumeroExcelParaInput(item.data_entregue); 
             document.getElementById('editRetorno').value = converterNumeroExcelParaInput(item.retorno); 
             document.getElementById('editObservacao').value = item.observacao || ''; 
             document.getElementById('modalEditarRegistro').style.display = 'flex'; 
         }
+        
         function fecharModalEditarRegistro() { document.getElementById('modalEditarRegistro').style.display = 'none'; indiceEditando = null; }
         
         async function salvarEdicaoRegistro() { 
-    const consultor = document.getElementById('editConsultor').value; 
-    const razaoSocial = document.getElementById('editRazaoSocial').value.trim(); 
-    
-    if (!consultor || !razaoSocial) { 
-        alert('Preencha consultor e razão social!'); 
-        return; 
-    } 
-    
-    const registro = { 
-        consultor: consultor, 
-        razaoSocial: razaoSocial, 
-        cnpj: document.getElementById('editCnpj').value.trim(), 
-        cidade: document.getElementById('editCidade').value.trim(), 
-        telefone: document.getElementById('editTelefone').value.trim(), 
-        responsavel: document.getElementById('editResponsavel').value.trim(), 
-        contabilidade: document.getElementById('editContabilidade').value.trim(), 
-        dataEntregue: document.getElementById('editDataEntregue').value, 
-        retorno: document.getElementById('editRetorno').value, 
-        observacao: document.getElementById('editObservacao').value.trim() 
-    }; 
-    
-    console.log('Enviando registro para salvar:', registro);
-    console.log('Índice:', indiceEditando);
-    
-    try {
-        const response = await fetch(`${API_URL}/salvar-pos-venda`, { 
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify({ registro, index: indiceEditando }) 
-        }); 
-        
-        const data = await response.json();
-        console.log('Resposta do servidor:', data);
-        
-        if (data.success) { 
-            mostrarNotificacao('✅ Registro atualizado com sucesso!'); 
-            fecharModalEditarRegistro(); 
-            await carregarPosVendas(); 
-            await carregarDashboard(); 
-        } else { 
-            alert('❌ Erro ao salvar: ' + (data.message || 'Erro desconhecido')); 
-        } 
-    } catch (error) {
-        console.error('Erro na requisição:', error);
-        alert('❌ Erro ao conectar com o servidor');
-    }
-}
+            const consultor = document.getElementById('editConsultor').value; 
+            const razaoSocial = document.getElementById('editRazaoSocial').value.trim(); 
+            
+            if (!consultor || !razaoSocial) { 
+                alert('Preencha consultor e razão social!'); 
+                return; 
+            } 
+            
+            const registro = { 
+                consultor: consultor, 
+                razaoSocial: razaoSocial, 
+                cnpj: document.getElementById('editCnpj').value.trim(), 
+                cidade: document.getElementById('editCidade').value.trim(), 
+                telefone: document.getElementById('editTelefone').value.trim(), 
+                responsavel: document.getElementById('editResponsavel').value.trim(), 
+                contabilidade: document.getElementById('editContabilidade').value.trim(), 
+                dataEntregue: document.getElementById('editDataEntregue').value, 
+                retorno: document.getElementById('editRetorno').value, 
+                observacao: document.getElementById('editObservacao').value.trim() 
+            }; 
+            
+            try {
+                const response = await fetch(`${API_URL}/salvar-pos-venda`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ registro, index: indiceEditando }) 
+                }); 
+                
+                const data = await response.json();
+                
+                if (data.success) { 
+                    mostrarNotificacao('✅ Registro atualizado com sucesso!'); 
+                    fecharModalEditarRegistro(); 
+                    await carregarPosVendas(); 
+                    await carregarDashboard();
+                    await carregarConsultores();
+                } else { 
+                    alert('❌ Erro ao salvar: ' + (data.message || 'Erro desconhecido')); 
+                } 
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('❌ Erro ao conectar com o servidor');
+            }
+        }
+
         async function carregarPosVendas() { 
             try { 
                 const response = await fetch(`${API_URL}/buscar-pos-vendas`); 
                 dadosPosVenda = await response.json(); 
+                console.log('Dados carregados:', dadosPosVenda.length);
+                
                 const tbody = document.getElementById('corpoTabelaPosVendas'); 
                 if (!dadosPosVenda.length) { 
-                    tbody.innerHTML = '<tr><td colspan="12">Nenhum registro encontrado. Clique em "Novo Registro" para adicionar.</td></tr>';
+                    tbody.innerHTML = '</td><td colspan="12">Nenhum registro encontrado. Clique em "Novo Registro" para adicionar.直视';
                 } else { 
                     tbody.innerHTML = ''; 
                     dadosPosVenda.forEach((item, idx) => { 
@@ -467,13 +464,13 @@
                         chkCell.appendChild(chk);
                         
                         row.insertCell(1).innerHTML = item.consultor || '-'; 
-                        row.insertCell(2).innerHTML = item.razaoSocial || '-'; 
+                        row.insertCell(2).innerHTML = item.razao_social || '-'; 
                         row.insertCell(3).innerHTML = item.cnpj || '-'; 
                         row.insertCell(4).innerHTML = item.cidade || '-'; 
                         row.insertCell(5).innerHTML = item.telefone || '-'; 
                         row.insertCell(6).innerHTML = item.responsavel || '-'; 
                         row.insertCell(7).innerHTML = item.contabilidade || '-'; 
-                        row.insertCell(8).innerHTML = converterNumeroExcelParaData(item.dataEntregue); 
+                        row.insertCell(8).innerHTML = converterNumeroExcelParaData(item.data_entregue); 
                         row.insertCell(9).innerHTML = converterNumeroExcelParaData(item.retorno); 
                         row.insertCell(10).innerHTML = item.observacao || '-'; 
                         const actionCell = row.insertCell(11); 
@@ -491,7 +488,7 @@
         async function excluirRegistroPosVenda(idx) { 
             if (confirm('Excluir este registro?')) { 
                 const response = await fetch(`${API_URL}/excluir-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ index: idx }) }); 
-                if ((await response.json()).success) { mostrarNotificacao('✅ Excluído!'); carregarPosVendas(); carregarDashboard(); } 
+                if ((await response.json()).success) { mostrarNotificacao('✅ Excluído!'); await carregarPosVendas(); await carregarDashboard(); } 
                 else alert('❌ Erro ao excluir'); 
             } 
         }
@@ -523,7 +520,6 @@
                         const jsonData = XLSX.utils.sheet_to_json(sheet);
                         
                         let importados = 0;
-                        let ignorados = [];
                         
                         function converterData(dataStr) {
                             if (!dataStr) return '';
@@ -544,62 +540,118 @@
                             return '';
                         }
                         
-                        for (let i = 0; i < jsonData.length; i++) {
-                            const row = jsonData[i];
+                        for (const row of jsonData) {
                             const consultor = row['CONSULTOR'] || '';
-                            const razaoSocial = row['RAZAO SOCIAL'] || row['RAZAO_SOCIAL'] || '';
-                            
-                            if (!consultor) { ignorados.push(`Linha ${i+1}: Consultor vazio`); continue; }
-                            if (!razaoSocial) { ignorados.push(`Linha ${i+1}: Razão Social vazia`); continue; }
-                            
-                            const novoRegistro = {
-                                consultor: consultor,
-                                razaoSocial: razaoSocial,
-                                cnpj: row['CNPJ'] || '',
-                                cidade: row['CIDADE'] || '',
-                                telefone: row['TELEFONE'] || '',
-                                responsavel: row['RESPONSAVEL'] || '',
-                                contabilidade: row['CONTABILIDADE'] || '',
-                                dataEntregue: converterData(row['DATA ENTREGUE'] || ''),
-                                retorno: converterData(row['RETORNO'] || ''),
-                                observacao: row['OBSERVAÇÃO'] || ''
-                            };
-                            
-                            const response = await fetch(`${API_URL}/adicionar-pos-venda`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ registro: novoRegistro })
-                            });
-                            const result = await response.json();
-                            if (result.success) importados++;
-                            else ignorados.push(`Linha ${i+1}: ${result.message || 'Erro'}`);
+                            const razaoSocial = row['RAZAO SOCIAL'] || '';
+                            if (consultor && razaoSocial) {
+                                await fetch(`${API_URL}/adicionar-pos-venda`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ registro: {
+                                        consultor, razaoSocial,
+                                        cnpj: row['CNPJ'] || '',
+                                        cidade: row['CIDADE'] || '',
+                                        telefone: row['TELEFONE'] || '',
+                                        responsavel: row['RESPONSAVEL'] || '',
+                                        contabilidade: row['CONTABILIDADE'] || '',
+                                        dataEntregue: converterData(row['DATA ENTREGUE'] || ''),
+                                        retorno: converterData(row['RETORNO'] || ''),
+                                        observacao: row['OBSERVAÇÃO'] || ''
+                                    } })
+                                });
+                                importados++;
+                            }
                         }
-                        
-                        mostrarNotificacao(`✅ ${importados} registros importados! ${ignorados.length > 0 ? `(${ignorados.length} ignorados)` : ''}`);
-                        if (importados > 0) { await carregarPosVendas(); await carregarDashboard(); }
-                    } catch(e) { console.error(e); alert('Erro ao importar: ' + e.message); }
+                        mostrarNotificacao(`✅ ${importados} registros importados!`);
+                        await carregarPosVendas();
+                        await carregarDashboard();
+                    } catch(e) { console.error(e); alert('Erro ao importar'); }
                 };
                 reader.readAsArrayBuffer(file);
             };
             input.click();
         }
 
-        function abrirModalEditarResposta(index) { indiceEditandoResposta = index; const item = dadosAtuais[index]; document.getElementById('editData').value = item.dataHora || ''; document.getElementById('editConsultorResposta').value = item.vendedor || ''; document.getElementById('editCnpjResposta').value = item.cnpj || ''; document.getElementById('editEmpresaResposta').value = item.empresa || ''; document.getElementById('editAet').value = item.pergunta9 || 'NÃO'; document.getElementById('editNr06').value = item.pergunta7 || 'NÃO'; document.getElementById('editCipa').value = item.pergunta8 || 'NÃO'; document.getElementById('editPeriodico').value = item.pergunta3 || 'NÃO'; document.getElementById('editEpis').value = item.pergunta4 || 'NÃO'; document.getElementById('editNotaVisita').value = item.notaVisita || ''; document.getElementById('editVendedor').value = item.vendedorNome || ''; document.getElementById('editVendido').value = item.vendido || ''; document.getElementById('editObsResposta').value = item.observacoes || ''; document.getElementById('modalEditarResposta').style.display = 'flex'; }
+        function abrirModalEditarResposta(index) { 
+            indiceEditandoResposta = index; 
+            const item = dadosAtuais[index]; 
+            document.getElementById('editData').value = item.data_hora || ''; 
+            document.getElementById('editConsultorResposta').value = item.vendedor || ''; 
+            document.getElementById('editCnpjResposta').value = item.cnpj || ''; 
+            document.getElementById('editEmpresaResposta').value = item.empresa || ''; 
+            document.getElementById('editAet').value = item.pergunta9 || 'NÃO'; 
+            document.getElementById('editNr06').value = item.pergunta7 || 'NÃO'; 
+            document.getElementById('editCipa').value = item.pergunta8 || 'NÃO'; 
+            document.getElementById('editPeriodico').value = item.pergunta3 || 'NÃO'; 
+            document.getElementById('editEpis').value = item.pergunta4 || 'NÃO'; 
+            document.getElementById('editNotaVisita').value = item.nota_visita || ''; 
+            document.getElementById('editVendedor').value = item.vendedor_nome || ''; 
+            document.getElementById('editVendido').value = item.vendido || ''; 
+            document.getElementById('editObsResposta').value = item.observacoes || ''; 
+            document.getElementById('modalEditarResposta').style.display = 'flex'; 
+        }
+        
         function fecharModalEditarResposta() { document.getElementById('modalEditarResposta').style.display = 'none'; indiceEditandoResposta = null; }
-        async function salvarEdicaoResposta() { if (indiceEditandoResposta === null) return; const item = dadosAtuais[indiceEditandoResposta]; item.vendedor = document.getElementById('editConsultorResposta').value; item.cnpj = document.getElementById('editCnpjResposta').value; item.empresa = document.getElementById('editEmpresaResposta').value; item.pergunta9 = document.getElementById('editAet').value; item.pergunta7 = document.getElementById('editNr06').value; item.pergunta8 = document.getElementById('editCipa').value; item.pergunta3 = document.getElementById('editPeriodico').value; item.pergunta4 = document.getElementById('editEpis').value; item.notaVisita = document.getElementById('editNotaVisita').value; item.vendedorNome = document.getElementById('editVendedor').value; item.vendido = document.getElementById('editVendido').value; item.observacoes = document.getElementById('editObsResposta').value; const response = await fetch(`${API_URL}/salvar-todos-dados`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dados: dadosAtuais }) }); if ((await response.json()).success) { mostrarNotificacao('✅ Atualizado!'); fecharModalEditarResposta(); carregarDados(); carregarDashboard(); } else alert('❌ Erro'); }
-        async function excluirResposta(index) { if (confirm('Excluir resposta?')) { dadosAtuais.splice(index, 1); const response = await fetch(`${API_URL}/salvar-todos-dados`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dados: dadosAtuais }) }); if ((await response.json()).success) { mostrarNotificacao('✅ Excluído!'); carregarDados(); carregarDashboard(); } else alert('❌ Erro'); } }
+        
+        async function salvarEdicaoResposta() { 
+            if (indiceEditandoResposta === null) return; 
+            const item = dadosAtuais[indiceEditandoResposta]; 
+            item.vendedor = document.getElementById('editConsultorResposta').value; 
+            item.cnpj = document.getElementById('editCnpjResposta').value; 
+            item.empresa = document.getElementById('editEmpresaResposta').value; 
+            item.pergunta9 = document.getElementById('editAet').value; 
+            item.pergunta7 = document.getElementById('editNr06').value; 
+            item.pergunta8 = document.getElementById('editCipa').value; 
+            item.pergunta3 = document.getElementById('editPeriodico').value; 
+            item.pergunta4 = document.getElementById('editEpis').value; 
+            item.nota_visita = document.getElementById('editNotaVisita').value; 
+            item.vendedor_nome = document.getElementById('editVendedor').value; 
+            item.vendido = document.getElementById('editVendido').value; 
+            item.observacoes = document.getElementById('editObsResposta').value; 
+            
+            try {
+                const response = await fetch(`${API_URL}/salvar-todos-dados`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ dados: dadosAtuais }) 
+                }); 
+                const data = await response.json();
+                if (data.success) { 
+                    mostrarNotificacao('✅ Resposta atualizada com sucesso!'); 
+                    fecharModalEditarResposta(); 
+                    await carregarDados(); 
+                    await carregarDashboard(); 
+                } else { 
+                    alert('❌ Erro ao salvar'); 
+                }
+            } catch (error) {
+                console.error(error);
+                alert('❌ Erro ao conectar com o servidor');
+            }
+        }
+        
+        async function excluirResposta(index) { 
+            if (confirm('Excluir resposta?')) { 
+                dadosAtuais.splice(index, 1); 
+                const response = await fetch(`${API_URL}/salvar-todos-dados`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dados: dadosAtuais }) }); 
+                if ((await response.json()).success) { mostrarNotificacao('✅ Excluído!'); await carregarDados(); await carregarDashboard(); } 
+                else alert('❌ Erro'); 
+            } 
+        }
 
         async function carregarDados() { 
             try { 
                 const response = await fetch(`${API_URL}/buscar-respostas`); 
                 dadosAtuais = await response.json(); 
+                console.log('Respostas carregadas:', dadosAtuais.length);
+                
                 const tbody = document.getElementById('corpoTabela'); 
-                if (!dadosAtuais.length) tbody.innerHTML = '<td><td colspan="15">Nenhuma resposta encontrada</td>';
+                if (!dadosAtuais.length) tbody.innerHTML = '<tr><td colspan="15">Nenhuma resposta encontrada直视';
                 else { 
                     tbody.innerHTML = ''; 
                     dadosAtuais.forEach((d, idx) => { 
                         const row = tbody.insertRow(); 
-                        row.insertCell(0).innerHTML = d.dataHora || '-'; 
+                        row.insertCell(0).innerHTML = d.data_hora || '-'; 
                         row.insertCell(1).innerHTML = d.vendedor || '-'; 
                         row.insertCell(2).innerHTML = d.cnpj || '-'; 
                         row.insertCell(3).innerHTML = d.empresa || '-'; 
@@ -609,8 +661,8 @@
                         row.insertCell(7).innerHTML = d.pergunta8 || '-'; 
                         row.insertCell(8).innerHTML = d.pergunta3 || '-'; 
                         row.insertCell(9).innerHTML = d.pergunta4 || '-'; 
-                        row.insertCell(10).innerHTML = d.notaVisita || '-'; 
-                        row.insertCell(11).innerHTML = d.vendedorNome || '-'; 
+                        row.insertCell(10).innerHTML = d.nota_visita || '-'; 
+                        row.insertCell(11).innerHTML = d.vendedor_nome || '-'; 
                         row.insertCell(12).innerHTML = d.vendido || '-'; 
                         row.insertCell(13).innerHTML = d.observacoes || '-'; 
                         const actionCell = row.insertCell(14); 
@@ -621,16 +673,16 @@
                 window.dadosExportacao = dadosAtuais; 
                 await carregarUsuarios(); 
                 await carregarConsultores(); 
-            } catch(e) { console.error(e); document.getElementById('corpoTabela').innerHTML = '<td><td colspan="15">Erro ao carregar dados</td>'; } 
+            } catch(e) { console.error(e); } 
         }
 
         function exportarExcel() { 
             if (!dadosAtuais?.length) { alert('Sem dados para exportar'); return; } 
             const dadosExcel = dadosAtuais.map(d => ({ 
-                'DATA': d.dataHora || '', 'CONSULTOR': d.vendedor || '', 'CNPJ': d.cnpj || '', 'EMPRESA': d.empresa || '', 
+                'DATA': d.data_hora || '', 'CONSULTOR': d.vendedor || '', 'CNPJ': d.cnpj || '', 'EMPRESA': d.empresa || '', 
                 'POS VENDA': 'SIM', 'AET': d.pergunta9 || '', 'NR 06': d.pergunta7 || '', 'CIPA': d.pergunta8 || '', 
-                'PERIODICO': d.pergunta3 || '', 'EPIS': d.pergunta4 || '', 'NOTA VISITA': d.notaVisita || '', 
-                'VENDEDOR': d.vendedorNome || '', 'VENDIDO': d.vendido || '', 'OBS': d.observacoes || '' 
+                'PERIODICO': d.pergunta3 || '', 'EPIS': d.pergunta4 || '', 'NOTA VISITA': d.nota_visita || '', 
+                'VENDEDOR': d.vendedor_nome || '', 'VENDIDO': d.vendido || '', 'OBS': d.observacoes || '' 
             })); 
             const ws = XLSX.utils.json_to_sheet(dadosExcel); 
             const wb = XLSX.utils.book_new(); 
@@ -640,27 +692,24 @@
         }
 
         async function carregarUsuarios() { 
-    const response = await fetch(`${API_URL}/buscar-usuarios`); 
-    const usuarios = await response.json(); 
-    const corpo = document.getElementById('corpoUsuarios'); 
-    
-    // FILTRO: Remove APENAS o usuário henrique (admin continua visível)
-    const usuariosParaMostrar = usuarios.filter(u => u.usuario !== 'henrique');
-    
-    if (!usuariosParaMostrar.length) corpo.innerHTML = '<tr><td colspan="5">Nenhum usuário cadastrado直视';
-    else corpo.innerHTML = usuariosParaMostrar.map(u => `<tr>
-        <td>${u.usuario}</td>
-        <td>${u.nome}</td>
-        <td>${u.tipo === 'admin' ? '👑 Administrador' : '📝 Pós Vendas'}</td>
-        <td>•••••• <button onclick="alert('Senha: ${u.senha}')" class="btn-ver-senha">👁️</button></td>
-        <td><button onclick="abrirModalAlterarSenha('${u.usuario}','${u.nome}')" class="btn-alterar-senha">🔑</button> <button onclick="excluirUsuario('${u.usuario}')" class="btn-excluir">🗑️</button></td>
-    </tr>`).join(''); 
-}
+            const response = await fetch(`${API_URL}/buscar-usuarios`); 
+            const usuarios = await response.json(); 
+            const corpo = document.getElementById('corpoUsuarios'); 
+            const usuariosParaMostrar = usuarios.filter(u => u.usuario !== 'henrique'); 
+            if (!usuariosParaMostrar.length) corpo.innerHTML = '<tr><td colspan="5">Nenhum usuário cadastrado直视';
+            else corpo.innerHTML = usuariosParaMostrar.map(u => `<tr>
+                <td>${u.usuario}</td>
+                <td>${u.nome}</td>
+                <td>${u.tipo === 'admin' ? '👑 Administrador' : '📝 Pós Vendas'}</td>
+                <td>•••••• <button onclick="alert('Senha: ${u.senha}')" class="btn-ver-senha">👁️</button></td>
+                <td><button onclick="abrirModalAlterarSenha('${u.usuario}','${u.nome}')" class="btn-alterar-senha">🔑</button> <button onclick="excluirUsuario('${u.usuario}')" class="btn-excluir">🗑️</button></td>
+            </tr>`).join(''); 
+        }
 
         function abrirModalAlterarSenha(usuario, nome) { const nova = prompt(`Nova senha para ${nome}:`); if (nova && nova.trim()) alterarSenha(usuario, nova); }
-        async function alterarSenha(u, s) { const r = await fetch(`${API_URL}/alterar-senha`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u, novaSenha:s})}); if((await r.json()).success){ alert('✅ Senha alterada!'); carregarUsuarios(); } else alert('❌ Erro'); }
-        async function adicionarUsuario() { const u=document.getElementById('novoUsuario').value.trim(), n=document.getElementById('novoNome').value.trim(), s=document.getElementById('novaSenha').value.trim(), t=document.getElementById('novoTipo').value; if(!u||!n||!s){alert('Preencha todos os campos!');return;} const r=await fetch(`${API_URL}/adicionar-usuario`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u, nome:n, senha:s, tipo:t})}); const d=await r.json(); if(d.success){alert('✅ Usuário adicionado!'); document.getElementById('novoUsuario').value=''; document.getElementById('novoNome').value=''; document.getElementById('novaSenha').value=''; carregarUsuarios(); carregarConsultores(); carregarDashboard();} else alert('❌ '+d.message); }
-        async function excluirUsuario(u) { if(u === 'Henrique'){ alert('Não é possível excluir este usuário'); return; } if(confirm(`Excluir o usuário "${u}"?`)){ const r = await fetch(`${API_URL}/excluir-usuario`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ usuario: u }) }); if ((await r.json()).success) { alert('✅ Usuário excluído!'); carregarUsuarios(); carregarConsultores(); carregarDashboard(); } else alert('❌ Erro ao excluir'); } }
+        async function alterarSenha(u, s) { const r = await fetch(`${API_URL}/alterar-senha`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u, novaSenha:s})}); if((await r.json()).success){ alert('✅ Senha alterada!'); await carregarUsuarios(); } else alert('❌ Erro'); }
+        async function adicionarUsuario() { const u=document.getElementById('novoUsuario').value.trim(), n=document.getElementById('novoNome').value.trim(), s=document.getElementById('novaSenha').value.trim(), t=document.getElementById('novoTipo').value; if(!u||!n||!s){alert('Preencha todos os campos!');return;} const r=await fetch(`${API_URL}/adicionar-usuario`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u, nome:n, senha:s, tipo:t})}); const d=await r.json(); if(d.success){alert('✅ Usuário adicionado!'); document.getElementById('novoUsuario').value=''; document.getElementById('novoNome').value=''; document.getElementById('novaSenha').value=''; await carregarUsuarios(); await carregarConsultores(); await carregarDashboard();} else alert('❌ '+d.message); }
+        async function excluirUsuario(u) { if(u === 'henrique'){ alert('Não é possível excluir este usuário'); return; } if(confirm(`Excluir o usuário "${u}"?`)){ const r = await fetch(`${API_URL}/excluir-usuario`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ usuario: u }) }); if ((await r.json()).success) { alert('✅ Usuário excluído!'); await carregarUsuarios(); await carregarConsultores(); await carregarDashboard(); } else alert('❌ Erro ao excluir'); } }
         
         document.getElementById('btnExcluirSelecionados')?.addEventListener('click', excluirSelecionados);
         
