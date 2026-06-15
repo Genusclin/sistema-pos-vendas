@@ -1,300 +1,300 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const fs = require('fs');
-const path = require('path');
+const { Pool } = require('pg');
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Caminho dos arquivos
-const DATA_FILE = path.join(__dirname, 'data', 'respostas.json');
-const USERS_FILE = path.join(__dirname, 'data', 'usuarios.json');
-const POSVENDA_FILE = path.join(__dirname, 'data', 'posvendas.json');
+// CONEXÃO COM POSTGRESQL (Render)
+const pool = new Pool({
+    connectionString: 'postgresql://henrique:X54Ykj0yrnqOrRMENHtRWrOqP1BFyhBe@dpg-d8o67f0g4nts73d1gjl0-a/posvendas',
+    ssl: { rejectUnauthorized: false }
+});
 
-// Criar pasta data se não existir
-if (!fs.existsSync(path.join(__dirname, 'data'))) {
-    fs.mkdirSync(path.join(__dirname, 'data'));
-}
-
-// Criar arquivo de respostas se não existir
-if (!fs.existsSync(DATA_FILE)) {
-    fs.writeFileSync(DATA_FILE, JSON.stringify([]));
-}
-
-// Criar arquivo de pós venda se não existir
-if (!fs.existsSync(POSVENDA_FILE)) {
-    fs.writeFileSync(POSVENDA_FILE, JSON.stringify([]));
-}
-
-// USUÁRIOS PADRÃO
-let USERS = {
-    'admin': { senha: 'admin123', role: 'admin', nome: 'Administrador' },
-    'Henrique': { senha: '30072021', role: 'admin', nome: 'Henrique Master' }
-};
-
-// Carregar usuários salvos se existir
-if (fs.existsSync(USERS_FILE)) {
+// Criar tabelas se não existirem
+async function initDatabase() {
     try {
-        const savedUsers = JSON.parse(fs.readFileSync(USERS_FILE));
-        USERS = { ...USERS, ...savedUsers };
-    } catch (e) {
-        console.log('Erro ao carregar usuários:', e);
+        // Tabela de respostas
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS respostas (
+                id SERIAL PRIMARY KEY,
+                data_hora TEXT,
+                vendedor TEXT,
+                cnpj TEXT,
+                empresa TEXT,
+                responsavel TEXT,
+                telefone TEXT,
+                pergunta1 TEXT,
+                pergunta2 TEXT,
+                pergunta3 TEXT,
+                pergunta4 TEXT,
+                pergunta5 TEXT,
+                pergunta6 TEXT,
+                pergunta7 TEXT,
+                pergunta8 TEXT,
+                pergunta9 TEXT,
+                nota_visita TEXT,
+                vendedor_nome TEXT,
+                vendido TEXT,
+                observacoes TEXT
+            )
+        `);
+        
+        // Tabela de pós vendas
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS pos_vendas (
+                id SERIAL PRIMARY KEY,
+                consultor TEXT,
+                razao_social TEXT,
+                cnpj TEXT,
+                cidade TEXT,
+                telefone TEXT,
+                responsavel TEXT,
+                contabilidade TEXT,
+                data_entregue TEXT,
+                retorno TEXT,
+                observacao TEXT
+            )
+        `);
+        
+        // Tabela de usuários
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS usuarios (
+                id SERIAL PRIMARY KEY,
+                username TEXT UNIQUE,
+                nome TEXT,
+                senha TEXT,
+                tipo TEXT
+            )
+        `);
+        
+        // Inserir usuários padrão se não existirem
+        await pool.query(`
+            INSERT INTO usuarios (username, nome, senha, tipo)
+            VALUES 
+                ('admin', 'Administrador', 'admin123', 'admin'),
+                ('henrique', 'Henrique Master', '30072021', 'admin'),
+                ('andressa', 'Andressa', '123', 'pos')
+            ON CONFLICT (username) DO NOTHING
+        `);
+        
+        console.log('✅ Banco de dados inicializado com sucesso!');
+    } catch (error) {
+        console.error('Erro ao inicializar banco:', error);
     }
 }
 
-// Função para salvar usuários
-function salvarUsuarios() {
-    const usuariosParaSalvar = {};
-    for (let key in USERS) {
-        if (key !== 'admin') {
-            usuariosParaSalvar[key] = USERS[key];
-        }
-    }
-    fs.writeFileSync(USERS_FILE, JSON.stringify(usuariosParaSalvar, null, 2));
-}
+initDatabase();
 
 // ==================== ROTAS DE LOGIN ====================
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    const user = USERS[username];
-    
-    console.log(`Tentativa de login: ${username}`);
-    
-    if (user && user.senha === password) {
-        console.log(`Login bem sucedido: ${username} (${user.role})`);
-        res.json({ success: true, role: user.role, nome: user.nome });
-    } else {
-        console.log(`Login falhou: ${username}`);
-        res.status(401).json({ success: false, message: 'Usuário ou senha inválidos' });
-    }
-});
-
-// ==================== ROTAS DE RESPOSTAS ====================
-app.post('/salvar-resposta', (req, res) => {
     try {
-        const resposta = req.body;
-        const dados = JSON.parse(fs.readFileSync(DATA_FILE));
-        resposta.dataHora = new Date().toLocaleString('pt-BR');
-        dados.push(resposta);
-        fs.writeFileSync(DATA_FILE, JSON.stringify(dados, null, 2));
-        res.json({ success: true, message: 'Resposta salva com sucesso!' });
-    } catch (error) {
-        console.error('Erro ao salvar resposta:', error);
-        res.status(500).json({ success: false, message: 'Erro ao salvar' });
-    }
-});
-
-app.get('/buscar-respostas', (req, res) => {
-    try {
-        const dados = JSON.parse(fs.readFileSync(DATA_FILE));
-        res.json(dados);
-    } catch (error) {
-        console.error('Erro ao buscar respostas:', error);
-        res.json([]);
-    }
-});
-
-app.post('/salvar-todos-dados', (req, res) => {
-    try {
-        const { dados } = req.body;
-        fs.writeFileSync(DATA_FILE, JSON.stringify(dados, null, 2));
-        res.json({ success: true, message: 'Dados salvos com sucesso!' });
-    } catch (error) {
-        console.error('Erro ao salvar dados:', error);
-        res.status(500).json({ success: false, message: 'Erro ao salvar' });
-    }
-});
-
-// ==================== ROTAS DE PÓS VENDA ====================
-
-// Buscar todos os registros
-app.get('/buscar-pos-vendas', (req, res) => {
-    try {
-        if (fs.existsSync(POSVENDA_FILE)) {
-            const dados = JSON.parse(fs.readFileSync(POSVENDA_FILE));
-            console.log(`Buscando pós vendas: ${dados.length} registros encontrados`);
-            res.json(dados);
+        const result = await pool.query(
+            'SELECT * FROM usuarios WHERE username = $1 AND senha = $2',
+            [username.toLowerCase(), password]
+        );
+        if (result.rows.length > 0) {
+            const user = result.rows[0];
+            res.json({ success: true, role: user.tipo, nome: user.nome });
         } else {
-            res.json([]);
+            res.status(401).json({ success: false });
         }
     } catch (error) {
-        console.error('Erro ao buscar pós vendas:', error);
-        res.json([]);
-    }
-});
-
-// Adicionar novo registro
-app.post('/adicionar-pos-venda', (req, res) => {
-    try {
-        const { registro } = req.body;
-        let dados = [];
-        
-        if (fs.existsSync(POSVENDA_FILE)) {
-            dados = JSON.parse(fs.readFileSync(POSVENDA_FILE));
-        }
-        
-        dados.push(registro);
-        fs.writeFileSync(POSVENDA_FILE, JSON.stringify(dados, null, 2));
-        
-        console.log(`✅ Registro adicionado: ${registro.razaoSocial || 'sem nome'}`);
-        console.log(`Total de registros: ${dados.length}`);
-        res.json({ success: true });
-    } catch (error) {
-        console.error('Erro ao adicionar pós venda:', error);
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-// Salvar registro editado
-app.post('/salvar-pos-venda', (req, res) => {
-    try {
-        const { registro, index } = req.body;
-        let dados = [];
-        
-        if (fs.existsSync(POSVENDA_FILE)) {
-            dados = JSON.parse(fs.readFileSync(POSVENDA_FILE));
-        }
-        
-        if (index >= 0 && index < dados.length) {
-            dados[index] = registro;
-            fs.writeFileSync(POSVENDA_FILE, JSON.stringify(dados, null, 2));
-            console.log(`✅ Registro salvo (index ${index}): ${registro.razaoSocial}`);
-            res.json({ success: true });
-        } else {
-            dados.push(registro);
-            fs.writeFileSync(POSVENDA_FILE, JSON.stringify(dados, null, 2));
-            console.log(`✅ Novo registro salvo: ${registro.razaoSocial}`);
-            res.json({ success: true });
-        }
-    } catch (error) {
-        console.error('Erro ao salvar pós venda:', error);
+        console.error(error);
         res.status(500).json({ success: false });
     }
 });
 
-// Excluir registro
-app.post('/excluir-pos-venda', (req, res) => {
+// ==================== ROTAS DE RESPOSTAS ====================
+app.post('/salvar-resposta', async (req, res) => {
+    try {
+        const resposta = req.body;
+        await pool.query(`
+            INSERT INTO respostas (
+                data_hora, vendedor, cnpj, empresa, responsavel, telefone,
+                pergunta1, pergunta2, pergunta3, pergunta4, pergunta5,
+                pergunta6, pergunta7, pergunta8, pergunta9, nota_visita,
+                vendedor_nome, vendido, observacoes
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
+        `, [
+            new Date().toLocaleString('pt-BR'), resposta.vendedor, resposta.cnpj,
+            resposta.empresa, resposta.responsavel, resposta.telefone,
+            resposta.pergunta1, resposta.pergunta2, resposta.pergunta3,
+            resposta.pergunta4, resposta.pergunta5, resposta.pergunta6,
+            resposta.pergunta7, resposta.pergunta8, resposta.pergunta9,
+            resposta.notaVisita, resposta.vendedorNome, resposta.vendido,
+            resposta.observacoes
+        ]);
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false });
+    }
+});
+
+app.get('/buscar-respostas', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM respostas ORDER BY id DESC');
+        res.json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.json([]);
+    }
+});
+
+app.post('/salvar-todos-dados', async (req, res) => {
+    try {
+        const { dados } = req.body;
+        await pool.query('DELETE FROM respostas');
+        for (const d of dados) {
+            await pool.query(`
+                INSERT INTO respostas (
+                    data_hora, vendedor, cnpj, empresa, responsavel, telefone,
+                    pergunta1, pergunta2, pergunta3, pergunta4, pergunta5,
+                    pergunta6, pergunta7, pergunta8, pergunta9, nota_visita,
+                    vendedor_nome, vendido, observacoes
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
+            `, [d.data_hora, d.vendedor, d.cnpj, d.empresa, d.responsavel, d.telefone,
+                d.pergunta1, d.pergunta2, d.pergunta3, d.pergunta4, d.pergunta5,
+                d.pergunta6, d.pergunta7, d.pergunta8, d.pergunta9, d.nota_visita,
+                d.vendedor_nome, d.vendido, d.observacoes]);
+        }
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false });
+    }
+});
+
+// ==================== ROTAS DE PÓS VENDAS ====================
+app.get('/buscar-pos-vendas', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM pos_vendas ORDER BY id DESC');
+        res.json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.json([]);
+    }
+});
+
+app.post('/adicionar-pos-venda', async (req, res) => {
+    try {
+        const { registro } = req.body;
+        await pool.query(`
+            INSERT INTO pos_vendas (
+                consultor, razao_social, cnpj, cidade, telefone, responsavel,
+                contabilidade, data_entregue, retorno, observacao
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        `, [registro.consultor, registro.razaoSocial, registro.cnpj, registro.cidade,
+            registro.telefone, registro.responsavel, registro.contabilidade,
+            registro.dataEntregue, registro.retorno, registro.observacao]);
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false });
+    }
+});
+
+app.post('/salvar-pos-venda', async (req, res) => {
+    try {
+        const { registro, index } = req.body;
+        const result = await pool.query('SELECT id FROM pos_vendas ORDER BY id LIMIT 1 OFFSET $1', [index]);
+        if (result.rows.length > 0) {
+            await pool.query(`
+                UPDATE pos_vendas SET
+                    consultor = $1, razao_social = $2, cnpj = $3, cidade = $4,
+                    telefone = $5, responsavel = $6, contabilidade = $7,
+                    data_entregue = $8, retorno = $9, observacao = $10
+                WHERE id = $11
+            `, [registro.consultor, registro.razaoSocial, registro.cnpj, registro.cidade,
+                registro.telefone, registro.responsavel, registro.contabilidade,
+                registro.dataEntregue, registro.retorno, registro.observacao, result.rows[0].id]);
+        } else {
+            await pool.query(`
+                INSERT INTO pos_vendas (
+                    consultor, razao_social, cnpj, cidade, telefone, responsavel,
+                    contabilidade, data_entregue, retorno, observacao
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+            `, [registro.consultor, registro.razaoSocial, registro.cnpj, registro.cidade,
+                registro.telefone, registro.responsavel, registro.contabilidade,
+                registro.dataEntregue, registro.retorno, registro.observacao]);
+        }
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false });
+    }
+});
+
+app.post('/excluir-pos-venda', async (req, res) => {
     try {
         const { index } = req.body;
-        let dados = [];
-        
-        if (fs.existsSync(POSVENDA_FILE)) {
-            dados = JSON.parse(fs.readFileSync(POSVENDA_FILE));
+        const result = await pool.query('SELECT id FROM pos_vendas ORDER BY id LIMIT 1 OFFSET $1', [index]);
+        if (result.rows.length > 0) {
+            await pool.query('DELETE FROM pos_vendas WHERE id = $1', [result.rows[0].id]);
         }
-        
-        if (index >= 0 && index < dados.length) {
-            const removido = dados[index];
-            dados.splice(index, 1);
-            fs.writeFileSync(POSVENDA_FILE, JSON.stringify(dados, null, 2));
-            console.log(`✅ Registro excluído: ${removido.razaoSocial}`);
-            res.json({ success: true });
-        } else {
-            res.json({ success: false, message: 'Índice inválido' });
-        }
+        res.json({ success: true });
     } catch (error) {
-        console.error('Erro ao excluir pós venda:', error);
+        console.error(error);
         res.status(500).json({ success: false });
     }
 });
 
 // ==================== ROTAS DE USUÁRIOS ====================
-app.get('/buscar-usuarios', (req, res) => {
+app.get('/buscar-usuarios', async (req, res) => {
     try {
-        const usuariosLista = Object.entries(USERS).map(([key, value]) => ({
-            usuario: key,
-            nome: value.nome,
-            senha: value.senha,
-            tipo: value.role
-        }));
-        res.json(usuariosLista);
+        const result = await pool.query('SELECT username as usuario, nome, senha, tipo FROM usuarios');
+        res.json(result.rows);
     } catch (error) {
-        console.error('Erro ao buscar usuários:', error);
+        console.error(error);
         res.json([]);
     }
 });
 
-app.post('/adicionar-usuario', (req, res) => {
+app.post('/adicionar-usuario', async (req, res) => {
     try {
         const { usuario, nome, senha, tipo } = req.body;
-        
-        console.log('Tentando adicionar usuário:', usuario);
-        
-        if (!usuario || !nome || !senha) {
-            res.json({ success: false, message: 'Preencha todos os campos!' });
-            return;
-        }
-        
-        if (USERS[usuario]) {
-            res.json({ success: false, message: 'Usuário já existe!' });
-            return;
-        }
-        
-        USERS[usuario] = { senha, role: tipo, nome };
-        salvarUsuarios();
-        
-        console.log('✅ Usuário adicionado com sucesso:', usuario);
-        res.json({ success: true, message: 'Usuário adicionado com sucesso!' });
-    } catch (error) {
-        console.error('Erro ao adicionar usuário:', error);
-        res.status(500).json({ success: false, message: 'Erro interno do servidor' });
-    }
-});
-
-app.post('/alterar-senha', (req, res) => {
-    try {
-        const { usuario, novaSenha } = req.body;
-        
-        if (!USERS[usuario]) {
-            res.json({ success: false, message: 'Usuário não encontrado' });
-            return;
-        }
-        
-        USERS[usuario].senha = novaSenha;
-        salvarUsuarios();
+        await pool.query(
+            'INSERT INTO usuarios (username, nome, senha, tipo) VALUES ($1, $2, $3, $4)',
+            [usuario.toLowerCase(), nome, senha, tipo]
+        );
         res.json({ success: true });
     } catch (error) {
-        console.error('Erro ao alterar senha:', error);
+        console.error(error);
         res.status(500).json({ success: false });
     }
 });
 
-app.post('/excluir-usuario', (req, res) => {
+app.post('/alterar-senha', async (req, res) => {
+    try {
+        const { usuario, novaSenha } = req.body;
+        await pool.query('UPDATE usuarios SET senha = $1 WHERE username = $2', [novaSenha, usuario.toLowerCase()]);
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false });
+    }
+});
+
+app.post('/excluir-usuario', async (req, res) => {
     try {
         const { usuario } = req.body;
-        
-        if (usuario === 'admin') {
-            res.json({ success: false, message: 'Não é possível excluir o admin principal' });
-            return;
+        if (usuario === 'admin' || usuario === 'henrique') {
+            return res.json({ success: false, message: 'Não pode excluir este usuário' });
         }
-        
-        if (USERS[usuario]) {
-            delete USERS[usuario];
-            salvarUsuarios();
-            res.json({ success: true });
-        } else {
-            res.json({ success: false, message: 'Usuário não encontrado' });
-        }
+        await pool.query('DELETE FROM usuarios WHERE username = $1', [usuario.toLowerCase()]);
+        res.json({ success: true });
     } catch (error) {
-        console.error('Erro ao excluir usuário:', error);
+        console.error(error);
         res.status(500).json({ success: false });
     }
 });
 
-// ==================== INICIAR SERVIDOR ====================
 const PORT = 3000;
 app.listen(PORT, () => {
-    console.log(`\n========================================`);
     console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
-    console.log(`========================================`);
-    console.log(`\n📋 USUÁRIOS DISPONÍVEIS:`);
-    Object.keys(USERS).forEach(user => {
-        console.log(`   - ${user} (${USERS[user].role}) - Senha: ${USERS[user].senha}`);
-    });
-    console.log(`\n📁 ARQUIVOS DE DADOS:`);
-    console.log(`   - Respostas: ${DATA_FILE}`);
-    console.log(`   - Pós Vendas: ${POSVENDA_FILE}`);
-    console.log(`   - Usuários: ${USERS_FILE}`);
-    console.log(`\n========================================\n`);
+    console.log(`✅ Banco de dados PostgreSQL conectado`);
 });

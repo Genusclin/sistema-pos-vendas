@@ -6,8 +6,9 @@
     "static": "npx serve frontend -l 3000"
   },
   "dependencies": {
-    "express": "^4.18.2",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
-    "body-parser": "^1.20.2"
+    "express": "^4.18.2",
+    "pg": "^8.21.0"
   }
 }
