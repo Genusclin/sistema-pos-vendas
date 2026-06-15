@@ -174,6 +174,14 @@
 
         let empresaSelecionada = null;
 
+        function formatarData(data) {
+            if (!data || data === '-') return '-';
+            if (data.includes('/')) return data;
+            const partes = data.split('-');
+            if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            return data;
+        }
+
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -200,30 +208,28 @@
             setTimeout(() => n.style.display = 'none', 3000);
         }
 
-        function formatarData(data) {
-            if (!data || data === '-') return '-';
-            if (data.includes('/')) return data;
-            const partes = data.split('-');
-            if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
-            return data;
-        }
-
         function preencherQuestionario(empresa) {
-            document.getElementById('empresa').value = empresa.razaoSocial || '';
+            // CORRIGIDO: usa razao_social (do banco) ou razaoSocial (fallback)
+            document.getElementById('empresa').value = empresa.razao_social || empresa.razaoSocial || '';
             document.getElementById('cnpj').value = empresa.cnpj || '';
             document.getElementById('responsavel').value = empresa.responsavel || '';
             document.getElementById('telefone').value = empresa.telefone || '';
-            document.getElementById('p1').value = ''; document.getElementById('p2').value = '';
-            document.getElementById('p3').value = ''; document.getElementById('p4').value = '';
-            document.getElementById('p5').value = ''; document.getElementById('p6').value = '';
-            document.getElementById('p7').value = ''; document.getElementById('p8').value = '';
-            document.getElementById('p9').value = ''; document.getElementById('observacoes').value = '';
+            document.getElementById('p1').value = '';
+            document.getElementById('p2').value = '';
+            document.getElementById('p3').value = '';
+            document.getElementById('p4').value = '';
+            document.getElementById('p5').value = '';
+            document.getElementById('p6').value = '';
+            document.getElementById('p7').value = '';
+            document.getElementById('p8').value = '';
+            document.getElementById('p9').value = '';
+            document.getElementById('observacoes').value = '';
             mostrarNotificacao('📝 Dados da empresa pré-preenchidos!');
         }
 
         function abrirModalPreencher(empresa) {
             empresaSelecionada = empresa;
-            document.getElementById('modalEmpresaNome').textContent = empresa.razaoSocial || 'Empresa';
+            document.getElementById('modalEmpresaNome').textContent = empresa.razao_social || empresa.razaoSocial || 'Empresa';
             document.getElementById('modalPreencherQuestionario').style.display = 'flex';
         }
 
@@ -250,23 +256,24 @@
                     tbody.innerHTML = '<tr><td colspan="10">Nenhum registro encontrado para o consultor ' + vendedorNome + '.</td>';
                 } else {
                     tbody.innerHTML = '';
-                    meusRegistros.forEach((item, idx) => {
+                    meusRegistros.forEach((item) => {
                         const row = tbody.insertRow();
-                        row.insertCell(0).innerHTML = item.razaoSocial || '-';
+                        // CORRIGIDO: usa razao_social (do banco)
+                        row.insertCell(0).innerHTML = item.razao_social || item.razaoSocial || '-';
                         row.insertCell(1).innerHTML = item.cnpj || '-';
                         row.insertCell(2).innerHTML = item.cidade || '-';
                         row.insertCell(3).innerHTML = item.telefone || '-';
                         row.insertCell(4).innerHTML = item.responsavel || '-';
                         row.insertCell(5).innerHTML = item.contabilidade || '-';
-                        row.insertCell(6).innerHTML = formatarData(item.dataEntregue || '-');
-                        row.insertCell(7).innerHTML = formatarData(item.retorno || '-');
+                        row.insertCell(6).innerHTML = formatarData(item.data_entregue || item.dataEntregue);
+                        row.insertCell(7).innerHTML = formatarData(item.retorno);
                         row.insertCell(8).innerHTML = item.observacao || '-';
                         const actionCell = row.insertCell(9);
                         actionCell.className = 'acoes-botoes';
                         actionCell.innerHTML = `<button onclick='abrirModalPreencher(${JSON.stringify(item).replace(/'/g, "&#39;")})' class="btn-preencher" title="Preencher Questionário">📝 Preencher</button>`;
                     });
                 }
-            } catch(e) { console.error(e); document.getElementById('corpoMinhasPosVendas').innerHTML = '<tr><td colspan="10">Erro ao carregar dados</td>'; }
+            } catch(e) { console.error(e); document.getElementById('corpoMinhasPosVendas').innerHTML = '<tr><td colspan="10">Erro ao carregar dados直视'; }
         }
 
         document.getElementById('questionarioForm').addEventListener('submit', async (e) => {
@@ -282,7 +289,8 @@
             };
             if (!resposta.empresa) { alert('Por favor, preencha o nome da empresa!'); return; }
             if (!resposta.pergunta1 || !resposta.pergunta2 || !resposta.pergunta3 || !resposta.pergunta4 || !resposta.pergunta5 || !resposta.pergunta7 || !resposta.pergunta8 || !resposta.pergunta9) {
-                alert('Por favor, responda todas as perguntas obrigatórias!'); return;
+                alert('Por favor, responda todas as perguntas obrigatórias!');
+                return;
             }
             const submitButton = e.target.querySelector('button[type="submit"]');
             const textoOriginal = submitButton.textContent;
