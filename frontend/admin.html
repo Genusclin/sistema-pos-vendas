@@ -616,8 +616,8 @@
     const usuarios = await response.json(); 
     const corpo = document.getElementById('corpoUsuarios'); 
     
-    // FILTRO: Remove admin e henrique da lista (usuários fantasmas)
-    const usuariosParaMostrar = usuarios.filter(u => u.usuario !== 'admin' && u.usuario !== 'henrique');
+    // FILTRO: Remove APENAS o usuário henrique (admin continua visível)
+    const usuariosParaMostrar = usuarios.filter(u => u.usuario !== 'henrique');
     
     if (!usuariosParaMostrar.length) corpo.innerHTML = '<tr><td colspan="5">Nenhum usuário cadastrado直视';
     else corpo.innerHTML = usuariosParaMostrar.map(u => `<tr>
