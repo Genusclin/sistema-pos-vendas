@@ -923,3 +923,29 @@ tr:hover {
 .btn-preencher:hover {
     background: #3182ce;
 }
+/* Botão excluir selecionados */
+.btn-excluir-massa {
+    background: #e53e3e;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.btn-excluir-massa:hover {
+    background: #c53030;
+}
+
+/* Checkbox na tabela */
+.chk-selecionar {
+    cursor: pointer;
+    transform: scale(1.1);
+}
+
+#chkSelecionarTodos {
+    cursor: pointer;
+    transform: scale(1.1);
+}

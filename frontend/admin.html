@@ -38,7 +38,6 @@
                     <div class="stat-card"><h3>Taxa de Conformidade</h3><p id="taxaConformidade">0%</p></div>
                 </div>
 
-                <!-- GRÁFICOS -->
                 <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 30px;">
                     <div style="flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                         <h3 style="text-align: center; margin-bottom: 15px;">📊 Desempenho por Consultor</h3>
@@ -56,16 +55,46 @@
                 </div>
             </div>
 
-            <!-- ABA 2: PÓS VENDAS -->
+            <!-- ABA 2: PÓS VENDAS (COM CHECKBOX E EXCLUIR EM MASSA) -->
             <div id="posvendas" class="tab-content">
                 <div class="tabela-container">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                         <h3 style="margin: 0;">📋 Controle de Pós Vendas</h3>
-                        <div><button onclick="abrirModalNovoRegistro()" class="btn-adicionar">➕ Novo Registro</button>
-                        <div class="dropdown" style="display: inline-block; margin-left: 10px;"><button onclick="toggleDropdown()" class="btn-importar-dropdown">📂 Importar ▼</button>
-                        <div id="dropdownMenu" class="dropdown-content"><a href="#" onclick="importarExcelPosVenda(); fecharDropdown(); return false;">📎 Importar Excel</a><a href="#" onclick="baixarModeloExcel(); fecharDropdown(); return false;">📄 Baixar Modelo</a></div></div></div>
+                        <div>
+                            <button onclick="abrirModalNovoRegistro()" class="btn-adicionar">➕ Novo Registro</button>
+                            <button id="btnExcluirSelecionados" class="btn-excluir-massa" style="display: none; margin-left: 10px; background: #e53e3e;">🗑️ Excluir Selecionados</button>
+                            <div class="dropdown" style="display: inline-block; margin-left: 10px;">
+                                <button onclick="toggleDropdown()" class="btn-importar-dropdown">📂 Importar ▼</button>
+                                <div id="dropdownMenu" class="dropdown-content">
+                                    <a href="#" onclick="importarExcelPosVenda(); fecharDropdown(); return false;">📎 Importar Excel</a>
+                                    <a href="#" onclick="baixarModeloExcel(); fecharDropdown(); return false;">📄 Baixar Modelo</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <table id="tabelaPosVendas"><thead><tr><th>CONSULTOR</th><th>RAZAO SOCIAL</th><th>CNPJ</th><th>CIDADE</th><th>TELEFONE</th><th>RESPONSAVEL</th><th>CONTABILIDADE</th><th>DATA ENTREGUE</th><th>RETORNO</th><th>OBSERVAÇÃO</th><th>Ações</th></tr></thead><tbody id="corpoTabelaPosVendas"><tr><td colspan="11">Carregando...</td></tr></tbody></table>
+                    <div style="overflow-x: auto;">
+                        <table id="tabelaPosVendas">
+                            <thead>
+                                <tr>
+                                    <th style="width: 30px;"><input type="checkbox" id="chkSelecionarTodos" onclick="selecionarTodos()"></th>
+                                    <th>CONSULTOR</th>
+                                    <th>RAZAO SOCIAL</th>
+                                    <th>CNPJ</th>
+                                    <th>CIDADE</th>
+                                    <th>TELEFONE</th>
+                                    <th>RESPONSAVEL</th>
+                                    <th>CONTABILIDADE</th>
+                                    <th>DATA ENTREGUE</th>
+                                    <th>RETORNO</th>
+                                    <th>OBSERVAÇÃO</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="corpoTabelaPosVendas">
+                                <tr><td colspan="12">Carregando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -73,7 +102,7 @@
             <div id="resultado" class="tab-content">
                 <div class="tabela-container">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;"><h3 style="margin: 0;">📋 Resultados Pós Vendas</h3><button onclick="exportarExcel()" class="btn-exportar-pequeno">📎 Exportar Excel</button></div>
-                    <table id="tabelaRespostas"><thead><tr><th>DATA</th><th>CONSULTOR</th><th>CNPJ</th><th>EMPRESA</th><th>POS VENDA</th><th>AET</th><th>NR 06</th><th>CIPA</th><th>PERIODICO</th><th>EPIS</th><th>NOTA VISITA</th><th>VENDEDOR</th><th>VENDIDO</th><th>OBS</th><th>Ações</th></tr></thead><tbody id="corpoTabela"><tr><td colspan="15">Carregando...</td</td></tbody></table>
+                    <table id="tabelaRespostas"><thead><tr><th>DATA</th><th>CONSULTOR</th><th>CNPJ</th><th>EMPRESA</th><th>POS VENDA</th><th>AET</th><th>NR 06</th><th>CIPA</th><th>PERIODICO</th><th>EPIS</th><th>NOTA VISITA</th><th>VENDEDOR</th><th>VENDIDO</th><th>OBS</th><th>Ações</th></tr></thead><tbody id="corpoTabela"><tr><td colspan="15">Carregando...</td</tr></tbody></table>
                 </div>
             </div>
 
@@ -86,7 +115,7 @@
                 <div class="input-group"><label>Tipo:</label><select id="novoTipo"><option value="pos">📝 Pós Vendas</option><option value="admin">👑 Administrador</option></select></div></div>
                 <button onclick="adicionarUsuario()" class="btn-submit">➕ Adicionar Usuário</button></div>
                 <div class="tabela-container"><h3>📋 Usuários Cadastrados</h3>
-                <table id="tabelaUsuarios"><thead><tr><th>Usuário</th><th>Nome</th><th>Tipo</th><th>Senha</th><th>Ações</th></tr></thead><tbody id="corpoUsuarios"><tr><td colspan="5">Carregando...</td></tr></tbody></table></div>
+                <table id="tabelaUsuarios"><thead><tr><th>Usuário</th><th>Nome</th><th>Tipo</th><th>Senha</th><th>Ações</th></tr></thead><tbody id="corpoUsuarios"><tr><td colspan="5">Carregando...</td></td></tbody></table></div>
             </div>
         </div>
     </div>
@@ -111,6 +140,64 @@
         function converterDataParaInput(data) { if (!data || data === '-') return ''; if (data.includes('-')) return data; const partes = data.split('/'); if (partes.length === 3) return `${partes[2]}-${partes[1]}-${partes[0]}`; return data; }
         
         function converterDataParaDate(dataStr) { if (!dataStr) return null; if (dataStr.includes(',')) { const partes = dataStr.split(','); const dataParte = partes[0].trim(); const dataArray = dataParte.split('/'); if (dataArray.length === 3) return new Date(`${dataArray[2]}-${dataArray[1]}-${dataArray[0]}`); } return new Date(dataStr); }
+
+        // Função para verificar quantos checkboxes estão selecionados
+        function verificarSelecionados() {
+            const checkboxes = document.querySelectorAll('.chk-selecionar');
+            const selecionados = Array.from(checkboxes).filter(chk => chk.checked);
+            const btnExcluir = document.getElementById('btnExcluirSelecionados');
+            const chkTodos = document.getElementById('chkSelecionarTodos');
+            
+            if (selecionados.length > 0) {
+                btnExcluir.style.display = 'inline-block';
+                btnExcluir.textContent = `🗑️ Excluir Selecionados (${selecionados.length})`;
+            } else {
+                btnExcluir.style.display = 'none';
+            }
+            
+            // Atualizar checkbox "selecionar todos"
+            if (chkTodos) {
+                const todosCheckboxes = document.querySelectorAll('.chk-selecionar');
+                const todosMarcados = Array.from(todosCheckboxes).every(chk => chk.checked);
+                chkTodos.checked = todosMarcados && todosCheckboxes.length > 0;
+            }
+        }
+
+        // Selecionar/deselecionar todos
+        function selecionarTodos() {
+            const chkTodos = document.getElementById('chkSelecionarTodos');
+            const checkboxes = document.querySelectorAll('.chk-selecionar');
+            checkboxes.forEach(chk => chk.checked = chkTodos.checked);
+            verificarSelecionados();
+        }
+
+        // Excluir selecionados em massa
+        async function excluirSelecionados() {
+            const checkboxes = document.querySelectorAll('.chk-selecionar:checked');
+            const indices = Array.from(checkboxes).map(chk => parseInt(chk.getAttribute('data-index')));
+            
+            if (indices.length === 0) return;
+            
+            if (!confirm(`⚠️ Tem certeza que deseja excluir ${indices.length} registro(s)?\n\nEsta ação não pode ser desfeita.`)) return;
+            
+            // Ordenar decrescente para excluir do final para o início
+            indices.sort((a, b) => b - a);
+            
+            for (const idx of indices) {
+                const response = await fetch(`${API_URL}/excluir-pos-venda`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ index: idx })
+                });
+                if (!(await response.json()).success) {
+                    alert(`❌ Erro ao excluir registro ${idx + 1}`);
+                }
+            }
+            
+            mostrarNotificacao(`✅ ${indices.length} registro(s) excluído(s) com sucesso!`);
+            await carregarPosVendas();
+            await carregarDashboard();
+        }
 
         async function carregarConsultores() { try { const response = await fetch(`${API_URL}/buscar-usuarios`); const usuarios = await response.json(); listaConsultores = usuarios.filter(u => u.tipo === 'pos' && u.usuario !== 'Henrique').map(u => u.nome); const modalSelect = document.getElementById('modalConsultor'); const editSelect = document.getElementById('editConsultor'); modalSelect.innerHTML = '<option value="">Selecione...</option>'; editSelect.innerHTML = '<option value="">Selecione...</option>'; listaConsultores.forEach(c => { modalSelect.innerHTML += `<option value="${c}">${c}</option>`; editSelect.innerHTML += `<option value="${c}">${c}</option>`; }); } catch(e) { console.error(e); } }
 
@@ -192,123 +279,64 @@
         async function salvarEdicaoRegistro() { const consultor = document.getElementById('editConsultor').value, razaoSocial = document.getElementById('editRazaoSocial').value.trim(); if (!consultor || !razaoSocial) { alert('Preencha consultor e razão social!'); return; } const registro = { consultor, razaoSocial, cnpj: document.getElementById('editCnpj').value.trim(), cidade: document.getElementById('editCidade').value.trim(), telefone: document.getElementById('editTelefone').value.trim(), responsavel: document.getElementById('editResponsavel').value.trim(), contabilidade: document.getElementById('editContabilidade').value.trim(), dataEntregue: document.getElementById('editDataEntregue').value, retorno: document.getElementById('editRetorno').value, observacao: document.getElementById('editObservacao').value.trim() }; const response = await fetch(`${API_URL}/salvar-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ registro, index: indiceEditando }) }); if ((await response.json()).success) { mostrarNotificacao('✅ Atualizado!'); fecharModalEditarRegistro(); carregarPosVendas(); carregarDashboard(); } else alert('❌ Erro'); }
 
         async function carregarPosVendas() { 
-    try { 
-        const response = await fetch(`${API_URL}/buscar-pos-vendas`); 
-        dadosPosVenda = await response.json(); 
-        const tbody = document.getElementById('corpoTabelaPosVendas'); 
-        
-        // Verificar se existem registros selecionados (para mostrar botão de excluir em massa)
-        const itensSelecionados = document.querySelectorAll('.checkbox-pos-venda:checked').length;
-        const btnExcluirMassa = document.getElementById('btnExcluirMassa');
-        if (btnExcluirMassa) {
-            if (itensSelecionados >= 2) {
-                btnExcluirMassa.style.display = 'inline-block';
-                btnExcluirMassa.textContent = `🗑️ Excluir Selecionados (${itensSelecionados})`;
-            } else {
-                btnExcluirMassa.style.display = 'none';
-            }
+            try { 
+                const response = await fetch(`${API_URL}/buscar-pos-vendas`); 
+                dadosPosVenda = await response.json(); 
+                const tbody = document.getElementById('corpoTabelaPosVendas'); 
+                if (!dadosPosVenda.length) { 
+                    tbody.innerHTML = '<tr><td colspan="12">Nenhum registro encontrado. Clique em "Novo Registro" para adicionar.直视';
+                } else { 
+                    tbody.innerHTML = ''; 
+                    dadosPosVenda.forEach((item, idx) => { 
+                        const row = tbody.insertRow(); 
+                        const chkCell = row.insertCell(0);
+                        const chk = document.createElement('input');
+                        chk.type = 'checkbox';
+                        chk.className = 'chk-selecionar';
+                        chk.setAttribute('data-index', idx);
+                        chk.onclick = function() { verificarSelecionados(); };
+                        chkCell.appendChild(chk);
+                        
+                        row.insertCell(1).innerHTML = item.consultor || '-'; 
+                        row.insertCell(2).innerHTML = item.razaoSocial || '-'; 
+                        row.insertCell(3).innerHTML = item.cnpj || '-'; 
+                        row.insertCell(4).innerHTML = item.cidade || '-'; 
+                        row.insertCell(5).innerHTML = item.telefone || '-'; 
+                        row.insertCell(6).innerHTML = item.responsavel || '-'; 
+                        row.insertCell(7).innerHTML = item.contabilidade || '-'; 
+                        
+                        let dataEntregueFormatada = '-';
+                        if (item.dataEntregue) {
+                            if (typeof item.dataEntregue === 'string' && item.dataEntregue.includes('-')) {
+                                const partes = item.dataEntregue.split('-');
+                                if (partes.length === 3) dataEntregueFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                            } else if (typeof item.dataEntregue === 'string') dataEntregueFormatada = item.dataEntregue;
+                        }
+                        row.insertCell(8).innerHTML = dataEntregueFormatada;
+                        
+                        let retornoFormatado = '-';
+                        if (item.retorno) {
+                            if (typeof item.retorno === 'string' && item.retorno.includes('-')) {
+                                const partes = item.retorno.split('-');
+                                if (partes.length === 3) retornoFormatado = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                            } else if (typeof item.retorno === 'string') retornoFormatado = item.retorno;
+                        }
+                        row.insertCell(9).innerHTML = retornoFormatado;
+                        
+                        row.insertCell(10).innerHTML = item.observacao || '-'; 
+                        const actionCell = row.insertCell(11); 
+                        actionCell.className = 'acoes-botoes'; 
+                        actionCell.innerHTML = `<button onclick="abrirModalEditarRegistro(${idx})" class="btn-editar">✏️</button><button onclick="excluirRegistroPosVenda(${idx})" class="btn-excluir">🗑️</button>`; 
+                    }); 
+                    verificarSelecionados();
+                } 
+            } catch(e) { 
+                console.error(e); 
+                document.getElementById('corpoTabelaPosVendas').innerHTML = '<tr><td colspan="12">Erro ao carregar dados直视';
+            } 
         }
-        
-        if (!dadosPosVenda.length) { 
-            tbody.innerHTML = '<tr><td colspan="11">Nenhum registro</td>';
-        } else { 
-            tbody.innerHTML = ''; 
-            dadosPosVenda.forEach((item, idx) => { 
-                const row = tbody.insertRow(); 
-                
-                // Checkbox de seleção
-                const chkCell = row.insertCell(0);
-                chkCell.innerHTML = `<input type="checkbox" class="checkbox-pos-venda" data-index="${idx}" onchange="toggleExcluirMassa()">`;
-                chkCell.style.width = '30px';
-                chkCell.style.textAlign = 'center';
-                
-                row.insertCell(1).innerHTML = item.consultor || '-'; 
-                row.insertCell(2).innerHTML = item.razaoSocial || '-'; 
-                row.insertCell(3).innerHTML = item.cnpj || '-'; 
-                row.insertCell(4).innerHTML = item.cidade || '-'; 
-                row.insertCell(5).innerHTML = item.telefone || '-'; 
-                row.insertCell(6).innerHTML = item.responsavel || '-'; 
-                row.insertCell(7).innerHTML = item.contabilidade || '-'; 
-                
-                let dataEntregueFormatada = '-';
-                if (item.dataEntregue) {
-                    if (typeof item.dataEntregue === 'string' && item.dataEntregue.includes('-')) {
-                        const partes = item.dataEntregue.split('-');
-                        if (partes.length === 3) dataEntregueFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
-                    } else if (typeof item.dataEntregue === 'string') dataEntregueFormatada = item.dataEntregue;
-                }
-                row.insertCell(8).innerHTML = dataEntregueFormatada;
-                
-                let retornoFormatado = '-';
-                if (item.retorno) {
-                    if (typeof item.retorno === 'string' && item.retorno.includes('-')) {
-                        const partes = item.retorno.split('-');
-                        if (partes.length === 3) retornoFormatado = `${partes[2]}/${partes[1]}/${partes[0]}`;
-                    } else if (typeof item.retorno === 'string') retornoFormatado = item.retorno;
-                }
-                row.insertCell(9).innerHTML = retornoFormatado;
-                
-                row.insertCell(10).innerHTML = item.observacao || '-'; 
-                const actionCell = row.insertCell(11); 
-                actionCell.className = 'acoes-botoes'; 
-                actionCell.innerHTML = '<button onclick="abrirModalEditarRegistro(' + idx + ')" class="btn-editar">✏️</button><button onclick="excluirRegistroPosVenda(' + idx + ')" class="btn-excluir">🗑️</button>'; 
-            }); 
-        } 
-    } catch(e) { 
-        console.error(e); 
-        document.getElementById('corpoTabelaPosVendas').innerHTML = '<tr><td colspan="12">Erro</td>';
-    } 
-}
 
-// Função para mostrar/esconder botão de excluir em massa
-function toggleExcluirMassa() {
-    const itensSelecionados = document.querySelectorAll('.checkbox-pos-venda:checked').length;
-    const btnExcluirMassa = document.getElementById('btnExcluirMassa');
-    if (btnExcluirMassa) {
-        if (itensSelecionados >= 2) {
-            btnExcluirMassa.style.display = 'inline-block';
-            btnExcluirMassa.textContent = `🗑️ Excluir Selecionados (${itensSelecionados})`;
-        } else {
-            btnExcluirMassa.style.display = 'none';
-        }
-    }
-}
-
-// Função para excluir vários registros em massa
-async function excluirSelecionados() {
-    const checkboxes = document.querySelectorAll('.checkbox-pos-venda:checked');
-    if (checkboxes.length < 2) {
-        alert('Selecione pelo menos 2 registros para excluir em massa!');
-        return;
-    }
-    
-    const indices = Array.from(checkboxes).map(cb => parseInt(cb.getAttribute('data-index')));
-    const nomes = indices.map(i => dadosPosVenda[i]?.razaoSocial || 'Sem nome');
-    
-    if (confirm(`⚠️ Tem certeza que deseja excluir ${indices.length} registros?\n\n${nomes.slice(0,5).join('\n')}${nomes.length > 5 ? '\n...' : ''}`)) {
-        // Excluir do array (do maior índice para o menor)
-        indices.sort((a,b) => b - a);
-        for (const idx of indices) {
-            dadosPosVenda.splice(idx, 1);
-        }
-        
-        // Salvar no backend
-        for (let i = 0; i < dadosPosVenda.length; i++) {
-            await fetch(`${API_URL}/salvar-pos-venda`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ registro: dadosPosVenda[i], index: i })
-            });
-        }
-        
-        // Recarregar a tabela
-        await carregarPosVendas();
-        await carregarDashboard();
-        mostrarNotificacao(`✅ ${indices.length} registros excluídos com sucesso!`);
-    }
-}
-
-        async function excluirRegistroPosVenda(idx) { if (confirm('Excluir?')) { const response = await fetch(`${API_URL}/excluir-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ index: idx }) }); if ((await response.json()).success) { mostrarNotificacao('✅ Excluído!'); carregarPosVendas(); carregarDashboard(); } else alert('❌ Erro'); } }
+        async function excluirRegistroPosVenda(idx) { if (confirm('Excluir este registro?')) { const response = await fetch(`${API_URL}/excluir-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ index: idx }) }); if ((await response.json()).success) { mostrarNotificacao('✅ Excluído!'); carregarPosVendas(); carregarDashboard(); } else alert('❌ Erro'); } }
 
         function baixarModeloExcel() { const modelo = [{ 'CONSULTOR':'','RAZAO SOCIAL':'','CNPJ':'','CIDADE':'','TELEFONE':'','RESPONSAVEL':'','CONTABILIDADE':'','DATA ENTREGUE':'','RETORNO':'','OBSERVAÇÃO':'' }]; const ws = XLSX.utils.json_to_sheet(modelo); ws['!cols'] = [{wch:20},{wch:30},{wch:18},{wch:20},{wch:15},{wch:20},{wch:25},{wch:15},{wch:15},{wch:40}]; const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'MODELO'); XLSX.writeFile(wb, 'modelo_pos_vendas.xlsx'); mostrarNotificacao('📄 Modelo baixado!'); }
 
@@ -329,8 +357,6 @@ async function excluirSelecionados() {
                         const jsonData = XLSX.utils.sheet_to_json(sheet);
                         
                         console.log('📊 Dados lidos do Excel:', jsonData.length, 'linhas');
-                        if (jsonData.length > 0) console.log('📋 Primeira linha:', jsonData[0]);
-                        
                         let importados = 0;
                         let ignorados = [];
                         
@@ -385,7 +411,6 @@ async function excluirSelecionados() {
                         }
                         
                         mostrarNotificacao(`✅ ${importados} registros importados! ${ignorados.length > 0 ? `(${ignorados.length} ignorados)` : ''}`);
-                        if (ignorados.length > 0) console.log('⚠️ Ignorados:', ignorados);
                         if (importados > 0) { await carregarPosVendas(); await carregarDashboard(); }
                     } catch(e) { console.error('❌ Erro:', e); alert('Erro ao importar: ' + e.message); }
                 };
@@ -399,16 +424,19 @@ async function excluirSelecionados() {
         async function salvarEdicaoResposta() { if (indiceEditandoResposta === null) return; const item = dadosAtuais[indiceEditandoResposta]; item.vendedor = document.getElementById('editConsultorResposta').value; item.cnpj = document.getElementById('editCnpjResposta').value; item.empresa = document.getElementById('editEmpresaResposta').value; item.pergunta9 = document.getElementById('editAet').value; item.pergunta7 = document.getElementById('editNr06').value; item.pergunta8 = document.getElementById('editCipa').value; item.pergunta3 = document.getElementById('editPeriodico').value; item.pergunta4 = document.getElementById('editEpis').value; item.notaVisita = document.getElementById('editNotaVisita').value; item.vendedorNome = document.getElementById('editVendedor').value; item.vendido = document.getElementById('editVendido').value; item.observacoes = document.getElementById('editObsResposta').value; const response = await fetch(`${API_URL}/salvar-todos-dados`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dados: dadosAtuais }) }); if ((await response.json()).success) { mostrarNotificacao('✅ Atualizado!'); fecharModalEditarResposta(); carregarDados(); carregarDashboard(); } else alert('❌ Erro'); }
         async function excluirResposta(index) { if (confirm('Excluir resposta?')) { dadosAtuais.splice(index, 1); const response = await fetch(`${API_URL}/salvar-todos-dados`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dados: dadosAtuais }) }); if ((await response.json()).success) { mostrarNotificacao('✅ Excluído!'); carregarDados(); carregarDashboard(); } else alert('❌ Erro'); } }
 
-        async function carregarDados() { try { const response = await fetch(`${API_URL}/buscar-respostas`); dadosAtuais = await response.json(); const tbody = document.getElementById('corpoTabela'); if (!dadosAtuais.length) tbody.innerHTML = '<td><td colspan="15">Nenhuma resposta</td>'; else { tbody.innerHTML = ''; dadosAtuais.forEach((d, idx) => { const row = tbody.insertRow(); row.insertCell(0).innerHTML = d.dataHora || '-'; row.insertCell(1).innerHTML = d.vendedor || '-'; row.insertCell(2).innerHTML = d.cnpj || '-'; row.insertCell(3).innerHTML = d.empresa || '-'; row.insertCell(4).innerHTML = 'SIM'; row.insertCell(5).innerHTML = d.pergunta9 || '-'; row.insertCell(6).innerHTML = d.pergunta7 || '-'; row.insertCell(7).innerHTML = d.pergunta8 || '-'; row.insertCell(8).innerHTML = d.pergunta3 || '-'; row.insertCell(9).innerHTML = d.pergunta4 || '-'; row.insertCell(10).innerHTML = d.notaVisita || '-'; row.insertCell(11).innerHTML = d.vendedorNome || '-'; row.insertCell(12).innerHTML = d.vendido || '-'; row.insertCell(13).innerHTML = d.observacoes || '-'; const actionCell = row.insertCell(14); actionCell.className = 'acoes-botoes'; actionCell.innerHTML = `<button onclick="abrirModalEditarResposta(${idx})" class="btn-editar">✏️</button><button onclick="excluirResposta(${idx})" class="btn-excluir">🗑️</button>`; }); } window.dadosExportacao = dadosAtuais; await carregarUsuarios(); await carregarConsultores(); } catch(e) { console.error(e); document.getElementById('corpoTabela').innerHTML = '<tr><td colspan="15">Erro'.repeat(1); } }
+        async function carregarDados() { try { const response = await fetch(`${API_URL}/buscar-respostas`); dadosAtuais = await response.json(); const tbody = document.getElementById('corpoTabela'); if (!dadosAtuais.length) tbody.innerHTML = '<td><td colspan="15">Nenhuma resposta encontrada直视'; else { tbody.innerHTML = ''; dadosAtuais.forEach((d, idx) => { const row = tbody.insertRow(); row.insertCell(0).innerHTML = d.dataHora || '-'; row.insertCell(1).innerHTML = d.vendedor || '-'; row.insertCell(2).innerHTML = d.cnpj || '-'; row.insertCell(3).innerHTML = d.empresa || '-'; row.insertCell(4).innerHTML = 'SIM'; row.insertCell(5).innerHTML = d.pergunta9 || '-'; row.insertCell(6).innerHTML = d.pergunta7 || '-'; row.insertCell(7).innerHTML = d.pergunta8 || '-'; row.insertCell(8).innerHTML = d.pergunta3 || '-'; row.insertCell(9).innerHTML = d.pergunta4 || '-'; row.insertCell(10).innerHTML = d.notaVisita || '-'; row.insertCell(11).innerHTML = d.vendedorNome || '-'; row.insertCell(12).innerHTML = d.vendido || '-'; row.insertCell(13).innerHTML = d.observacoes || '-'; const actionCell = row.insertCell(14); actionCell.className = 'acoes-botoes'; actionCell.innerHTML = `<button onclick="abrirModalEditarResposta(${idx})" class="btn-editar">✏️</button><button onclick="excluirResposta(${idx})" class="btn-excluir">🗑️</button>`; }); } window.dadosExportacao = dadosAtuais; await carregarUsuarios(); await carregarConsultores(); } catch(e) { console.error(e); document.getElementById('corpoTabela').innerHTML = '<tr><td colspan="15">Erro ao carregar dados直视'; } }
 
         function exportarExcel() { if (!dadosAtuais?.length) { alert('Sem dados'); return; } const dadosExcel = dadosAtuais.map(d => ({ 'DATA': d.dataHora || '', 'CONSULTOR': d.vendedor || '', 'CNPJ': d.cnpj || '', 'EMPRESA': d.empresa || '', 'POS VENDA': 'SIM', 'AET': d.pergunta9 || '', 'NR 06': d.pergunta7 || '', 'CIPA': d.pergunta8 || '', 'PERIODICO': d.pergunta3 || '', 'EPIS': d.pergunta4 || '', 'NOTA VISITA': d.notaVisita || '', 'VENDEDOR': d.vendedorNome || '', 'VENDIDO': d.vendido || '', 'OBS': d.observacoes || '' })); const ws = XLSX.utils.json_to_sheet(dadosExcel); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'RESULTADOS'); XLSX.writeFile(wb, `RESULTADOS_POS_VENDAS_${new Date().toISOString().split('T')[0]}.xlsx`); mostrarNotificacao('✅ Exportado!'); }
 
-        async function carregarUsuarios() { const response = await fetch(`${API_URL}/buscar-usuarios`); const usuarios = await response.json(); const corpo = document.getElementById('corpoUsuarios'); const usuariosParaMostrar = usuarios.filter(u => u.usuario !== 'Henrique'); if (!usuariosParaMostrar.length) corpo.innerHTML = '</table><td colspan="5">Nenhum usuário</td>'; else corpo.innerHTML = usuariosParaMostrar.map(u => `<tr><td>${u.usuario}</td><td>${u.nome}</td><td>${u.tipo === 'admin' ? '👑 Administrador' : '📝 Pós Vendas'}</td><td>•••••• <button onclick="alert('Senha: ${u.senha}')" class="btn-ver-senha">👁️</button></td><td><button onclick="abrirModalAlterarSenha('${u.usuario}','${u.nome}')" class="btn-alterar-senha">🔑</button> <button onclick="excluirUsuario('${u.usuario}')" class="btn-excluir">🗑️</button></td></tr>`).join(''); }
+        async function carregarUsuarios() { const response = await fetch(`${API_URL}/buscar-usuarios`); const usuarios = await response.json(); const corpo = document.getElementById('corpoUsuarios'); const usuariosParaMostrar = usuarios.filter(u => u.usuario !== 'Henrique'); if (!usuariosParaMostrar.length) corpo.innerHTML = '<tr><td colspan="5">Nenhum usuário直视'; else corpo.innerHTML = usuariosParaMostrar.map(u => `<tr><td>${u.usuario}</td><td>${u.nome}</td><td>${u.tipo === 'admin' ? '👑 Administrador' : '📝 Pós Vendas'}</td><td>•••••• <button onclick="alert('Senha: ${u.senha}')" class="btn-ver-senha">👁️</button></td><td><button onclick="abrirModalAlterarSenha('${u.usuario}','${u.nome}')" class="btn-alterar-senha">🔑</button> <button onclick="excluirUsuario('${u.usuario}')" class="btn-excluir">🗑️</button></td></tr>`).join(''); }
 
         function abrirModalAlterarSenha(usuario, nome) { const nova = prompt(`Nova senha para ${nome}:`); if (nova && nova.trim()) alterarSenha(usuario, nova); }
         async function alterarSenha(u, s) { const r = await fetch(`${API_URL}/alterar-senha`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u, novaSenha:s})}); if((await r.json()).success){ alert('✅ Senha alterada!'); carregarUsuarios(); } else alert('❌ Erro'); }
         async function adicionarUsuario() { const u=document.getElementById('novoUsuario').value.trim(), n=document.getElementById('novoNome').value.trim(), s=document.getElementById('novaSenha').value.trim(), t=document.getElementById('novoTipo').value; if(!u||!n||!s){alert('Preencha tudo!');return;} const r=await fetch(`${API_URL}/adicionar-usuario`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u, nome:n, senha:s, tipo:t})}); const d=await r.json(); if(d.success){alert('✅ Usuário adicionado!'); document.getElementById('novoUsuario').value=''; document.getElementById('novoNome').value=''; document.getElementById('novaSenha').value=''; carregarUsuarios(); carregarConsultores(); carregarDashboard();} else alert('❌ '+d.message); }
         async function excluirUsuario(u) { if(u === 'Henrique'){ alert('Não pode excluir este usuário'); return; } if(confirm(`Excluir ${u}?`)){ const r = await fetch(`${API_URL}/excluir-usuario`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ usuario: u }) }); if ((await r.json()).success) { alert('✅ Excluído!'); carregarUsuarios(); carregarConsultores(); carregarDashboard(); } else alert('❌ Erro'); } }
+        
+        // Adicionar evento ao botão de excluir selecionados
+        document.getElementById('btnExcluirSelecionados')?.addEventListener('click', excluirSelecionados);
         
         window.dadosExportacao = []; 
         carregarDados(); 
