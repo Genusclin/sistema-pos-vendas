@@ -923,7 +923,7 @@ tr:hover {
 .btn-preencher:hover {
     background: #3182ce;
 }
-/* Botão excluir selecionados */
+/* Botão excluir selecionados - tamanho pequeno (igual ao Novo Registro) */
 .btn-excluir-massa {
     background: #e53e3e;
     color: white;
@@ -933,6 +933,8 @@ tr:hover {
     cursor: pointer;
     font-size: 14px;
     transition: background 0.3s;
+    width: auto;
+    margin-left: 10px;
 }
 
 .btn-excluir-massa:hover {
