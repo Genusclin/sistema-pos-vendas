@@ -243,7 +243,63 @@
         function fecharModalEditarRegistro() { document.getElementById('modalEditarRegistro').style.display = 'none'; indiceEditando = null; }
         async function salvarEdicaoRegistro() { const consultor = document.getElementById('editConsultor').value, razaoSocial = document.getElementById('editRazaoSocial').value.trim(); if (!consultor || !razaoSocial) { alert('Preencha consultor e razão social!'); return; } const registro = { consultor, razaoSocial, cnpj: document.getElementById('editCnpj').value.trim(), cidade: document.getElementById('editCidade').value.trim(), telefone: document.getElementById('editTelefone').value.trim(), responsavel: document.getElementById('editResponsavel').value.trim(), contabilidade: document.getElementById('editContabilidade').value.trim(), dataEntregue: document.getElementById('editDataEntregue').value, retorno: document.getElementById('editRetorno').value, observacao: document.getElementById('editObservacao').value.trim() }; const response = await fetch(`${API_URL}/salvar-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ registro, index: indiceEditando }) }); if ((await response.json()).success) { mostrarNotificacao('✅ Atualizado!'); fecharModalEditarRegistro(); carregarPosVendas(); carregarDashboard(); } else alert('❌ Erro'); }
 
-        async function carregarPosVendas() { try { const response = await fetch(`${API_URL}/buscar-pos-vendas`); dadosPosVenda = await response.json(); const tbody = document.getElementById('corpoTabelaPosVendas'); if (!dadosPosVenda.length) tbody.innerHTML = '<tr><td colspan="11">Nenhum registro</td>'; else { tbody.innerHTML = ''; dadosPosVenda.forEach((item, idx) => { const row = tbody.insertRow(); row.insertCell(0).innerHTML = item.consultor || '-'; row.insertCell(1).innerHTML = item.razaoSocial || '-'; row.insertCell(2).innerHTML = item.cnpj || '-'; row.insertCell(3).innerHTML = item.cidade || '-'; row.insertCell(4).innerHTML = item.telefone || '-'; row.insertCell(5).innerHTML = item.responsavel || '-'; row.insertCell(6).innerHTML = item.contabilidade || '-'; row.insertCell(7).innerHTML = item.dataEntregue ? item.dataEntregue.split('-').reverse().join('/') : '-'; row.insertCell(8).innerHTML = item.retorno ? item.retorno.split('-').reverse().join('/') : '-'; row.insertCell(9).innerHTML = item.observacao || '-'; const actionCell = row.insertCell(10); actionCell.className = 'acoes-botoes'; actionCell.innerHTML = `<button onclick="abrirModalEditarRegistro(${idx})" class="btn-editar">✏️</button><button onclick="excluirRegistroPosVenda(${idx})" class="btn-excluir">🗑️</button>`; }); } } catch(e) { console.error(e); document.getElementById('corpoTabelaPosVendas').innerHTML = '<tr><td colspan="11">Erro erro'; } }
+        async function carregarPosVendas() { 
+    try { 
+        const response = await fetch(`${API_URL}/buscar-pos-vendas`); 
+        dadosPosVenda = await response.json(); 
+        const tbody = document.getElementById('corpoTabelaPosVendas'); 
+        if (!dadosPosVenda.length) { 
+            tbody.innerHTML = '<tr><td colspan="11">Nenhum registro</td>';
+        } else { 
+            tbody.innerHTML = ''; 
+            dadosPosVenda.forEach((item, idx) => { 
+                const row = tbody.insertRow(); 
+                row.insertCell(0).innerHTML = item.consultor || '-'; 
+                row.insertCell(1).innerHTML = item.razaoSocial || '-'; 
+                row.insertCell(2).innerHTML = item.cnpj || '-'; 
+                row.insertCell(3).innerHTML = item.cidade || '-'; 
+                row.insertCell(4).innerHTML = item.telefone || '-'; 
+                row.insertCell(5).innerHTML = item.responsavel || '-'; 
+                row.insertCell(6).innerHTML = item.contabilidade || '-'; 
+                
+                // CORREÇÃO AQUI: verifica se é string antes de fazer split
+                let dataEntregueFormatada = '-';
+                if (item.dataEntregue) {
+                    if (typeof item.dataEntregue === 'string' && item.dataEntregue.includes('-')) {
+                        const partes = item.dataEntregue.split('-');
+                        if (partes.length === 3) {
+                            dataEntregueFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                        }
+                    } else if (typeof item.dataEntregue === 'string') {
+                        dataEntregueFormatada = item.dataEntregue;
+                    }
+                }
+                row.insertCell(7).innerHTML = dataEntregueFormatada;
+                
+                let retornoFormatado = '-';
+                if (item.retorno) {
+                    if (typeof item.retorno === 'string' && item.retorno.includes('-')) {
+                        const partes = item.retorno.split('-');
+                        if (partes.length === 3) {
+                            retornoFormatado = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                        }
+                    } else if (typeof item.retorno === 'string') {
+                        retornoFormatado = item.retorno;
+                    }
+                }
+                row.insertCell(8).innerHTML = retornoFormatado;
+                
+                row.insertCell(9).innerHTML = item.observacao || '-'; 
+                const actionCell = row.insertCell(10); 
+                actionCell.className = 'acoes-botoes'; 
+                actionCell.innerHTML = `<button onclick="abrirModalEditarRegistro(${idx})" class="btn-editar">✏️</button><button onclick="excluirRegistroPosVenda(${idx})" class="btn-excluir">🗑️</button>`; 
+            }); 
+        } 
+    } catch(e) { 
+        console.error(e); 
+        document.getElementById('corpoTabelaPosVendas').innerHTML = '<tr><td colspan="11">Erro</td>';
+    } 
+}
 
         async function excluirRegistroPosVenda(idx) { if (confirm('Excluir?')) { const response = await fetch(`${API_URL}/excluir-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ index: idx }) }); if ((await response.json()).success) { mostrarNotificacao('✅ Excluído!'); carregarPosVendas(); carregarDashboard(); } else alert('❌ Erro'); } }
 
