@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="admin-menu.css">
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -28,6 +29,7 @@
                 </ul>
             </div>
 
+            <!-- ABA 1: DASHBOARD -->
             <div id="dashboard" class="tab-content ativo">
                 <div class="stats">
                     <div class="stat-card"><h3>Total de Visitas Mensais</h3><p id="totalVisitas">0</p></div>
@@ -35,12 +37,26 @@
                     <div class="stat-card"><h3>Total de Empresas Cadastradas</h3><p id="totalEmpresasCadastradas">0</p></div>
                     <div class="stat-card"><h3>Taxa de Conformidade</h3><p id="taxaConformidade">0%</p></div>
                 </div>
+
+                <!-- GRÁFICOS -->
+                <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 30px;">
+                    <div style="flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <h3 style="text-align: center; margin-bottom: 15px;">📊 Desempenho por Consultor</h3>
+                        <canvas id="graficoDesempenho" style="max-height: 300px;"></canvas>
+                    </div>
+                    <div style="flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <h3 style="text-align: center; margin-bottom: 15px;">📋 Cadastradas vs Não Respondidas</h3>
+                        <canvas id="graficoComparativo" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+
                 <div class="tabela-container">
                     <h3>📊 Desempenho por Consultor</h3>
                     <table id="tabelaDesempenho"><thead><tr><th>Consultor</th><th>Empresas Cadastradas</th><th>Empresas Visitadas</th><th>Convertido em Vendas</th></tr></thead><tbody id="corpoDesempenho"><tr><td colspan="4">Carregando...</td></tr></tbody></table>
                 </div>
             </div>
 
+            <!-- ABA 2: PÓS VENDAS -->
             <div id="posvendas" class="tab-content">
                 <div class="tabela-container">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -53,13 +69,15 @@
                 </div>
             </div>
 
+            <!-- ABA 3: RESULTADO -->
             <div id="resultado" class="tab-content">
                 <div class="tabela-container">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;"><h3 style="margin: 0;">📋 Resultados Pós Vendas</h3><button onclick="exportarExcel()" class="btn-exportar-pequeno">📎 Exportar Excel</button></div>
-                    <table id="tabelaRespostas"><thead><tr><th>DATA</th><th>CONSULTOR</th><th>CNPJ</th><th>EMPRESA</th><th>POS VENDA</th><th>AET</th><th>NR 06</th><th>CIPA</th><th>PERIODICO</th><th>EPIS</th><th>NOTA VISITA</th><th>VENDEDOR</th><th>VENDIDO</th><th>OBS</th><th>Ações</th></tr></thead><tbody id="corpoTabela"><tr><td colspan="15">Carregando...</td</tr></tbody></table>
+                    <table id="tabelaRespostas"><thead><tr><th>DATA</th><th>CONSULTOR</th><th>CNPJ</th><th>EMPRESA</th><th>POS VENDA</th><th>AET</th><th>NR 06</th><th>CIPA</th><th>PERIODICO</th><th>EPIS</th><th>NOTA VISITA</th><th>VENDEDOR</th><th>VENDIDO</th><th>OBS</th><th>Ações</th></tr></thead><tbody id="corpoTabela"><tr><td colspan="15">Carregando...</td</table></tbody></table>
                 </div>
             </div>
 
+            <!-- ABA 4: CADASTRO -->
             <div id="cadastro" class="tab-content">
                 <div class="section"><h3>➕ Adicionar Novo Usuário</h3>
                 <div class="form-cadastro"><div class="input-group"><label>Usuário:</label><input type="text" id="novoUsuario" placeholder="ex: maria"></div>
@@ -68,8 +86,7 @@
                 <div class="input-group"><label>Tipo:</label><select id="novoTipo"><option value="pos">📝 Pós Vendas</option><option value="admin">👑 Administrador</option></select></div></div>
                 <button onclick="adicionarUsuario()" class="btn-submit">➕ Adicionar Usuário</button></div>
                 <div class="tabela-container"><h3>📋 Usuários Cadastrados</h3>
-                <table id="tabelaUsuarios"><thead><tr><th>Usuário</th><th>Nome</th><th>Tipo</th><th>Senha</th><th>Ações</th></tr></thead><tbody id="corpoUsuarios"><tr><td colspan="5">Carregando...</td></tr></tbody></table>
-                </div>
+                <table id="tabelaUsuarios"><thead><tr><th>Usuário</th><th>Nome</th><th>Tipo</th><th>Senha</th><th>Ações</th></tr></thead><tbody id="corpoUsuarios"><tr><td colspan="5">Carregando...</td></tr></tbody></table></div>
             </div>
         </div>
     </div>
@@ -87,6 +104,8 @@
         if (userRole !== 'admin') window.location.href = 'login.html';
 
         let dadosAtuais = [], dadosPosVenda = [], indiceEditando = null, indiceEditandoResposta = null, listaConsultores = [];
+        let graficoDesempenho = null;
+        let graficoComparativo = null;
 
         function converterDataParaInput(data) { if (!data || data === '-') return ''; if (data.includes('-')) return data; const partes = data.split('/'); if (partes.length === 3) return `${partes[2]}-${partes[1]}-${partes[0]}`; return data; }
         function converterDataParaDate(dataStr) { if (!dataStr) return null; if (dataStr.includes(',')) { const partes = dataStr.split(','); const dataParte = partes[0].trim(); const dataArray = dataParte.split('/'); if (dataArray.length === 3) return new Date(`${dataArray[2]}-${dataArray[1]}-${dataArray[0]}`); } return new Date(dataStr); }
@@ -102,6 +121,70 @@
 
         function logout() { const manter = confirm('Manter dados salvos?'); if (!manter) { localStorage.removeItem('loginSalvo'); localStorage.removeItem('senhaSalva'); localStorage.removeItem('manterConectado'); } localStorage.removeItem('userRole'); localStorage.removeItem('userName'); localStorage.removeItem('usuarioLogado'); localStorage.removeItem('sessaoAtiva'); localStorage.removeItem('ultimoAcesso'); window.location.href = 'login.html'; }
         function mostrarNotificacao(mensagem) { let n = document.getElementById('notificacao'); if (!n) { n = document.createElement('div'); n.id = 'notificacao'; n.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#48bb78;color:white;padding:10px 20px;border-radius:5px;z-index:9999'; document.body.appendChild(n); } n.textContent = mensagem; n.style.display = 'block'; setTimeout(() => n.style.display = 'none', 3000); }
+
+        function atualizarGraficos(consultores, cadastradas, visitadas, naoRespondidas) {
+            // Gráfico 1: Desempenho por Consultor (Empresas Visitadas vs Convertidas)
+            if (graficoDesempenho) graficoDesempenho.destroy();
+            const ctx1 = document.getElementById('graficoDesempenho').getContext('2d');
+            graficoDesempenho = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: consultores,
+                    datasets: [
+                        {
+                            label: 'Empresas Visitadas',
+                            data: visitadas,
+                            backgroundColor: '#667eea',
+                            borderRadius: 5
+                        },
+                        {
+                            label: 'Convertido em Vendas',
+                            data: consultores.map((_, i) => dadosDesempenhoConvertido[i]),
+                            backgroundColor: '#48bb78',
+                            borderRadius: 5
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { position: 'top' } },
+                    scales: { y: { beginAtZero: true, title: { display: true, text: 'Quantidade' } } }
+                }
+            });
+
+            // Gráfico 2: Cadastradas vs Não Respondidas
+            if (graficoComparativo) graficoComparativo.destroy();
+            const ctx2 = document.getElementById('graficoComparativo').getContext('2d');
+            graficoComparativo = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: consultores,
+                    datasets: [
+                        {
+                            label: 'Empresas Cadastradas',
+                            data: cadastradas,
+                            backgroundColor: '#4299e1',
+                            borderRadius: 5
+                        },
+                        {
+                            label: 'Não Respondidas',
+                            data: naoRespondidas,
+                            backgroundColor: '#e53e3e',
+                            borderRadius: 5
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { position: 'top' } },
+                    scales: { y: { beginAtZero: true, title: { display: true, text: 'Quantidade' } } }
+                }
+            });
+        }
+
+        let dadosDesempenhoConvertido = [];
 
         async function carregarDashboard() {
             try {
@@ -124,9 +207,31 @@
                 document.getElementById('taxaConformidade').textContent = respostas.length ? Math.round((conformidade/respostas.length)*100)+'%' : '0%';
                 
                 const consultoresPos = usuarios.filter(u => u.tipo === 'pos' && u.usuario !== 'Henrique').map(u => u.nome);
+                
+                // Dados para os gráficos
+                const cadastradasPorConsultor = [];
+                const visitadasPorConsultor = [];
+                const convertidasPorConsultor = [];
+                const naoRespondidasPorConsultor = [];
+                
+                for (const c of consultoresPos) {
+                    const cadastradas = posVendas.filter(p => p.consultor === c).length;
+                    const visitadas = respostas.filter(r => r.vendedor === c).length;
+                    const convertidas = respostas.filter(r => r.vendedor === c && r.vendido === 'SIM').length;
+                    const naoRespondidas = cadastradas - visitadas;
+                    
+                    cadastradasPorConsultor.push(cadastradas);
+                    visitadasPorConsultor.push(visitadas);
+                    convertidasPorConsultor.push(convertidas);
+                    naoRespondidasPorConsultor.push(naoRespondidas < 0 ? 0 : naoRespondidas);
+                }
+                
+                dadosDesempenhoConvertido = convertidasPorConsultor;
+                atualizarGraficos(consultoresPos, cadastradasPorConsultor, visitadasPorConsultor, naoRespondidasPorConsultor);
+                
                 const corpo = document.getElementById('corpoDesempenho');
                 if (!consultoresPos.length) corpo.innerHTML = '<tr><td colspan="4">Nenhum consultor</td>';
-                else { corpo.innerHTML = ''; for (const c of consultoresPos) { const row = corpo.insertRow(); row.insertCell(0).innerHTML = c; row.insertCell(1).innerHTML = posVendas.filter(p => p.consultor === c).length; row.insertCell(2).innerHTML = respostas.filter(r => r.vendedor === c).length; row.insertCell(3).innerHTML = respostas.filter(r => r.vendedor === c && r.vendido === 'SIM').length; } }
+                else { corpo.innerHTML = ''; for (let i = 0; i < consultoresPos.length; i++) { const row = corpo.insertRow(); row.insertCell(0).innerHTML = consultoresPos[i]; row.insertCell(1).innerHTML = cadastradasPorConsultor[i]; row.insertCell(2).innerHTML = visitadasPorConsultor[i]; row.insertCell(3).innerHTML = convertidasPorConsultor[i]; } }
             } catch(e) { console.error(e); }
         }
 
@@ -138,7 +243,7 @@
         function fecharModalEditarRegistro() { document.getElementById('modalEditarRegistro').style.display = 'none'; indiceEditando = null; }
         async function salvarEdicaoRegistro() { const consultor = document.getElementById('editConsultor').value, razaoSocial = document.getElementById('editRazaoSocial').value.trim(); if (!consultor || !razaoSocial) { alert('Preencha consultor e razão social!'); return; } const registro = { consultor, razaoSocial, cnpj: document.getElementById('editCnpj').value.trim(), cidade: document.getElementById('editCidade').value.trim(), telefone: document.getElementById('editTelefone').value.trim(), responsavel: document.getElementById('editResponsavel').value.trim(), contabilidade: document.getElementById('editContabilidade').value.trim(), dataEntregue: document.getElementById('editDataEntregue').value, retorno: document.getElementById('editRetorno').value, observacao: document.getElementById('editObservacao').value.trim() }; const response = await fetch(`${API_URL}/salvar-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ registro, index: indiceEditando }) }); if ((await response.json()).success) { mostrarNotificacao('✅ Atualizado!'); fecharModalEditarRegistro(); carregarPosVendas(); carregarDashboard(); } else alert('❌ Erro'); }
 
-        async function carregarPosVendas() { try { const response = await fetch(`${API_URL}/buscar-pos-vendas`); dadosPosVenda = await response.json(); const tbody = document.getElementById('corpoTabelaPosVendas'); if (!dadosPosVenda.length) tbody.innerHTML = '<tr><td colspan="11">Nenhum registro</td>'; else { tbody.innerHTML = ''; dadosPosVenda.forEach((item, idx) => { const row = tbody.insertRow(); row.insertCell(0).innerHTML = item.consultor || '-'; row.insertCell(1).innerHTML = item.razaoSocial || '-'; row.insertCell(2).innerHTML = item.cnpj || '-'; row.insertCell(3).innerHTML = item.cidade || '-'; row.insertCell(4).innerHTML = item.telefone || '-'; row.insertCell(5).innerHTML = item.responsavel || '-'; row.insertCell(6).innerHTML = item.contabilidade || '-'; row.insertCell(7).innerHTML = item.dataEntregue ? item.dataEntregue.split('-').reverse().join('/') : '-'; row.insertCell(8).innerHTML = item.retorno ? item.retorno.split('-').reverse().join('/') : '-'; row.insertCell(9).innerHTML = item.observacao || '-'; const actionCell = row.insertCell(10); actionCell.className = 'acoes-botoes'; actionCell.innerHTML = `<button onclick="abrirModalEditarRegistro(${idx})" class="btn-editar">✏️</button><button onclick="excluirRegistroPosVenda(${idx})" class="btn-excluir">🗑️</button>`; }); } } catch(e) { console.error(e); document.getElementById('corpoTabelaPosVendas').innerHTML = '<td><td colspan="11">Erro</td>'; } }
+        async function carregarPosVendas() { try { const response = await fetch(`${API_URL}/buscar-pos-vendas`); dadosPosVenda = await response.json(); const tbody = document.getElementById('corpoTabelaPosVendas'); if (!dadosPosVenda.length) tbody.innerHTML = '<tr><td colspan="11">Nenhum registro</td>'; else { tbody.innerHTML = ''; dadosPosVenda.forEach((item, idx) => { const row = tbody.insertRow(); row.insertCell(0).innerHTML = item.consultor || '-'; row.insertCell(1).innerHTML = item.razaoSocial || '-'; row.insertCell(2).innerHTML = item.cnpj || '-'; row.insertCell(3).innerHTML = item.cidade || '-'; row.insertCell(4).innerHTML = item.telefone || '-'; row.insertCell(5).innerHTML = item.responsavel || '-'; row.insertCell(6).innerHTML = item.contabilidade || '-'; row.insertCell(7).innerHTML = item.dataEntregue ? item.dataEntregue.split('-').reverse().join('/') : '-'; row.insertCell(8).innerHTML = item.retorno ? item.retorno.split('-').reverse().join('/') : '-'; row.insertCell(9).innerHTML = item.observacao || '-'; const actionCell = row.insertCell(10); actionCell.className = 'acoes-botoes'; actionCell.innerHTML = `<button onclick="abrirModalEditarRegistro(${idx})" class="btn-editar">✏️</button><button onclick="excluirRegistroPosVenda(${idx})" class="btn-excluir">🗑️</button>`; }); } } catch(e) { console.error(e); document.getElementById('corpoTabelaPosVendas').innerHTML = '<tr><td colspan="11">Erro erro'; } }
 
         async function excluirRegistroPosVenda(idx) { if (confirm('Excluir?')) { const response = await fetch(`${API_URL}/excluir-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ index: idx }) }); if ((await response.json()).success) { mostrarNotificacao('✅ Excluído!'); carregarPosVendas(); carregarDashboard(); } else alert('❌ Erro'); } }
 
@@ -155,16 +260,12 @@
 
         function exportarExcel() { if (!dadosAtuais?.length) { alert('Sem dados'); return; } const dadosExcel = dadosAtuais.map(d => ({ 'DATA': d.dataHora || '', 'CONSULTOR': d.vendedor || '', 'CNPJ': d.cnpj || '', 'EMPRESA': d.empresa || '', 'POS VENDA': 'SIM', 'AET': d.pergunta9 || '', 'NR 06': d.pergunta7 || '', 'CIPA': d.pergunta8 || '', 'PERIODICO': d.pergunta3 || '', 'EPIS': d.pergunta4 || '', 'NOTA VISITA': d.notaVisita || '', 'VENDEDOR': d.vendedorNome || '', 'VENDIDO': d.vendido || '', 'OBS': d.observacoes || '' })); const ws = XLSX.utils.json_to_sheet(dadosExcel); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'RESULTADOS'); XLSX.writeFile(wb, `RESULTADOS_POS_VENDAS_${new Date().toISOString().split('T')[0]}.xlsx`); mostrarNotificacao('✅ Exportado!'); }
 
-        // FUNÇÃO MODIFICADA: Apenas Henrique fica oculto, admin aparece
         async function carregarUsuarios() { 
             const response = await fetch(`${API_URL}/buscar-usuarios`); 
             const usuarios = await response.json(); 
             const corpo = document.getElementById('corpoUsuarios'); 
-            
-            // FILTRO: Remove APENAS o usuário Henrique da lista (admin aparece)
             const usuariosParaMostrar = usuarios.filter(u => u.usuario !== 'Henrique');
-            
-            if (!usuariosParaMostrar.length) corpo.innerHTML = '<tr><td colspan="5">Nenhum usuário</td>'; 
+            if (!usuariosParaMostrar.length) corpo.innerHTML = '<tr><td colspan="5">Nenhum usuárioço'; 
             else corpo.innerHTML = usuariosParaMostrar.map(u => `
                 <tr>
                     <td>${u.usuario}</td>
@@ -180,7 +281,6 @@
         async function alterarSenha(u, s) { const r = await fetch(`${API_URL}/alterar-senha`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u, novaSenha:s})}); if((await r.json()).success){ alert('✅ Senha alterada!'); carregarUsuarios(); } else alert('❌ Erro'); }
         async function adicionarUsuario() { const u=document.getElementById('novoUsuario').value.trim(), n=document.getElementById('novoNome').value.trim(), s=document.getElementById('novaSenha').value.trim(), t=document.getElementById('novoTipo').value; if(!u||!n||!s){alert('Preencha tudo!');return;} const r=await fetch(`${API_URL}/adicionar-usuario`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u, nome:n, senha:s, tipo:t})}); const d=await r.json(); if(d.success){alert('✅ Usuário adicionado!'); document.getElementById('novoUsuario').value=''; document.getElementById('novoNome').value=''; document.getElementById('novaSenha').value=''; carregarUsuarios(); carregarConsultores(); carregarDashboard();} else alert('❌ '+d.message); }
         
-        // FUNÇÃO MODIFICADA: Henrique não pode ser excluído
         async function excluirUsuario(u) { 
             if(u === 'Henrique'){ alert('Não pode excluir este usuário'); return; } 
             if(confirm(`Excluir ${u}?`)){
