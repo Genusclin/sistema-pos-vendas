@@ -612,13 +612,22 @@
         }
 
         async function carregarUsuarios() { 
-            const response = await fetch(`${API_URL}/buscar-usuarios`); 
-            const usuarios = await response.json(); 
-            const corpo = document.getElementById('corpoUsuarios'); 
-            const usuariosParaMostrar = usuarios.filter(u => u.usuario !== 'Henrique'); 
-            if (!usuariosParaMostrar.length) corpo.innerHTML = '<tr><td colspan="5">Nenhum usuário cadastrado</td>';
-            else corpo.innerHTML = usuariosParaMostrar.map(u => `<tr><td>${u.usuario}</td><td>${u.nome}</td><td>${u.tipo === 'admin' ? '👑 Administrador' : '📝 Pós Vendas'}</td><td>•••••• <button onclick="alert('Senha: ${u.senha}')" class="btn-ver-senha">👁️</button></td><td><button onclick="abrirModalAlterarSenha('${u.usuario}','${u.nome}')" class="btn-alterar-senha">🔑</button> <button onclick="excluirUsuario('${u.usuario}')" class="btn-excluir">🗑️</button></td></tr>`).join(''); 
-        }
+    const response = await fetch(`${API_URL}/buscar-usuarios`); 
+    const usuarios = await response.json(); 
+    const corpo = document.getElementById('corpoUsuarios'); 
+    
+    // FILTRO: Remove admin e henrique da lista (usuários fantasmas)
+    const usuariosParaMostrar = usuarios.filter(u => u.usuario !== 'admin' && u.usuario !== 'henrique');
+    
+    if (!usuariosParaMostrar.length) corpo.innerHTML = '<tr><td colspan="5">Nenhum usuário cadastrado直视';
+    else corpo.innerHTML = usuariosParaMostrar.map(u => `<tr>
+        <td>${u.usuario}</td>
+        <td>${u.nome}</td>
+        <td>${u.tipo === 'admin' ? '👑 Administrador' : '📝 Pós Vendas'}</td>
+        <td>•••••• <button onclick="alert('Senha: ${u.senha}')" class="btn-ver-senha">👁️</button></td>
+        <td><button onclick="abrirModalAlterarSenha('${u.usuario}','${u.nome}')" class="btn-alterar-senha">🔑</button> <button onclick="excluirUsuario('${u.usuario}')" class="btn-excluir">🗑️</button></td>
+    </tr>`).join(''); 
+}
 
         function abrirModalAlterarSenha(usuario, nome) { const nova = prompt(`Nova senha para ${nome}:`); if (nova && nova.trim()) alterarSenha(usuario, nova); }
         async function alterarSenha(u, s) { const r = await fetch(`${API_URL}/alterar-senha`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u, novaSenha:s})}); if((await r.json()).success){ alert('✅ Senha alterada!'); carregarUsuarios(); } else alert('❌ Erro'); }
