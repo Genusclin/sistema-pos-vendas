@@ -1,0 +1,9 @@
+# Dados (não enviar para o GitHub)
+backend/data/*.json
+
+# Dependências
+node_modules/
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
