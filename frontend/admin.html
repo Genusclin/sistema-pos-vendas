@@ -58,12 +58,14 @@
             <!-- ABA 2: PÓS VENDAS -->
             <div id="posvendas" class="tab-content">
                 <div class="tabela-container">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
                         <h3 style="margin: 0;">📋 Controle de Pós Vendas</h3>
-                        <div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                            <button onclick="abrirModalFiltroPosVendas()" class="btn-filtro">🔍 Filtrar</button>
+                            <button onclick="exportarExcelPosVendas()" class="btn-exportar-pequeno">📎 Exportar</button>
                             <button onclick="abrirModalNovoRegistro()" class="btn-adicionar">➕ Novo Registro</button>
-                            <button id="btnExcluirSelecionados" class="btn-excluir-massa" style="display: none; margin-left: 10px;">🗑️ Excluir Selecionados</button>
-                            <div class="dropdown" style="display: inline-block; margin-left: 10px;">
+                            <button id="btnExcluirSelecionados" class="btn-excluir-massa" style="display: none;">🗑️ Excluir Selecionados</button>
+                            <div class="dropdown" style="display: inline-block;">
                                 <button onclick="toggleDropdown()" class="btn-importar-dropdown">📂 Importar ▼</button>
                                 <div id="dropdownMenu" class="dropdown-content">
                                     <a href="#" onclick="importarExcelPosVenda(); fecharDropdown(); return false;">📎 Importar Excel</a>
@@ -91,7 +93,7 @@
                                 </tr>
                             </thead>
                             <tbody id="corpoTabelaPosVendas">
-                                <tr><td colspan="12">Carregando dados...</td</tr>
+                                <tr><td colspan="12">Carregando dados...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -101,8 +103,25 @@
             <!-- ABA 3: RESULTADO -->
             <div id="resultado" class="tab-content">
                 <div class="tabela-container">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;"><h3 style="margin: 0;">📋 Resultados Pós Vendas</h3><button onclick="exportarExcel()" class="btn-exportar-pequeno">📎 Exportar Excel</button></div>
-                    <table id="tabelaRespostas"><thead><tr><th>DATA</th><th>CONSULTOR</th><th>CNPJ</th><th>EMPRESA</th><th>POS VENDA</th><th>AET</th><th>NR 06</th><th>CIPA</th><th>PERIODICO</th><th>EPIS</th><th>NOTA VISITA</th><th>VENDEDOR</th><th>VENDIDO</th><th>OBS</th><th>Ações</th></tr></thead><tbody id="corpoTabela"><tr><td colspan="15">Nenhuma resposta encontrada</td</tr></tbody></table>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                        <h3 style="margin: 0;">📋 Resultados Pós Vendas</h3>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                            <button onclick="abrirModalFiltroResultado()" class="btn-filtro">🔍 Filtrar</button>
+                            <button onclick="exportarExcel()" class="btn-exportar-pequeno">📎 Exportar Excel</button>
+                        </div>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table id="tabelaRespostas">
+                            <thead>
+                                <tr>
+                                    <th>DATA</th><th>CONSULTOR</th><th>CNPJ</th><th>EMPRESA</th><th>POS VENDA</th>
+                                    <th>AET</th><th>NR 06</th><th>CIPA</th><th>PERIODICO</th><th>EPIS</th>
+                                    <th>NOTA VISITA</th><th>VENDEDOR</th><th>VENDIDO</th><th>OBS</th><th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="corpoTabela"><tr><td colspan="15">Nenhuma resposta encontrada</td></tr></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -115,12 +134,155 @@
                 <div class="input-group"><label>Tipo:</label><select id="novoTipo"><option value="pos">📝 Pós Vendas</option><option value="admin">👑 Administrador</option></select></div></div>
                 <button onclick="adicionarUsuario()" class="btn-submit">➕ Adicionar Usuário</button></div>
                 <div class="tabela-container"><h3>📋 Usuários Cadastrados</h3>
-                <table id="tabelaUsuarios"><thead><tr><th>Usuário</th><th>Nome</th><th>Tipo</th><th>Senha</th><th>Ações</th></tr></thead><tbody id="corpoUsuarios"><td><td colspan="5">Carregando usuários...</td</tr></tbody></table></div>
+                <table id="tabelaUsuarios"><thead><tr><th>Usuário</th><th>Nome</th><th>Tipo</th><th>Senha</th><th>Ações</th></tr></thead><tbody id="corpoUsuarios"><tr><td colspan="5">Carregando usuários...</td></tr></tbody></table></div>
             </div>
         </div>
     </div>
 
-    <!-- MODAIS -->
+    <!-- MODAL FILTRO PÓS VENDAS -->
+    <div id="modalFiltroPosVendas" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header"><h3>🔍 Filtrar Pós Vendas</h3><span class="modal-fechar" onclick="fecharModalFiltroPosVendas()">&times;</span></div>
+            <div class="modal-body">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="input-group">
+                        <label>CONSULTOR:</label>
+                        <select id="filtroConsultorPosVendas">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>RAZAO SOCIAL:</label>
+                        <input type="text" id="filtroRazaoPosVendas" placeholder="Digite para filtrar...">
+                    </div>
+                    <div class="input-group">
+                        <label>CNPJ:</label>
+                        <input type="text" id="filtroCnpjPosVendas" placeholder="Digite para filtrar...">
+                    </div>
+                    <div class="input-group">
+                        <label>CIDADE:</label>
+                        <input type="text" id="filtroCidadePosVendas" placeholder="Digite para filtrar...">
+                    </div>
+                    <div class="input-group">
+                        <label>CONTABILIDADE:</label>
+                        <input type="text" id="filtroContabilidadePosVendas" placeholder="Digite para filtrar...">
+                    </div>
+                    <div class="input-group">
+                        <label>DATA ENTREGUE:</label>
+                        <input type="date" id="filtroDataEntreguePosVendas">
+                    </div>
+                    <div class="input-group" style="grid-column: span 2;">
+                        <label>RETORNO:</label>
+                        <input type="date" id="filtroRetornoPosVendas">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button onclick="aplicarFiltroPosVendas()" class="btn-salvar-modal" style="flex:1;">✅ Aplicar Filtro</button>
+                    <button onclick="limparFiltroPosVendas()" class="btn-cancelar" style="flex:1;">🔄 Limpar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FILTRO RESULTADO -->
+    <div id="modalFiltroResultado" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header"><h3>🔍 Filtrar Resultados</h3><span class="modal-fechar" onclick="fecharModalFiltroResultado()">&times;</span></div>
+            <div class="modal-body">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="input-group">
+                        <label>DATA:</label>
+                        <input type="date" id="filtroDataResultado">
+                    </div>
+                    <div class="input-group">
+                        <label>CONSULTOR:</label>
+                        <select id="filtroConsultorResultado">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>CNPJ:</label>
+                        <input type="text" id="filtroCnpjResultado" placeholder="Digite para filtrar...">
+                    </div>
+                    <div class="input-group">
+                        <label>EMPRESA:</label>
+                        <input type="text" id="filtroEmpresaResultado" placeholder="Digite para filtrar...">
+                    </div>
+                    <div class="input-group">
+                        <label>POS VENDA:</label>
+                        <select id="filtroPosVendaResultado">
+                            <option value="">Todos</option>
+                            <option value="SIM">SIM</option>
+                            <option value="NÃO">NÃO</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>AET:</label>
+                        <select id="filtroAetResultado">
+                            <option value="">Todos</option>
+                            <option value="SIM">SIM</option>
+                            <option value="NÃO">NÃO</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>NR 06:</label>
+                        <select id="filtroNr06Resultado">
+                            <option value="">Todos</option>
+                            <option value="SIM">SIM</option>
+                            <option value="NÃO">NÃO</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>CIPA:</label>
+                        <select id="filtroCipaResultado">
+                            <option value="">Todos</option>
+                            <option value="SIM">SIM</option>
+                            <option value="NÃO">NÃO</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>PERIODICO:</label>
+                        <select id="filtroPeriodicoResultado">
+                            <option value="">Todos</option>
+                            <option value="SIM">SIM</option>
+                            <option value="NÃO">NÃO</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>EPIS:</label>
+                        <select id="filtroEpisResultado">
+                            <option value="">Todos</option>
+                            <option value="SIM">SIM</option>
+                            <option value="NÃO">NÃO</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>NOTA VISITA:</label>
+                        <input type="text" id="filtroNotaVisitaResultado" placeholder="Digite para filtrar...">
+                    </div>
+                    <div class="input-group">
+                        <label>VENDEDOR:</label>
+                        <input type="text" id="filtroVendedorResultado" placeholder="Digite para filtrar...">
+                    </div>
+                    <div class="input-group" style="grid-column: span 2;">
+                        <label>VENDIDO:</label>
+                        <select id="filtroVendidoResultado">
+                            <option value="">Todos</option>
+                            <option value="SIM">SIM</option>
+                            <option value="NÃO">NÃO</option>
+                            <option value="EM NEGOCIAÇÃO">EM NEGOCIAÇÃO</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button onclick="aplicarFiltroResultado()" class="btn-salvar-modal" style="flex:1;">✅ Aplicar Filtro</button>
+                    <button onclick="limparFiltroResultado()" class="btn-cancelar" style="flex:1;">🔄 Limpar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DEMAIS MODAIS -->
     <div id="modalNovoRegistro" class="modal"><div class="modal-content"><div class="modal-header"><h3>➕ Novo Registro</h3><span class="modal-fechar" onclick="fecharModalNovoRegistro()">&times;</span></div><div class="modal-body"><div class="form-cadastro-modal"><div class="input-group"><label>CONSULTOR:</label><select id="modalConsultor"></select></div><div class="input-group"><label>RAZÃO SOCIAL:</label><input type="text" id="modalRazaoSocial"></div><div class="input-group"><label>CNPJ:</label><input type="text" id="modalCnpj"></div><div class="input-group"><label>CIDADE:</label><input type="text" id="modalCidade"></div><div class="input-group"><label>TELEFONE:</label><input type="text" id="modalTelefone"></div><div class="input-group"><label>RESPONSAVEL:</label><input type="text" id="modalResponsavel"></div><div class="input-group"><label>CONTABILIDADE:</label><input type="text" id="modalContabilidade"></div><div class="input-group"><label>DATA ENTREGUE:</label><input type="date" id="modalDataEntregue"></div><div class="input-group"><label>RETORNO:</label><input type="date" id="modalRetorno"></div><div class="input-group full-width"><label>OBS:</label><textarea id="modalObservacao" rows="3"></textarea></div></div></div><div class="modal-footer"><button onclick="fecharModalNovoRegistro()" class="btn-cancelar">Cancelar</button><button onclick="salvarNovoRegistro()" class="btn-salvar-modal">💾 Salvar</button></div></div></div>
 
     <div id="modalEditarRegistro" class="modal"><div class="modal-content"><div class="modal-header"><h3>✏️ Editar Registro</h3><span class="modal-fechar" onclick="fecharModalEditarRegistro()">&times;</span></div><div class="modal-body"><div class="form-cadastro-modal"><div class="input-group"><label>CONSULTOR:</label><select id="editConsultor"></select></div><div class="input-group"><label>RAZÃO SOCIAL:</label><input type="text" id="editRazaoSocial"></div><div class="input-group"><label>CNPJ:</label><input type="text" id="editCnpj"></div><div class="input-group"><label>CIDADE:</label><input type="text" id="editCidade"></div><div class="input-group"><label>TELEFONE:</label><input type="text" id="editTelefone"></div><div class="input-group"><label>RESPONSAVEL:</label><input type="text" id="editResponsavel"></div><div class="input-group"><label>CONTABILIDADE:</label><input type="text" id="editContabilidade"></div><div class="input-group"><label>DATA ENTREGUE:</label><input type="date" id="editDataEntregue"></div><div class="input-group"><label>RETORNO:</label><input type="date" id="editRetorno"></div><div class="input-group full-width"><label>OBS:</label><textarea id="editObservacao" rows="3"></textarea></div></div></div><div class="modal-footer"><button onclick="fecharModalEditarRegistro()" class="btn-cancelar">Cancelar</button><button onclick="salvarEdicaoRegistro()" class="btn-salvar-modal">💾 Salvar</button></div></div></div>
@@ -133,11 +295,12 @@
         const userRole = localStorage.getItem('userRole');
         if (userRole !== 'admin') window.location.href = 'login.html';
 
-        let dadosAtuais = [], dadosPosVenda = [], indiceEditando = null, indiceEditandoResposta = null, listaConsultores = [];
+        let dadosAtuais = [], dadosPosVenda = [], dadosPosVendaFiltrados = [], dadosAtuaisFiltrados = [];
+        let indiceEditando = null, indiceEditandoResposta = null, listaConsultores = [];
         let graficoDesempenho = null, graficoComparativo = null;
         let dadosDesempenhoConvertido = [];
 
-        // Função para converter número do Excel para data legível (DD/MM/YYYY)
+        // ========== FUNÇÕES DE CONVERSÃO ==========
         function converterNumeroExcelParaData(numero) {
             if (!numero) return '-';
             if (typeof numero === 'string') {
@@ -177,330 +340,275 @@
             return '';
         }
 
-        function converterDataParaInput(data) { 
-            if (!data || data === '-') return ''; 
-            if (data.includes('-')) return data; 
-            const partes = data.split('/'); 
-            if (partes.length === 3) return `${partes[2]}-${partes[1]}-${partes[0]}`; 
-            return ''; 
-        }
-        
-        function converterDataParaDate(dataStr) { 
-            if (!dataStr) return null; 
-            if (dataStr.includes(',')) { 
-                const partes = dataStr.split(','); 
-                const dataParte = partes[0].trim(); 
-                const dataArray = dataParte.split('/'); 
-                if (dataArray.length === 3) return new Date(`${dataArray[2]}-${dataArray[1]}-${dataArray[0]}`); 
-            } 
-            return new Date(dataStr); 
+        function converterDataParaDate(dataStr) {
+            if (!dataStr) return null;
+            if (dataStr.includes(',')) {
+                const partes = dataStr.split(',');
+                const dataParte = partes[0].trim();
+                const dataArray = dataParte.split('/');
+                if (dataArray.length === 3) return new Date(`${dataArray[2]}-${dataArray[1]}-${dataArray[0]}`);
+            }
+            return new Date(dataStr);
         }
 
-        function verificarSelecionados() {
-            const checkboxes = document.querySelectorAll('.chk-selecionar');
-            const selecionados = Array.from(checkboxes).filter(chk => chk.checked);
-            const btnExcluir = document.getElementById('btnExcluirSelecionados');
-            const chkTodos = document.getElementById('chkSelecionarTodos');
-            
-            if (selecionados.length > 0) {
-                btnExcluir.style.display = 'inline-block';
-                btnExcluir.textContent = `🗑️ Excluir Selecionados (${selecionados.length})`;
-            } else {
-                btnExcluir.style.display = 'none';
-            }
-            
-            if (chkTodos) {
-                const todosCheckboxes = document.querySelectorAll('.chk-selecionar');
-                const todosMarcados = todosCheckboxes.length > 0 && Array.from(todosCheckboxes).every(chk => chk.checked);
-                chkTodos.checked = todosMarcados;
-            }
+        // ========== FUNÇÕES DE FILTRO PÓS VENDAS ==========
+        function abrirModalFiltroPosVendas() {
+            const select = document.getElementById('filtroConsultorPosVendas');
+            select.innerHTML = '<option value="">Todos</option>';
+            listaConsultores.forEach(c => {
+                select.innerHTML += `<option value="${c}">${c}</option>`;
+            });
+            document.getElementById('modalFiltroPosVendas').style.display = 'flex';
         }
 
-        function selecionarTodos() {
-            const chkTodos = document.getElementById('chkSelecionarTodos');
-            const checkboxes = document.querySelectorAll('.chk-selecionar');
-            checkboxes.forEach(chk => chk.checked = chkTodos.checked);
+        function fecharModalFiltroPosVendas() {
+            document.getElementById('modalFiltroPosVendas').style.display = 'none';
+        }
+
+        function aplicarFiltroPosVendas() {
+            const consultor = document.getElementById('filtroConsultorPosVendas').value;
+            const razao = document.getElementById('filtroRazaoPosVendas').value.toLowerCase();
+            const cnpj = document.getElementById('filtroCnpjPosVendas').value.toLowerCase();
+            const cidade = document.getElementById('filtroCidadePosVendas').value.toLowerCase();
+            const contabilidade = document.getElementById('filtroContabilidadePosVendas').value.toLowerCase();
+            const dataEntregue = document.getElementById('filtroDataEntreguePosVendas').value;
+            const retorno = document.getElementById('filtroRetornoPosVendas').value;
+
+            dadosPosVendaFiltrados = dadosPosVenda.filter(item => {
+                let match = true;
+                if (consultor && item.consultor !== consultor) match = false;
+                if (razao && !(item.razao_social || item.razaoSocial || '').toLowerCase().includes(razao)) match = false;
+                if (cnpj && !(item.cnpj || '').toLowerCase().includes(cnpj)) match = false;
+                if (cidade && !(item.cidade || '').toLowerCase().includes(cidade)) match = false;
+                if (contabilidade && !(item.contabilidade || '').toLowerCase().includes(contabilidade)) match = false;
+                if (dataEntregue) {
+                    const dataItem = item.data_entregue || item.dataEntregue || '';
+                    if (!dataItem.includes(dataEntregue)) match = false;
+                }
+                if (retorno) {
+                    const retornoItem = item.retorno || '';
+                    if (!retornoItem.includes(retorno)) match = false;
+                }
+                return match;
+            });
+
+            renderizarTabelaPosVendas(dadosPosVendaFiltrados);
+            fecharModalFiltroPosVendas();
+            mostrarNotificacao(`✅ Filtro aplicado: ${dadosPosVendaFiltrados.length} registros encontrados`);
+        }
+
+        function limparFiltroPosVendas() {
+            document.getElementById('filtroConsultorPosVendas').value = '';
+            document.getElementById('filtroRazaoPosVendas').value = '';
+            document.getElementById('filtroCnpjPosVendas').value = '';
+            document.getElementById('filtroCidadePosVendas').value = '';
+            document.getElementById('filtroContabilidadePosVendas').value = '';
+            document.getElementById('filtroDataEntreguePosVendas').value = '';
+            document.getElementById('filtroRetornoPosVendas').value = '';
+            dadosPosVendaFiltrados = [...dadosPosVenda];
+            renderizarTabelaPosVendas(dadosPosVendaFiltrados);
+            fecharModalFiltroPosVendas();
+            mostrarNotificacao('🔄 Filtro removido');
+        }
+
+        function renderizarTabelaPosVendas(dados) {
+            const tbody = document.getElementById('corpoTabelaPosVendas');
+            if (!dados.length) {
+                tbody.innerHTML = '<tr><td colspan="12">Nenhum registro encontrado com os filtros aplicados.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = '';
+            dados.forEach((item, idx) => {
+                const row = tbody.insertRow();
+                const chkCell = row.insertCell(0);
+                const chk = document.createElement('input');
+                chk.type = 'checkbox';
+                chk.className = 'chk-selecionar';
+                chk.setAttribute('data-index', dadosPosVenda.indexOf(item));
+                chk.onclick = function() { verificarSelecionados(); };
+                chkCell.appendChild(chk);
+                
+                row.insertCell(1).innerHTML = item.consultor || '-';
+                row.insertCell(2).innerHTML = item.razao_social || item.razaoSocial || '-';
+                row.insertCell(3).innerHTML = item.cnpj || '-';
+                row.insertCell(4).innerHTML = item.cidade || '-';
+                row.insertCell(5).innerHTML = item.telefone || '-';
+                row.insertCell(6).innerHTML = item.responsavel || '-';
+                row.insertCell(7).innerHTML = item.contabilidade || '-';
+                row.insertCell(8).innerHTML = converterNumeroExcelParaData(item.data_entregue || item.dataEntregue);
+                row.insertCell(9).innerHTML = converterNumeroExcelParaData(item.retorno);
+                row.insertCell(10).innerHTML = item.observacao || '-';
+                const actionCell = row.insertCell(11);
+                actionCell.className = 'acoes-botoes';
+                actionCell.innerHTML = `<button onclick="abrirModalEditarRegistro(${dadosPosVenda.indexOf(item)})" class="btn-editar">✏️</button><button onclick="excluirRegistroPosVenda(${dadosPosVenda.indexOf(item)})" class="btn-excluir">🗑️</button>`;
+            });
             verificarSelecionados();
         }
 
-        async function excluirSelecionados() {
-            const checkboxes = document.querySelectorAll('.chk-selecionar:checked');
-            const indices = Array.from(checkboxes).map(chk => parseInt(chk.getAttribute('data-index')));
-            if (indices.length === 0) return;
-            if (!confirm(`⚠️ Tem certeza que deseja excluir ${indices.length} registro(s)?\n\nEsta ação não pode ser desfeita.`)) return;
-            indices.sort((a, b) => b - a);
-            for (const idx of indices) {
-                await fetch(`${API_URL}/excluir-pos-venda`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ index: idx })
-                });
-            }
-            mostrarNotificacao(`✅ ${indices.length} registro(s) excluído(s)!`);
-            await carregarPosVendas();
-            await carregarDashboard();
-        }
-
-        async function carregarConsultores() { 
-            try { 
-                const response = await fetch(`${API_URL}/buscar-usuarios`); 
-                const usuarios = await response.json(); 
-                listaConsultores = usuarios.filter(u => u.tipo === 'pos' && u.usuario !== 'henrique').map(u => u.nome); 
-                const modalSelect = document.getElementById('modalConsultor'); 
-                const editSelect = document.getElementById('editConsultor'); 
-                modalSelect.innerHTML = '<option value="">Selecione...</option>'; 
-                editSelect.innerHTML = '<option value="">Selecione...</option>'; 
-                listaConsultores.forEach(c => { 
-                    modalSelect.innerHTML += `<option value="${c}">${c}</option>`; 
-                    editSelect.innerHTML += `<option value="${c}">${c}</option>`; 
-                }); 
-            } catch(e) { console.error(e); } 
-        }
-
-        function toggleDropdown() { const d = document.getElementById('dropdownMenu'); d.style.display = d.style.display === 'block' ? 'none' : 'block'; }
-        function fecharDropdown() { document.getElementById('dropdownMenu').style.display = 'none'; }
-
-        window.onclick = function(e) { 
-            if (!e.target.matches('.btn-importar-dropdown')) document.getElementById('dropdownMenu').style.display = 'none'; 
-            if (e.target === document.getElementById('modalNovoRegistro')) fecharModalNovoRegistro(); 
-            if (e.target === document.getElementById('modalEditarRegistro')) fecharModalEditarRegistro(); 
-            if (e.target === document.getElementById('modalEditarResposta')) fecharModalEditarResposta(); 
-        }
-
-        document.querySelectorAll('.nav-link').forEach(link => { 
-            link.addEventListener('click', function(e) { 
-                e.preventDefault(); 
-                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('ativo')); 
-                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('ativo')); 
-                this.classList.add('ativo'); 
-                document.getElementById(this.getAttribute('data-tab')).classList.add('ativo'); 
-                if (this.getAttribute('data-tab') === 'posvendas') carregarPosVendas(); 
-                if (this.getAttribute('data-tab') === 'dashboard') carregarDashboard(); 
-            }); 
-        });
-
-        function logout() { 
-            const manter = confirm('Manter dados salvos?'); 
-            if (!manter) { localStorage.removeItem('loginSalvo'); localStorage.removeItem('senhaSalva'); localStorage.removeItem('manterConectado'); } 
-            localStorage.removeItem('userRole'); localStorage.removeItem('userName'); localStorage.removeItem('usuarioLogado'); 
-            localStorage.removeItem('sessaoAtiva'); localStorage.removeItem('ultimoAcesso'); 
-            window.location.href = 'login.html'; 
-        }
-        
-        function mostrarNotificacao(mensagem) { 
-            let n = document.getElementById('notificacao'); 
-            if (!n) { n = document.createElement('div'); n.id = 'notificacao'; n.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#48bb78;color:white;padding:10px 20px;border-radius:5px;z-index:9999'; document.body.appendChild(n); } 
-            n.textContent = mensagem; n.style.display = 'block'; 
-            setTimeout(() => n.style.display = 'none', 3000); 
-        }
-
-        function atualizarGraficos(consultores, cadastradas, visitadas, naoRespondidas) {
-            if (graficoDesempenho) graficoDesempenho.destroy();
-            const ctx1 = document.getElementById('graficoDesempenho').getContext('2d');
-            graficoDesempenho = new Chart(ctx1, {
-                type: 'bar',
-                data: { labels: consultores, datasets: [{ label: 'Empresas Visitadas', data: visitadas, backgroundColor: '#667eea', borderRadius: 5 }, { label: 'Convertido em Vendas', data: dadosDesempenhoConvertido, backgroundColor: '#48bb78', borderRadius: 5 }] },
-                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Quantidade' } } } }
+        // ========== FUNÇÕES DE FILTRO RESULTADO ==========
+        function abrirModalFiltroResultado() {
+            const select = document.getElementById('filtroConsultorResultado');
+            select.innerHTML = '<option value="">Todos</option>';
+            listaConsultores.forEach(c => {
+                select.innerHTML += `<option value="${c}">${c}</option>`;
             });
-            if (graficoComparativo) graficoComparativo.destroy();
-            const ctx2 = document.getElementById('graficoComparativo').getContext('2d');
-            graficoComparativo = new Chart(ctx2, {
-                type: 'bar',
-                data: { labels: consultores, datasets: [{ label: 'Empresas Cadastradas', data: cadastradas, backgroundColor: '#4299e1', borderRadius: 5 }, { label: 'Não Respondidas', data: naoRespondidas, backgroundColor: '#e53e3e', borderRadius: 5 }] },
-                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Quantidade' } } } }
-            });
+            document.getElementById('modalFiltroResultado').style.display = 'flex';
         }
 
-        async function carregarDashboard() {
-            try {
-                const respostas = await (await fetch(`${API_URL}/buscar-respostas`)).json();
-                const posVendas = await (await fetch(`${API_URL}/buscar-pos-vendas`)).json();
-                const usuarios = await (await fetch(`${API_URL}/buscar-usuarios`)).json();
-                
-                const mesAtual = new Date().getMonth(), anoAtual = new Date().getFullYear();
-                const visitasMensais = respostas.filter(r => { const d = converterDataParaDate(r.data_hora); return d && d.getMonth() === mesAtual && d.getFullYear() === anoAtual; }).length;
-                document.getElementById('totalVisitas').textContent = visitasMensais;
-                
-                const hoje = new Date(); const hojeStr = `${hoje.getDate().toString().padStart(2,'0')}/${(hoje.getMonth()+1).toString().padStart(2,'0')}/${hoje.getFullYear()}`;
-                const visitasHoje = respostas.filter(r => { if (!r.data_hora) return false; return r.data_hora.includes(',') ? r.data_hora.split(',')[0] === hojeStr : new Date(r.data_hora).toLocaleDateString('pt-BR') === hojeStr; }).length;
-                document.getElementById('totalVisitasHoje').textContent = visitasHoje;
-                
-                const cnpjsUnicos = new Set(); posVendas.forEach(p => { if (p.cnpj && p.cnpj.trim()) cnpjsUnicos.add(p.cnpj); });
-                document.getElementById('totalEmpresasCadastradas').textContent = cnpjsUnicos.size;
-                
-                const conformidade = respostas.filter(r => r.pergunta1 === 'SIM').length;
-                document.getElementById('taxaConformidade').textContent = respostas.length ? Math.round((conformidade/respostas.length)*100)+'%' : '0%';
-                
-                const consultoresPos = usuarios.filter(u => u.tipo === 'pos' && u.usuario !== 'henrique').map(u => u.nome);
-                const cadastradasPorConsultor = [], visitadasPorConsultor = [], convertidasPorConsultor = [], naoRespondidasPorConsultor = [];
-                
-                for (const c of consultoresPos) {
-                    const cadastradas = posVendas.filter(p => p.consultor === c).length;
-                    const visitadas = respostas.filter(r => r.vendedor === c).length;
-                    const convertidas = respostas.filter(r => r.vendedor === c && r.vendido === 'SIM').length;
-                    cadastradasPorConsultor.push(cadastradas);
-                    visitadasPorConsultor.push(visitadas);
-                    convertidasPorConsultor.push(convertidas);
-                    naoRespondidasPorConsultor.push(Math.max(0, cadastradas - visitadas));
+        function fecharModalFiltroResultado() {
+            document.getElementById('modalFiltroResultado').style.display = 'none';
+        }
+
+        function aplicarFiltroResultado() {
+            const data = document.getElementById('filtroDataResultado').value;
+            const consultor = document.getElementById('filtroConsultorResultado').value;
+            const cnpj = document.getElementById('filtroCnpjResultado').value.toLowerCase();
+            const empresa = document.getElementById('filtroEmpresaResultado').value.toLowerCase();
+            const posVenda = document.getElementById('filtroPosVendaResultado').value;
+            const aet = document.getElementById('filtroAetResultado').value;
+            const nr06 = document.getElementById('filtroNr06Resultado').value;
+            const cipa = document.getElementById('filtroCipaResultado').value;
+            const periodico = document.getElementById('filtroPeriodicoResultado').value;
+            const epis = document.getElementById('filtroEpisResultado').value;
+            const notaVisita = document.getElementById('filtroNotaVisitaResultado').value.toLowerCase();
+            const vendedor = document.getElementById('filtroVendedorResultado').value.toLowerCase();
+            const vendido = document.getElementById('filtroVendidoResultado').value;
+
+            dadosAtuaisFiltrados = dadosAtuais.filter(item => {
+                let match = true;
+                if (data) {
+                    const dataItem = item.data_hora || item.dataHora || '';
+                    if (!dataItem.includes(data)) match = false;
                 }
-                dadosDesempenhoConvertido = convertidasPorConsultor;
-                atualizarGraficos(consultoresPos, cadastradasPorConsultor, visitadasPorConsultor, naoRespondidasPorConsultor);
-                
-                const corpo = document.getElementById('corpoDesempenho');
-                if (!consultoresPos.length) corpo.innerHTML = '<tr><td colspan="4">Nenhum consultor cadastrado</td>';
-                else { corpo.innerHTML = ''; for (let i = 0; i < consultoresPos.length; i++) { const row = corpo.insertRow(); row.insertCell(0).innerHTML = consultoresPos[i]; row.insertCell(1).innerHTML = cadastradasPorConsultor[i]; row.insertCell(2).innerHTML = visitadasPorConsultor[i]; row.insertCell(3).innerHTML = convertidasPorConsultor[i]; } }
-            } catch(e) { console.error(e); }
+                if (consultor && item.vendedor !== consultor) match = false;
+                if (cnpj && !(item.cnpj || '').toLowerCase().includes(cnpj)) match = false;
+                if (empresa && !(item.empresa || '').toLowerCase().includes(empresa)) match = false;
+                if (posVenda && 'SIM' !== posVenda) match = false;
+                if (aet && item.pergunta9 !== aet) match = false;
+                if (nr06 && item.pergunta7 !== nr06) match = false;
+                if (cipa && item.pergunta8 !== cipa) match = false;
+                if (periodico && item.pergunta3 !== periodico) match = false;
+                if (epis && item.pergunta4 !== epis) match = false;
+                if (notaVisita && !(item.nota_visita || item.notaVisita || '').toLowerCase().includes(notaVisita)) match = false;
+                if (vendedor && !(item.vendedor_nome || item.vendedorNome || '').toLowerCase().includes(vendedor)) match = false;
+                if (vendido && item.vendido !== vendido) match = false;
+                return match;
+            });
+
+            renderizarTabelaResultado(dadosAtuaisFiltrados);
+            fecharModalFiltroResultado();
+            mostrarNotificacao(`✅ Filtro aplicado: ${dadosAtuaisFiltrados.length} registros encontrados`);
         }
 
-        function abrirModalNovoRegistro() { 
-            ['modalConsultor','modalRazaoSocial','modalCnpj','modalCidade','modalTelefone','modalResponsavel','modalContabilidade','modalDataEntregue','modalRetorno','modalObservacao'].forEach(id => document.getElementById(id).value = ''); 
-            document.getElementById('modalNovoRegistro').style.display = 'flex'; 
-        }
-        function fecharModalNovoRegistro() { document.getElementById('modalNovoRegistro').style.display = 'none'; }
-        
-        async function salvarNovoRegistro() { 
-            const consultor = document.getElementById('modalConsultor').value; 
-            const razaoSocial = document.getElementById('modalRazaoSocial').value.trim(); 
-            if (!consultor || !razaoSocial) { alert('Preencha consultor e razão social!'); return; } 
-            const registro = { 
-                consultor, razaoSocial, 
-                cnpj: document.getElementById('modalCnpj').value.trim(), 
-                cidade: document.getElementById('modalCidade').value.trim(), 
-                telefone: document.getElementById('modalTelefone').value.trim(), 
-                responsavel: document.getElementById('modalResponsavel').value.trim(), 
-                contabilidade: document.getElementById('modalContabilidade').value.trim(), 
-                dataEntregue: document.getElementById('modalDataEntregue').value, 
-                retorno: document.getElementById('modalRetorno').value, 
-                observacao: document.getElementById('modalObservacao').value.trim() 
-            }; 
-            const response = await fetch(`${API_URL}/adicionar-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ registro }) }); 
-            if ((await response.json()).success) { mostrarNotificacao('✅ Adicionado!'); fecharModalNovoRegistro(); await carregarPosVendas(); await carregarDashboard(); } 
-            else alert('❌ Erro ao adicionar'); 
+        function limparFiltroResultado() {
+            document.getElementById('filtroDataResultado').value = '';
+            document.getElementById('filtroConsultorResultado').value = '';
+            document.getElementById('filtroCnpjResultado').value = '';
+            document.getElementById('filtroEmpresaResultado').value = '';
+            document.getElementById('filtroPosVendaResultado').value = '';
+            document.getElementById('filtroAetResultado').value = '';
+            document.getElementById('filtroNr06Resultado').value = '';
+            document.getElementById('filtroCipaResultado').value = '';
+            document.getElementById('filtroPeriodicoResultado').value = '';
+            document.getElementById('filtroEpisResultado').value = '';
+            document.getElementById('filtroNotaVisitaResultado').value = '';
+            document.getElementById('filtroVendedorResultado').value = '';
+            document.getElementById('filtroVendidoResultado').value = '';
+            dadosAtuaisFiltrados = [...dadosAtuais];
+            renderizarTabelaResultado(dadosAtuaisFiltrados);
+            fecharModalFiltroResultado();
+            mostrarNotificacao('🔄 Filtro removido');
         }
 
-        function abrirModalEditarRegistro(index) { 
-            indiceEditando = index; 
-            const item = dadosPosVenda[index]; 
-            document.getElementById('editConsultor').value = item.consultor || ''; 
-            document.getElementById('editRazaoSocial').value = item.razao_social || ''; 
-            document.getElementById('editCnpj').value = item.cnpj || ''; 
-            document.getElementById('editCidade').value = item.cidade || ''; 
-            document.getElementById('editTelefone').value = item.telefone || ''; 
-            document.getElementById('editResponsavel').value = item.responsavel || ''; 
-            document.getElementById('editContabilidade').value = item.contabilidade || ''; 
-            document.getElementById('editDataEntregue').value = converterNumeroExcelParaInput(item.data_entregue); 
-            document.getElementById('editRetorno').value = converterNumeroExcelParaInput(item.retorno); 
-            document.getElementById('editObservacao').value = item.observacao || ''; 
-            document.getElementById('modalEditarRegistro').style.display = 'flex'; 
-        }
-        
-        function fecharModalEditarRegistro() { document.getElementById('modalEditarRegistro').style.display = 'none'; indiceEditando = null; }
-        
-        async function salvarEdicaoRegistro() { 
-            const consultor = document.getElementById('editConsultor').value; 
-            const razaoSocial = document.getElementById('editRazaoSocial').value.trim(); 
-            
-            if (!consultor || !razaoSocial) { 
-                alert('Preencha consultor e razão social!'); 
-                return; 
-            } 
-            
-            const registro = { 
-                consultor: consultor, 
-                razaoSocial: razaoSocial, 
-                cnpj: document.getElementById('editCnpj').value.trim(), 
-                cidade: document.getElementById('editCidade').value.trim(), 
-                telefone: document.getElementById('editTelefone').value.trim(), 
-                responsavel: document.getElementById('editResponsavel').value.trim(), 
-                contabilidade: document.getElementById('editContabilidade').value.trim(), 
-                dataEntregue: document.getElementById('editDataEntregue').value, 
-                retorno: document.getElementById('editRetorno').value, 
-                observacao: document.getElementById('editObservacao').value.trim() 
-            }; 
-            
-            try {
-                const response = await fetch(`${API_URL}/salvar-pos-venda`, { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ registro, index: indiceEditando }) 
-                }); 
-                
-                const data = await response.json();
-                
-                if (data.success) { 
-                    mostrarNotificacao('✅ Registro atualizado com sucesso!'); 
-                    fecharModalEditarRegistro(); 
-                    await carregarPosVendas(); 
-                    await carregarDashboard();
-                    await carregarConsultores();
-                } else { 
-                    alert('❌ Erro ao salvar: ' + (data.message || 'Erro desconhecido')); 
-                } 
-            } catch (error) {
-                console.error('Erro:', error);
-                alert('❌ Erro ao conectar com o servidor');
+        function renderizarTabelaResultado(dados) {
+            const tbody = document.getElementById('corpoTabela');
+            if (!dados.length) {
+                tbody.innerHTML = '<tr><td colspan="15">Nenhuma resposta encontrada com os filtros aplicados.</td></tr>';
+                return;
             }
+            tbody.innerHTML = '';
+            dados.forEach((d, idx) => {
+                const row = tbody.insertRow();
+                row.insertCell(0).innerHTML = d.data_hora || d.dataHora || '-';
+                row.insertCell(1).innerHTML = d.vendedor || '-';
+                row.insertCell(2).innerHTML = d.cnpj || '-';
+                row.insertCell(3).innerHTML = d.empresa || '-';
+                row.insertCell(4).innerHTML = 'SIM';
+                row.insertCell(5).innerHTML = d.pergunta9 || '-';
+                row.insertCell(6).innerHTML = d.pergunta7 || '-';
+                row.insertCell(7).innerHTML = d.pergunta8 || '-';
+                row.insertCell(8).innerHTML = d.pergunta3 || '-';
+                row.insertCell(9).innerHTML = d.pergunta4 || '-';
+                row.insertCell(10).innerHTML = d.nota_visita || d.notaVisita || '-';
+                row.insertCell(11).innerHTML = d.vendedor_nome || d.vendedorNome || '-';
+                row.insertCell(12).innerHTML = d.vendido || '-';
+                row.insertCell(13).innerHTML = d.observacoes || '-';
+                const actionCell = row.insertCell(14);
+                actionCell.className = 'acoes-botoes';
+                actionCell.innerHTML = `<button onclick="abrirModalEditarResposta(${dadosAtuais.indexOf(d)})" class="btn-editar">✏️</button><button onclick="excluirResposta(${dadosAtuais.indexOf(d)})" class="btn-excluir">🗑️</button>`;
+            });
         }
 
-        async function carregarPosVendas() { 
-            try { 
-                const response = await fetch(`${API_URL}/buscar-pos-vendas`); 
-                dadosPosVenda = await response.json(); 
-                console.log('Dados carregados:', dadosPosVenda.length);
-                
-                const tbody = document.getElementById('corpoTabelaPosVendas'); 
-                if (!dadosPosVenda.length) { 
-                    tbody.innerHTML = '</td><td colspan="12">Nenhum registro encontrado. Clique em "Novo Registro" para adicionar.';
-                } else { 
-                    tbody.innerHTML = ''; 
-                    dadosPosVenda.forEach((item, idx) => { 
-                        const row = tbody.insertRow(); 
-                        const chkCell = row.insertCell(0);
-                        const chk = document.createElement('input');
-                        chk.type = 'checkbox';
-                        chk.className = 'chk-selecionar';
-                        chk.setAttribute('data-index', idx);
-                        chk.onclick = function() { verificarSelecionados(); };
-                        chkCell.appendChild(chk);
-                        
-                        row.insertCell(1).innerHTML = item.consultor || '-'; 
-                        row.insertCell(2).innerHTML = item.razao_social || '-'; 
-                        row.insertCell(3).innerHTML = item.cnpj || '-'; 
-                        row.insertCell(4).innerHTML = item.cidade || '-'; 
-                        row.insertCell(5).innerHTML = item.telefone || '-'; 
-                        row.insertCell(6).innerHTML = item.responsavel || '-'; 
-                        row.insertCell(7).innerHTML = item.contabilidade || '-'; 
-                        row.insertCell(8).innerHTML = converterNumeroExcelParaData(item.data_entregue); 
-                        row.insertCell(9).innerHTML = converterNumeroExcelParaData(item.retorno); 
-                        row.insertCell(10).innerHTML = item.observacao || '-'; 
-                        const actionCell = row.insertCell(11); 
-                        actionCell.className = 'acoes-botoes'; 
-                        actionCell.innerHTML = `<button onclick="abrirModalEditarRegistro(${idx})" class="btn-editar">✏️</button><button onclick="excluirRegistroPosVenda(${idx})" class="btn-excluir">🗑️</button>`; 
-                    }); 
-                    verificarSelecionados();
-                } 
-            } catch(e) { 
-                console.error(e); 
-                document.getElementById('corpoTabelaPosVendas').innerHTML = '<tr><td colspan="12">Erro ao carregar dados. Verifique o servidor.直视';
-            } 
+        // ========== EXPORTAR POS VENDAS ==========
+        function exportarExcelPosVendas() {
+            const dados = dadosPosVendaFiltrados.length ? dadosPosVendaFiltrados : dadosPosVenda;
+            if (!dados || !dados.length) {
+                alert('Não há dados para exportar!');
+                return;
+            }
+            const dadosExcel = dados.map(d => ({
+                'CONSULTOR': d.consultor || '',
+                'RAZAO SOCIAL': d.razao_social || d.razaoSocial || '',
+                'CNPJ': d.cnpj || '',
+                'CIDADE': d.cidade || '',
+                'TELEFONE': d.telefone || '',
+                'RESPONSAVEL': d.responsavel || '',
+                'CONTABILIDADE': d.contabilidade || '',
+                'DATA ENTREGUE': d.data_entregue || d.dataEntregue || '',
+                'RETORNO': d.retorno || '',
+                'OBSERVAÇÃO': d.observacao || ''
+            }));
+            const ws = XLSX.utils.json_to_sheet(dadosExcel);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'POS_VENDAS');
+            XLSX.writeFile(wb, `POS_VENDAS_${new Date().toISOString().split('T')[0]}.xlsx`);
+            mostrarNotificacao('✅ Planilha exportada com sucesso!');
         }
 
-        async function excluirRegistroPosVenda(idx) { 
-            if (confirm('Excluir este registro?')) { 
-                const response = await fetch(`${API_URL}/excluir-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ index: idx }) }); 
-                if ((await response.json()).success) { mostrarNotificacao('✅ Excluído!'); await carregarPosVendas(); await carregarDashboard(); } 
-                else alert('❌ Erro ao excluir'); 
-            } 
+        function exportarExcel() {
+            const dados = dadosAtuaisFiltrados.length ? dadosAtuaisFiltrados : dadosAtuais;
+            if (!dados?.length) { alert('Sem dados para exportar'); return; }
+            const dadosExcel = dados.map(d => ({
+                'DATA': d.data_hora || d.dataHora || '',
+                'CONSULTOR': d.vendedor || '',
+                'CNPJ': d.cnpj || '',
+                'EMPRESA': d.empresa || '',
+                'POS VENDA': 'SIM',
+                'AET': d.pergunta9 || '',
+                'NR 06': d.pergunta7 || '',
+                'CIPA': d.pergunta8 || '',
+                'PERIODICO': d.pergunta3 || '',
+                'EPIS': d.pergunta4 || '',
+                'NOTA VISITA': d.nota_visita || d.notaVisita || '',
+                'VENDEDOR': d.vendedor_nome || d.vendedorNome || '',
+                'VENDIDO': d.vendido || '',
+                'OBS': d.observacoes || ''
+            }));
+            const ws = XLSX.utils.json_to_sheet(dadosExcel);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'RESULTADOS');
+            XLSX.writeFile(wb, `RESULTADOS_POS_VENDAS_${new Date().toISOString().split('T')[0]}.xlsx`);
+            mostrarNotificacao('✅ Planilha exportada com sucesso!');
         }
 
-        function baixarModeloExcel() { 
-            const modelo = [{ 'CONSULTOR':'','RAZAO SOCIAL':'','CNPJ':'','CIDADE':'','TELEFONE':'','RESPONSAVEL':'','CONTABILIDADE':'','DATA ENTREGUE':'','RETORNO':'','OBSERVAÇÃO':'' }]; 
-            const ws = XLSX.utils.json_to_sheet(modelo); 
-            ws['!cols'] = [{wch:20},{wch:30},{wch:18},{wch:20},{wch:15},{wch:20},{wch:25},{wch:15},{wch:15},{wch:40}]; 
-            const wb = XLSX.utils.book_new(); 
-            XLSX.utils.book_append_sheet(wb, ws, 'MODELO'); 
-            XLSX.writeFile(wb, 'modelo_pos_vendas.xlsx'); 
-            mostrarNotificacao('📄 Modelo baixado!'); 
+        function baixarModeloExcel() {
+            const modelo = [{ 'CONSULTOR':'','RAZAO SOCIAL':'','CNPJ':'','CIDADE':'','TELEFONE':'','RESPONSAVEL':'','CONTABILIDADE':'','DATA ENTREGUE':'','RETORNO':'','OBSERVAÇÃO':'' }];
+            const ws = XLSX.utils.json_to_sheet(modelo);
+            ws['!cols'] = [{wch:20},{wch:30},{wch:18},{wch:20},{wch:15},{wch:20},{wch:25},{wch:15},{wch:15},{wch:40}];
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'MODELO');
+            XLSX.writeFile(wb, 'modelo_pos_vendas.xlsx');
+            mostrarNotificacao('📄 Modelo baixado!');
         }
 
         function importarExcelPosVenda() {
@@ -518,9 +626,7 @@
                         const workbook = XLSX.read(data, { type: 'array' });
                         const sheet = workbook.Sheets[workbook.SheetNames[0]];
                         const jsonData = XLSX.utils.sheet_to_json(sheet);
-                        
                         let importados = 0;
-                        
                         function converterData(dataStr) {
                             if (!dataStr) return '';
                             if (typeof dataStr !== 'string') dataStr = String(dataStr);
@@ -539,7 +645,6 @@
                             }
                             return '';
                         }
-                        
                         for (const row of jsonData) {
                             const consultor = row['CONSULTOR'] || '';
                             const razaoSocial = row['RAZAO SOCIAL'] || '';
@@ -572,150 +677,382 @@
             input.click();
         }
 
-        function abrirModalEditarResposta(index) { 
-            indiceEditandoResposta = index; 
-            const item = dadosAtuais[index]; 
-            document.getElementById('editData').value = item.data_hora || ''; 
-            document.getElementById('editConsultorResposta').value = item.vendedor || ''; 
-            document.getElementById('editCnpjResposta').value = item.cnpj || ''; 
-            document.getElementById('editEmpresaResposta').value = item.empresa || ''; 
-            document.getElementById('editAet').value = item.pergunta9 || 'NÃO'; 
-            document.getElementById('editNr06').value = item.pergunta7 || 'NÃO'; 
-            document.getElementById('editCipa').value = item.pergunta8 || 'NÃO'; 
-            document.getElementById('editPeriodico').value = item.pergunta3 || 'NÃO'; 
-            document.getElementById('editEpis').value = item.pergunta4 || 'NÃO'; 
-            document.getElementById('editNotaVisita').value = item.nota_visita || ''; 
-            document.getElementById('editVendedor').value = item.vendedor_nome || ''; 
-            document.getElementById('editVendido').value = item.vendido || ''; 
-            document.getElementById('editObsResposta').value = item.observacoes || ''; 
-            document.getElementById('modalEditarResposta').style.display = 'flex'; 
-        }
-        
-        function fecharModalEditarResposta() { document.getElementById('modalEditarResposta').style.display = 'none'; indiceEditandoResposta = null; }
-        
-        async function salvarEdicaoResposta() { 
-            if (indiceEditandoResposta === null) return; 
-            const item = dadosAtuais[indiceEditandoResposta]; 
-            item.vendedor = document.getElementById('editConsultorResposta').value; 
-            item.cnpj = document.getElementById('editCnpjResposta').value; 
-            item.empresa = document.getElementById('editEmpresaResposta').value; 
-            item.pergunta9 = document.getElementById('editAet').value; 
-            item.pergunta7 = document.getElementById('editNr06').value; 
-            item.pergunta8 = document.getElementById('editCipa').value; 
-            item.pergunta3 = document.getElementById('editPeriodico').value; 
-            item.pergunta4 = document.getElementById('editEpis').value; 
-            item.nota_visita = document.getElementById('editNotaVisita').value; 
-            item.vendedor_nome = document.getElementById('editVendedor').value; 
-            item.vendido = document.getElementById('editVendido').value; 
-            item.observacoes = document.getElementById('editObsResposta').value; 
-            
-            try {
-                const response = await fetch(`${API_URL}/salvar-todos-dados`, { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ dados: dadosAtuais }) 
-                }); 
-                const data = await response.json();
-                if (data.success) { 
-                    mostrarNotificacao('✅ Resposta atualizada com sucesso!'); 
-                    fecharModalEditarResposta(); 
-                    await carregarDados(); 
-                    await carregarDashboard(); 
-                } else { 
-                    alert('❌ Erro ao salvar'); 
-                }
-            } catch (error) {
-                console.error(error);
-                alert('❌ Erro ao conectar com o servidor');
+        // ========== FUNÇÕES DE SELEÇÃO E EXCLUSÃO ==========
+        function verificarSelecionados() {
+            const checkboxes = document.querySelectorAll('.chk-selecionar');
+            const selecionados = Array.from(checkboxes).filter(chk => chk.checked);
+            const btnExcluir = document.getElementById('btnExcluirSelecionados');
+            const chkTodos = document.getElementById('chkSelecionarTodos');
+            if (selecionados.length > 0) {
+                btnExcluir.style.display = 'inline-block';
+                btnExcluir.textContent = `🗑️ Excluir Selecionados (${selecionados.length})`;
+            } else {
+                btnExcluir.style.display = 'none';
+            }
+            if (chkTodos) {
+                const todosCheckboxes = document.querySelectorAll('.chk-selecionar');
+                const todosMarcados = todosCheckboxes.length > 0 && Array.from(todosCheckboxes).every(chk => chk.checked);
+                chkTodos.checked = todosMarcados;
             }
         }
-        
-        async function excluirResposta(index) { 
-            if (confirm('Excluir resposta?')) { 
-                dadosAtuais.splice(index, 1); 
-                const response = await fetch(`${API_URL}/salvar-todos-dados`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dados: dadosAtuais }) }); 
-                if ((await response.json()).success) { mostrarNotificacao('✅ Excluído!'); await carregarDados(); await carregarDashboard(); } 
-                else alert('❌ Erro'); 
-            } 
+
+        function selecionarTodos() {
+            const chkTodos = document.getElementById('chkSelecionarTodos');
+            const checkboxes = document.querySelectorAll('.chk-selecionar');
+            checkboxes.forEach(chk => chk.checked = chkTodos.checked);
+            verificarSelecionados();
         }
 
-        async function carregarDados() { 
-            try { 
-                const response = await fetch(`${API_URL}/buscar-respostas`); 
-                dadosAtuais = await response.json(); 
-                console.log('Respostas carregadas:', dadosAtuais.length);
-                
-                const tbody = document.getElementById('corpoTabela'); 
-                if (!dadosAtuais.length) tbody.innerHTML = '<tr><td colspan="15">Nenhuma resposta encontrada';
-                else { 
-                    tbody.innerHTML = ''; 
-                    dadosAtuais.forEach((d, idx) => { 
-                        const row = tbody.insertRow(); 
-                        row.insertCell(0).innerHTML = d.data_hora || '-'; 
-                        row.insertCell(1).innerHTML = d.vendedor || '-'; 
-                        row.insertCell(2).innerHTML = d.cnpj || '-'; 
-                        row.insertCell(3).innerHTML = d.empresa || '-'; 
-                        row.insertCell(4).innerHTML = 'SIM'; 
-                        row.insertCell(5).innerHTML = d.pergunta9 || '-'; 
-                        row.insertCell(6).innerHTML = d.pergunta7 || '-'; 
-                        row.insertCell(7).innerHTML = d.pergunta8 || '-'; 
-                        row.insertCell(8).innerHTML = d.pergunta3 || '-'; 
-                        row.insertCell(9).innerHTML = d.pergunta4 || '-'; 
-                        row.insertCell(10).innerHTML = d.nota_visita || '-'; 
-                        row.insertCell(11).innerHTML = d.vendedor_nome || '-'; 
-                        row.insertCell(12).innerHTML = d.vendido || '-'; 
-                        row.insertCell(13).innerHTML = d.observacoes || '-'; 
-                        const actionCell = row.insertCell(14); 
-                        actionCell.className = 'acoes-botoes'; 
-                        actionCell.innerHTML = `<button onclick="abrirModalEditarResposta(${idx})" class="btn-editar">✏️</button><button onclick="excluirResposta(${idx})" class="btn-excluir">🗑️</button>`; 
-                    }); 
-                } 
-                window.dadosExportacao = dadosAtuais; 
-                await carregarUsuarios(); 
-                await carregarConsultores(); 
-            } catch(e) { console.error(e); } 
+        async function excluirSelecionados() {
+            const checkboxes = document.querySelectorAll('.chk-selecionar:checked');
+            const indices = Array.from(checkboxes).map(chk => parseInt(chk.getAttribute('data-index')));
+            if (indices.length === 0) return;
+            if (!confirm(`⚠️ Tem certeza que deseja excluir ${indices.length} registro(s)?`)) return;
+            indices.sort((a, b) => b - a);
+            for (const idx of indices) {
+                await fetch(`${API_URL}/excluir-pos-venda`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ index: idx })
+                });
+            }
+            mostrarNotificacao(`✅ ${indices.length} registro(s) excluído(s)!`);
+            await carregarPosVendas();
+            await carregarDashboard();
         }
 
-        function exportarExcel() { 
-            if (!dadosAtuais?.length) { alert('Sem dados para exportar'); return; } 
-            const dadosExcel = dadosAtuais.map(d => ({ 
-                'DATA': d.data_hora || '', 'CONSULTOR': d.vendedor || '', 'CNPJ': d.cnpj || '', 'EMPRESA': d.empresa || '', 
-                'POS VENDA': 'SIM', 'AET': d.pergunta9 || '', 'NR 06': d.pergunta7 || '', 'CIPA': d.pergunta8 || '', 
-                'PERIODICO': d.pergunta3 || '', 'EPIS': d.pergunta4 || '', 'NOTA VISITA': d.nota_visita || '', 
-                'VENDEDOR': d.vendedor_nome || '', 'VENDIDO': d.vendido || '', 'OBS': d.observacoes || '' 
-            })); 
-            const ws = XLSX.utils.json_to_sheet(dadosExcel); 
-            const wb = XLSX.utils.book_new(); 
-            XLSX.utils.book_append_sheet(wb, ws, 'RESULTADOS'); 
-            XLSX.writeFile(wb, `RESULTADOS_POS_VENDAS_${new Date().toISOString().split('T')[0]}.xlsx`); 
-            mostrarNotificacao('✅ Planilha exportada com sucesso!'); 
+        // ========== FUNÇÕES DE MODAIS ==========
+        function abrirModalNovoRegistro() {
+            ['modalConsultor','modalRazaoSocial','modalCnpj','modalCidade','modalTelefone','modalResponsavel','modalContabilidade','modalDataEntregue','modalRetorno','modalObservacao'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('modalNovoRegistro').style.display = 'flex';
+        }
+        function fecharModalNovoRegistro() { document.getElementById('modalNovoRegistro').style.display = 'none'; }
+
+        async function salvarNovoRegistro() {
+            const consultor = document.getElementById('modalConsultor').value;
+            const razaoSocial = document.getElementById('modalRazaoSocial').value.trim();
+            if (!consultor || !razaoSocial) { alert('Preencha consultor e razão social!'); return; }
+            const registro = {
+                consultor, razaoSocial,
+                cnpj: document.getElementById('modalCnpj').value.trim(),
+                cidade: document.getElementById('modalCidade').value.trim(),
+                telefone: document.getElementById('modalTelefone').value.trim(),
+                responsavel: document.getElementById('modalResponsavel').value.trim(),
+                contabilidade: document.getElementById('modalContabilidade').value.trim(),
+                dataEntregue: document.getElementById('modalDataEntregue').value,
+                retorno: document.getElementById('modalRetorno').value,
+                observacao: document.getElementById('modalObservacao').value.trim()
+            };
+            const response = await fetch(`${API_URL}/adicionar-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ registro }) });
+            if ((await response.json()).success) { mostrarNotificacao('✅ Adicionado!'); fecharModalNovoRegistro(); await carregarPosVendas(); await carregarDashboard(); }
+            else alert('❌ Erro ao adicionar');
         }
 
-        async function carregarUsuarios() { 
-            const response = await fetch(`${API_URL}/buscar-usuarios`); 
-            const usuarios = await response.json(); 
-            const corpo = document.getElementById('corpoUsuarios'); 
-            const usuariosParaMostrar = usuarios.filter(u => u.usuario !== 'henrique'); 
-            if (!usuariosParaMostrar.length) corpo.innerHTML = '<tr><td colspan="5">Nenhum usuário cadastrado直视';
+        function abrirModalEditarRegistro(index) {
+            indiceEditando = index;
+            const item = dadosPosVenda[index];
+            document.getElementById('editConsultor').value = item.consultor || '';
+            document.getElementById('editRazaoSocial').value = item.razao_social || item.razaoSocial || '';
+            document.getElementById('editCnpj').value = item.cnpj || '';
+            document.getElementById('editCidade').value = item.cidade || '';
+            document.getElementById('editTelefone').value = item.telefone || '';
+            document.getElementById('editResponsavel').value = item.responsavel || '';
+            document.getElementById('editContabilidade').value = item.contabilidade || '';
+            document.getElementById('editDataEntregue').value = converterNumeroExcelParaInput(item.data_entregue || item.dataEntregue);
+            document.getElementById('editRetorno').value = converterNumeroExcelParaInput(item.retorno);
+            document.getElementById('editObservacao').value = item.observacao || '';
+            document.getElementById('modalEditarRegistro').style.display = 'flex';
+        }
+        function fecharModalEditarRegistro() { document.getElementById('modalEditarRegistro').style.display = 'none'; indiceEditando = null; }
+
+        async function salvarEdicaoRegistro() {
+            const consultor = document.getElementById('editConsultor').value;
+            const razaoSocial = document.getElementById('editRazaoSocial').value.trim();
+            if (!consultor || !razaoSocial) { alert('Preencha consultor e razão social!'); return; }
+            const registro = {
+                consultor, razaoSocial,
+                cnpj: document.getElementById('editCnpj').value.trim(),
+                cidade: document.getElementById('editCidade').value.trim(),
+                telefone: document.getElementById('editTelefone').value.trim(),
+                responsavel: document.getElementById('editResponsavel').value.trim(),
+                contabilidade: document.getElementById('editContabilidade').value.trim(),
+                dataEntregue: document.getElementById('editDataEntregue').value,
+                retorno: document.getElementById('editRetorno').value,
+                observacao: document.getElementById('editObservacao').value.trim()
+            };
+            try {
+                const response = await fetch(`${API_URL}/salvar-pos-venda`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ registro, index: indiceEditando })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    mostrarNotificacao('✅ Registro atualizado!');
+                    fecharModalEditarRegistro();
+                    await carregarPosVendas();
+                    await carregarDashboard();
+                } else { alert('❌ Erro ao salvar'); }
+            } catch (error) { console.error(error); alert('❌ Erro ao conectar com o servidor'); }
+        }
+
+        async function excluirRegistroPosVenda(idx) {
+            if (confirm('Excluir este registro?')) {
+                const response = await fetch(`${API_URL}/excluir-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ index: idx }) });
+                if ((await response.json()).success) { mostrarNotificacao('✅ Excluído!'); await carregarPosVendas(); await carregarDashboard(); }
+                else alert('❌ Erro ao excluir');
+            }
+        }
+
+        function abrirModalEditarResposta(index) {
+            indiceEditandoResposta = index;
+            const item = dadosAtuais[index];
+            document.getElementById('editData').value = item.data_hora || item.dataHora || '';
+            document.getElementById('editConsultorResposta').value = item.vendedor || '';
+            document.getElementById('editCnpjResposta').value = item.cnpj || '';
+            document.getElementById('editEmpresaResposta').value = item.empresa || '';
+            document.getElementById('editAet').value = item.pergunta9 || 'NÃO';
+            document.getElementById('editNr06').value = item.pergunta7 || 'NÃO';
+            document.getElementById('editCipa').value = item.pergunta8 || 'NÃO';
+            document.getElementById('editPeriodico').value = item.pergunta3 || 'NÃO';
+            document.getElementById('editEpis').value = item.pergunta4 || 'NÃO';
+            document.getElementById('editNotaVisita').value = item.nota_visita || item.notaVisita || '';
+            document.getElementById('editVendedor').value = item.vendedor_nome || item.vendedorNome || '';
+            document.getElementById('editVendido').value = item.vendido || '';
+            document.getElementById('editObsResposta').value = item.observacoes || '';
+            document.getElementById('modalEditarResposta').style.display = 'flex';
+        }
+        function fecharModalEditarResposta() { document.getElementById('modalEditarResposta').style.display = 'none'; indiceEditandoResposta = null; }
+
+        async function salvarEdicaoResposta() {
+            if (indiceEditandoResposta === null) return;
+            const item = dadosAtuais[indiceEditandoResposta];
+            item.vendedor = document.getElementById('editConsultorResposta').value;
+            item.cnpj = document.getElementById('editCnpjResposta').value;
+            item.empresa = document.getElementById('editEmpresaResposta').value;
+            item.pergunta9 = document.getElementById('editAet').value;
+            item.pergunta7 = document.getElementById('editNr06').value;
+            item.pergunta8 = document.getElementById('editCipa').value;
+            item.pergunta3 = document.getElementById('editPeriodico').value;
+            item.pergunta4 = document.getElementById('editEpis').value;
+            item.nota_visita = document.getElementById('editNotaVisita').value;
+            item.vendedor_nome = document.getElementById('editVendedor').value;
+            item.vendido = document.getElementById('editVendido').value;
+            item.observacoes = document.getElementById('editObsResposta').value;
+            try {
+                const response = await fetch(`${API_URL}/salvar-todos-dados`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ dados: dadosAtuais })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    mostrarNotificacao('✅ Resposta atualizada!');
+                    fecharModalEditarResposta();
+                    await carregarDados();
+                    await carregarDashboard();
+                } else { alert('❌ Erro ao salvar'); }
+            } catch (error) { console.error(error); alert('❌ Erro ao conectar com o servidor'); }
+        }
+
+        async function excluirResposta(index) {
+            if (confirm('Excluir resposta?')) {
+                dadosAtuais.splice(index, 1);
+                const response = await fetch(`${API_URL}/salvar-todos-dados`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dados: dadosAtuais }) });
+                if ((await response.json()).success) { mostrarNotificacao('✅ Excluído!'); await carregarDados(); await carregarDashboard(); }
+                else alert('❌ Erro');
+            }
+        }
+
+        // ========== CARREGAR DADOS ==========
+        async function carregarConsultores() {
+            try {
+                const response = await fetch(`${API_URL}/buscar-usuarios`);
+                const usuarios = await response.json();
+                listaConsultores = usuarios.filter(u => u.tipo === 'pos' && u.usuario !== 'henrique').map(u => u.nome);
+                const modalSelect = document.getElementById('modalConsultor');
+                const editSelect = document.getElementById('editConsultor');
+                modalSelect.innerHTML = '<option value="">Selecione...</option>';
+                editSelect.innerHTML = '<option value="">Selecione...</option>';
+                listaConsultores.forEach(c => {
+                    modalSelect.innerHTML += `<option value="${c}">${c}</option>`;
+                    editSelect.innerHTML += `<option value="${c}">${c}</option>`;
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        async function carregarPosVendas() {
+            try {
+                const response = await fetch(`${API_URL}/buscar-pos-vendas`);
+                dadosPosVenda = await response.json();
+                dadosPosVendaFiltrados = [...dadosPosVenda];
+                renderizarTabelaPosVendas(dadosPosVendaFiltrados);
+            } catch(e) {
+                console.error(e);
+                document.getElementById('corpoTabelaPosVendas').innerHTML = '<tr><td colspan="12">Erro ao carregar dados. Verifique o servidor.</td></tr>';
+            }
+        }
+
+        async function carregarDados() {
+            try {
+                const response = await fetch(`${API_URL}/buscar-respostas`);
+                dadosAtuais = await response.json();
+                dadosAtuaisFiltrados = [...dadosAtuais];
+                renderizarTabelaResultado(dadosAtuaisFiltrados);
+                window.dadosExportacao = dadosAtuais;
+                await carregarUsuarios();
+                await carregarConsultores();
+            } catch(e) { console.error(e); }
+        }
+
+        async function carregarUsuarios() {
+            const response = await fetch(`${API_URL}/buscar-usuarios`);
+            const usuarios = await response.json();
+            const corpo = document.getElementById('corpoUsuarios');
+            const usuariosParaMostrar = usuarios.filter(u => u.usuario !== 'henrique');
+            if (!usuariosParaMostrar.length) corpo.innerHTML = '<tr><td colspan="5">Nenhum usuário cadastrado</td></tr>';
             else corpo.innerHTML = usuariosParaMostrar.map(u => `<tr>
                 <td>${u.usuario}</td>
                 <td>${u.nome}</td>
                 <td>${u.tipo === 'admin' ? '👑 Administrador' : '📝 Pós Vendas'}</td>
                 <td>•••••• <button onclick="alert('Senha: ${u.senha}')" class="btn-ver-senha">👁️</button></td>
                 <td><button onclick="abrirModalAlterarSenha('${u.usuario}','${u.nome}')" class="btn-alterar-senha">🔑</button> <button onclick="excluirUsuario('${u.usuario}')" class="btn-excluir">🗑️</button></td>
-            </tr>`).join(''); 
+            </tr>`).join('');
         }
 
         function abrirModalAlterarSenha(usuario, nome) { const nova = prompt(`Nova senha para ${nome}:`); if (nova && nova.trim()) alterarSenha(usuario, nova); }
         async function alterarSenha(u, s) { const r = await fetch(`${API_URL}/alterar-senha`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u, novaSenha:s})}); if((await r.json()).success){ alert('✅ Senha alterada!'); await carregarUsuarios(); } else alert('❌ Erro'); }
         async function adicionarUsuario() { const u=document.getElementById('novoUsuario').value.trim(), n=document.getElementById('novoNome').value.trim(), s=document.getElementById('novaSenha').value.trim(), t=document.getElementById('novoTipo').value; if(!u||!n||!s){alert('Preencha todos os campos!');return;} const r=await fetch(`${API_URL}/adicionar-usuario`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u, nome:n, senha:s, tipo:t})}); const d=await r.json(); if(d.success){alert('✅ Usuário adicionado!'); document.getElementById('novoUsuario').value=''; document.getElementById('novoNome').value=''; document.getElementById('novaSenha').value=''; await carregarUsuarios(); await carregarConsultores(); await carregarDashboard();} else alert('❌ '+d.message); }
         async function excluirUsuario(u) { if(u === 'henrique'){ alert('Não é possível excluir este usuário'); return; } if(confirm(`Excluir o usuário "${u}"?`)){ const r = await fetch(`${API_URL}/excluir-usuario`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ usuario: u }) }); if ((await r.json()).success) { alert('✅ Usuário excluído!'); await carregarUsuarios(); await carregarConsultores(); await carregarDashboard(); } else alert('❌ Erro ao excluir'); } }
-        
+
+        // ========== DASHBOARD ==========
+        async function carregarDashboard() {
+            try {
+                const respostas = await (await fetch(`${API_URL}/buscar-respostas`)).json();
+                const posVendas = await (await fetch(`${API_URL}/buscar-pos-vendas`)).json();
+                const usuarios = await (await fetch(`${API_URL}/buscar-usuarios`)).json();
+
+                const mesAtual = new Date().getMonth(), anoAtual = new Date().getFullYear();
+                const visitasMensais = respostas.filter(r => {
+                    const d = converterDataParaDate(r.data_hora || r.dataHora);
+                    return d && d.getMonth() === mesAtual && d.getFullYear() === anoAtual;
+                }).length;
+                document.getElementById('totalVisitas').textContent = visitasMensais;
+
+                const hoje = new Date();
+                const hojeStr = `${hoje.getDate().toString().padStart(2,'0')}/${(hoje.getMonth()+1).toString().padStart(2,'0')}/${hoje.getFullYear()}`;
+                const visitasHoje = respostas.filter(r => {
+                    if (!r.data_hora && !r.dataHora) return false;
+                    const data = r.data_hora || r.dataHora;
+                    return data.includes(',') ? data.split(',')[0] === hojeStr : new Date(data).toLocaleDateString('pt-BR') === hojeStr;
+                }).length;
+                document.getElementById('totalVisitasHoje').textContent = visitasHoje;
+
+                const cnpjsUnicos = new Set();
+                posVendas.forEach(p => { if (p.cnpj && p.cnpj.trim()) cnpjsUnicos.add(p.cnpj); });
+                document.getElementById('totalEmpresasCadastradas').textContent = cnpjsUnicos.size;
+
+                const conformidade = respostas.filter(r => r.pergunta1 === 'SIM').length;
+                document.getElementById('taxaConformidade').textContent = respostas.length ? Math.round((conformidade/respostas.length)*100)+'%' : '0%';
+
+                const consultoresPos = usuarios.filter(u => u.tipo === 'pos' && u.usuario !== 'henrique').map(u => u.nome);
+                const cadastradasPorConsultor = [], visitadasPorConsultor = [], convertidasPorConsultor = [], naoRespondidasPorConsultor = [];
+
+                for (const c of consultoresPos) {
+                    const cadastradas = posVendas.filter(p => p.consultor === c).length;
+                    const visitadas = respostas.filter(r => r.vendedor === c).length;
+                    const convertidas = respostas.filter(r => r.vendedor === c && r.vendido === 'SIM').length;
+                    cadastradasPorConsultor.push(cadastradas);
+                    visitadasPorConsultor.push(visitadas);
+                    convertidasPorConsultor.push(convertidas);
+                    naoRespondidasPorConsultor.push(Math.max(0, cadastradas - visitadas));
+                }
+                dadosDesempenhoConvertido = convertidasPorConsultor;
+                atualizarGraficos(consultoresPos, cadastradasPorConsultor, visitadasPorConsultor, naoRespondidasPorConsultor);
+
+                const corpo = document.getElementById('corpoDesempenho');
+                if (!consultoresPos.length) corpo.innerHTML = '<tr><td colspan="4">Nenhum consultor cadastrado</td>';
+                else {
+                    corpo.innerHTML = '';
+                    for (let i = 0; i < consultoresPos.length; i++) {
+                        const row = corpo.insertRow();
+                        row.insertCell(0).innerHTML = consultoresPos[i];
+                        row.insertCell(1).innerHTML = cadastradasPorConsultor[i];
+                        row.insertCell(2).innerHTML = visitadasPorConsultor[i];
+                        row.insertCell(3).innerHTML = convertidasPorConsultor[i];
+                    }
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        function atualizarGraficos(consultores, cadastradas, visitadas, naoRespondidas) {
+            if (graficoDesempenho) graficoDesempenho.destroy();
+            const ctx1 = document.getElementById('graficoDesempenho').getContext('2d');
+            graficoDesempenho = new Chart(ctx1, {
+                type: 'bar',
+                data: { labels: consultores, datasets: [{ label: 'Empresas Visitadas', data: visitadas, backgroundColor: '#667eea', borderRadius: 5 }, { label: 'Convertido em Vendas', data: dadosDesempenhoConvertido, backgroundColor: '#48bb78', borderRadius: 5 }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Quantidade' } } } }
+            });
+            if (graficoComparativo) graficoComparativo.destroy();
+            const ctx2 = document.getElementById('graficoComparativo').getContext('2d');
+            graficoComparativo = new Chart(ctx2, {
+                type: 'bar',
+                data: { labels: consultores, datasets: [{ label: 'Empresas Cadastradas', data: cadastradas, backgroundColor: '#4299e1', borderRadius: 5 }, { label: 'Não Respondidas', data: naoRespondidas, backgroundColor: '#e53e3e', borderRadius: 5 }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Quantidade' } } } }
+            });
+        }
+
+        // ========== FUNÇÕES GERAIS ==========
+        function toggleDropdown() {
+            const d = document.getElementById('dropdownMenu');
+            d.style.display = d.style.display === 'block' ? 'none' : 'block';
+        }
+        function fecharDropdown() { document.getElementById('dropdownMenu').style.display = 'none'; }
+
+        function mostrarNotificacao(mensagem) {
+            let n = document.getElementById('notificacao');
+            if (!n) { n = document.createElement('div'); n.id = 'notificacao'; n.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#48bb78;color:white;padding:10px 20px;border-radius:5px;z-index:9999'; document.body.appendChild(n); }
+            n.textContent = mensagem;
+            n.style.display = 'block';
+            setTimeout(() => n.style.display = 'none', 3000);
+        }
+
+        function logout() {
+            const manter = confirm('Manter dados salvos?');
+            if (!manter) { localStorage.removeItem('loginSalvo'); localStorage.removeItem('senhaSalva'); localStorage.removeItem('manterConectado'); }
+            localStorage.removeItem('userRole'); localStorage.removeItem('userName'); localStorage.removeItem('usuarioLogado');
+            localStorage.removeItem('sessaoAtiva'); localStorage.removeItem('ultimoAcesso');
+            window.location.href = 'login.html';
+        }
+
+        // ========== EVENT LISTENERS ==========
         document.getElementById('btnExcluirSelecionados')?.addEventListener('click', excluirSelecionados);
-        
-        window.dadosExportacao = []; 
-        carregarDados(); 
-        carregarPosVendas(); 
+
+        window.onclick = function(e) {
+            if (!e.target.matches('.btn-importar-dropdown')) document.getElementById('dropdownMenu').style.display = 'none';
+            if (e.target === document.getElementById('modalNovoRegistro')) fecharModalNovoRegistro();
+            if (e.target === document.getElementById('modalEditarRegistro')) fecharModalEditarRegistro();
+            if (e.target === document.getElementById('modalEditarResposta')) fecharModalEditarResposta();
+            if (e.target === document.getElementById('modalFiltroPosVendas')) fecharModalFiltroPosVendas();
+            if (e.target === document.getElementById('modalFiltroResultado')) fecharModalFiltroResultado();
+        };
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('ativo'));
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('ativo'));
+                this.classList.add('ativo');
+                document.getElementById(this.getAttribute('data-tab')).classList.add('ativo');
+                if (this.getAttribute('data-tab') === 'posvendas') carregarPosVendas();
+                if (this.getAttribute('data-tab') === 'dashboard') carregarDashboard();
+            });
+        });
+
+        // ========== INICIALIZAÇÃO ==========
+        window.dadosExportacao = [];
+        carregarDados();
+        carregarPosVendas();
         carregarDashboard();
     </script>
 </body>

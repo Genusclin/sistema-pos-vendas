@@ -979,3 +979,83 @@ tr:hover {
     cursor: pointer;
     transform: scale(1.1);
 }
+/* Botão Filtro */
+.btn-filtro {
+    background: #4299e1;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    width: auto;
+    transition: background 0.3s;
+}
+
+.btn-filtro:hover {
+    background: #3182ce;
+}
+
+.btn-excluir-massa {
+    background: #e53e3e;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    width: auto;
+    transition: background 0.3s;
+}
+
+.btn-excluir-massa:hover {
+    background: #c53030;
+}
+
+.btn-exportar-pequeno {
+    background: #48bb78;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    width: auto;
+    transition: background 0.3s;
+}
+
+.btn-exportar-pequeno:hover {
+    background: #38a169;
+}
+
+.btn-adicionar {
+    background: #4299e1;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    width: auto;
+    transition: background 0.3s;
+}
+
+.btn-adicionar:hover {
+    background: #3182ce;
+}
+
+.btn-importar-dropdown {
+    background: #9c27b0;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    width: auto;
+    transition: background 0.3s;
+}
+
+.btn-importar-dropdown:hover {
+    background: #7b1fa2;
+}
