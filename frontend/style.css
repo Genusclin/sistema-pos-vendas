@@ -274,14 +274,29 @@ button:active {
 .btn-excluir {
     background: #e53e3e;
     width: auto;
-    padding: 5px 10px;
-    font-size: 12px;
+    padding: 6px 12px;
+    font-size: 16px;
     margin-top: 0;
-    margin-left: 5px;
+    display: inline-block;
 }
 
 .btn-excluir:hover {
     background: #c53030;
+}
+
+.btn-editar {
+    background: #ed8936;
+    width: auto;
+    padding: 6px 12px;
+    font-size: 16px;
+    margin-top: 0;
+    margin-right: 5px;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+.btn-editar:hover {
+    background: #dd6b20;
 }
 
 .btn-alterar-senha {
@@ -387,6 +402,73 @@ button:active {
     background: #38a169;
 }
 
+.btn-preencher {
+    background: #4299e1;
+    width: auto;
+    padding: 5px 10px;
+    font-size: 12px;
+    margin-top: 0;
+    border-radius: 5px;
+}
+
+.btn-preencher:hover {
+    background: #3182ce;
+}
+
+.btn-excluir-massa {
+    background: #e53e3e;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+    width: auto;
+    margin-left: 10px;
+}
+
+.btn-excluir-massa:hover {
+    background: #c53030;
+}
+
+.btn-filtro {
+    background: #4299e1;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    width: auto;
+    transition: background 0.3s;
+}
+
+.btn-filtro:hover {
+    background: #3182ce;
+}
+
+.btn-paginacao {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    width: auto;
+    transition: background 0.3s;
+}
+
+.btn-paginacao:hover:not(:disabled) {
+    background: #5a67d8;
+}
+
+.btn-paginacao:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
 /* ==================== CÉLULAS EDITÁVEIS ==================== */
 .editavel {
     cursor: pointer;
@@ -478,7 +560,6 @@ td.editavel {
     gap: 10px;
 }
 
-/* Formulário dentro do modal */
 .form-cadastro-modal {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -615,6 +696,22 @@ tr:hover {
     letter-spacing: 2px;
 }
 
+.acoes-botoes {
+    white-space: nowrap;
+    text-align: center;
+}
+
+/* Checkboxes de seleção */
+.chk-selecionar, .chk-selecionar-pv, .chk-selecionar-res {
+    cursor: pointer;
+    transform: scale(1.1);
+}
+
+#chkSelecionarTodos, #chkSelecionarTodosPV, #chkSelecionarTodosRES {
+    cursor: pointer;
+    transform: scale(1.1);
+}
+
 /* ==================== FORMULÁRIO DE CADASTRO ==================== */
 .form-cadastro {
     display: grid;
@@ -628,6 +725,53 @@ tr:hover {
 
 .form-cadastro .input-group.full-width {
     grid-column: span 2;
+}
+
+/* ==================== DROPDOWN MENU ==================== */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.btn-importar-dropdown {
+    background: #9c27b0;
+    width: auto;
+    padding: 8px 16px;
+    font-size: 14px;
+    margin-top: 0;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-importar-dropdown:hover {
+    background: #7b1fa2;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 180px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.dropdown-content a {
+    color: #333;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 14px;
+    transition: background 0.3s;
+    cursor: pointer;
+}
+
+.dropdown-content a:hover {
+    background-color: #f0f0f0;
+    color: #9c27b0;
 }
 
 /* ==================== INFO (OCULTA) ==================== */
@@ -803,7 +947,6 @@ tr:hover {
     background: #555;
 }
 
-/* Scrollbar dentro do modal */
 .modal-content::-webkit-scrollbar {
     width: 6px;
 }
@@ -816,246 +959,4 @@ tr:hover {
 .modal-content::-webkit-scrollbar-thumb {
     background: #888;
     border-radius: 10px;
-}
-/* ==================== DROPDOWN MENU ==================== */
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-.btn-importar-dropdown {
-    background: #9c27b0;
-    width: auto;
-    padding: 8px 16px;
-    font-size: 14px;
-    margin-top: 0;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.btn-importar-dropdown:hover {
-    background: #7b1fa2;
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    right: 0;
-    background-color: white;
-    min-width: 180px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.dropdown-content a {
-    color: #333;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-    font-size: 14px;
-    transition: background 0.3s;
-    cursor: pointer;
-}
-
-.dropdown-content a:hover {
-    background-color: #f0f0f0;
-    color: #9c27b0;
-}
-/* Botões de ação com emojis */
-.btn-editar {
-    background: #ed8936;
-    width: auto;
-    padding: 5px 10px;
-    font-size: 14px;
-    margin-top: 0;
-    margin-right: 5px;
-    border-radius: 5px;
-}
-
-.btn-editar:hover {
-    background: #dd6b20;
-}
-/* Botões de ação lado a lado */
-.acoes-botoes {
-    white-space: nowrap;
-    text-align: center;
-}
-
-.btn-editar {
-    background: #ed8936;
-    width: auto;
-    padding: 6px 12px;
-    font-size: 16px;
-    margin-top: 0;
-    margin-right: 5px;
-    border-radius: 5px;
-    display: inline-block;
-}
-
-.btn-editar:hover {
-    background: #dd6b20;
-}
-
-.btn-excluir {
-    background: #e53e3e;
-    width: auto;
-    padding: 6px 12px;
-    font-size: 16px;
-    margin-top: 0;
-    display: inline-block;
-}
-
-.btn-excluir:hover {
-    background: #c53030;
-}
-/* Botão Preencher */
-.btn-preencher {
-    background: #4299e1;
-    width: auto;
-    padding: 5px 10px;
-    font-size: 12px;
-    margin-top: 0;
-    border-radius: 5px;
-}
-
-.btn-preencher:hover {
-    background: #3182ce;
-}
-/* Botão excluir selecionados - tamanho pequeno (igual ao Novo Registro) */
-.btn-excluir-massa {
-    background: #e53e3e;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.3s;
-    width: auto;
-    margin-left: 10px;
-}
-
-.btn-excluir-massa:hover {
-    background: #c53030;
-}
-
-/* Checkbox na tabela */
-.chk-selecionar {
-    cursor: pointer;
-    transform: scale(1.1);
-}
-
-#chkSelecionarTodos {
-    cursor: pointer;
-    transform: scale(1.1);
-}
-/* Botão excluir selecionados */
-.btn-excluir-massa {
-    background: #e53e3e;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: background 0.3s;
-    width: auto;
-    display: inline-block;
-}
-
-.btn-excluir-massa:hover {
-    background: #c53030;
-}
-
-/* Checkbox na tabela */
-.chk-selecionar {
-    cursor: pointer;
-    transform: scale(1.1);
-}
-
-#chkSelecionarTodos {
-    cursor: pointer;
-    transform: scale(1.1);
-}
-/* Botão Filtro */
-.btn-filtro {
-    background: #4299e1;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    width: auto;
-    transition: background 0.3s;
-}
-
-.btn-filtro:hover {
-    background: #3182ce;
-}
-
-.btn-excluir-massa {
-    background: #e53e3e;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    width: auto;
-    transition: background 0.3s;
-}
-
-.btn-excluir-massa:hover {
-    background: #c53030;
-}
-
-.btn-exportar-pequeno {
-    background: #48bb78;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    width: auto;
-    transition: background 0.3s;
-}
-
-.btn-exportar-pequeno:hover {
-    background: #38a169;
-}
-
-.btn-adicionar {
-    background: #4299e1;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    width: auto;
-    transition: background 0.3s;
-}
-
-.btn-adicionar:hover {
-    background: #3182ce;
-}
-
-.btn-importar-dropdown {
-    background: #9c27b0;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    width: auto;
-    transition: background 0.3s;
-}
-
-.btn-importar-dropdown:hover {
-    background: #7b1fa2;
 }
