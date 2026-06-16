@@ -108,6 +108,8 @@ app.post('/login', async (req, res) => {
 app.post('/salvar-resposta', async (req, res) => {
     try {
         const resposta = req.body;
+        // CORRIGIDO: Fuso horário de Brasília (UTC-3)
+        const agora = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
         await pool.query(`
             INSERT INTO respostas (
                 data_hora, vendedor, cnpj, empresa, responsavel, telefone,
@@ -116,7 +118,7 @@ app.post('/salvar-resposta', async (req, res) => {
                 vendedor_nome, vendido, observacoes
             ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
         `, [
-            new Date().toLocaleString('pt-BR'), resposta.vendedor, resposta.cnpj,
+            agora, resposta.vendedor, resposta.cnpj,
             resposta.empresa, resposta.responsavel, resposta.telefone,
             resposta.pergunta1, resposta.pergunta2, resposta.pergunta3,
             resposta.pergunta4, resposta.pergunta5, resposta.pergunta6,
@@ -169,7 +171,6 @@ app.post('/salvar-todos-dados', async (req, res) => {
 app.get('/buscar-pos-vendas', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM pos_vendas ORDER BY id DESC');
-        console.log('📊 Registros retornados:', result.rows.length);
         res.json(result.rows);
     } catch (error) {
         console.error(error);
@@ -189,7 +190,6 @@ app.post('/adicionar-pos-venda', async (req, res) => {
         `, [registro.consultor, registro.razaoSocial, registro.cnpj, registro.cidade,
             registro.telefone, registro.responsavel, registro.contabilidade,
             registro.dataEntregue, registro.retorno, registro.observacao]);
-        console.log('✅ Registro adicionado com ID:', result.rows[0].id);
         res.json({ success: true, id: result.rows[0].id });
     } catch (error) {
         console.error(error);
@@ -197,58 +197,31 @@ app.post('/adicionar-pos-venda', async (req, res) => {
     }
 });
 
-// ROTA SALVAR POS VENDA - CORRIGIDA
 app.post('/salvar-pos-venda', async (req, res) => {
     try {
         const { registro, index } = req.body;
-        console.log('📝 ===== RECEBENDO EDIÇÃO =====');
-        console.log('📝 Registro recebido:', JSON.stringify(registro, null, 2));
-        console.log('📝 ID recebido:', registro.id);
-        console.log('📝 Index recebido:', index);
         
         if (!registro.id) {
             console.log('❌ ERRO: ID não enviado!');
             return res.status(400).json({ success: false, message: 'ID não enviado' });
         }
         
-        // ATUALIZA PELO ID
         const updateResult = await pool.query(`
             UPDATE pos_vendas SET
-                consultor = $1, 
-                razao_social = $2, 
-                cnpj = $3, 
-                cidade = $4,
-                telefone = $5, 
-                responsavel = $6, 
-                contabilidade = $7,
-                data_entregue = $8, 
-                retorno = $9, 
-                observacao = $10
+                consultor = $1, razao_social = $2, cnpj = $3, cidade = $4,
+                telefone = $5, responsavel = $6, contabilidade = $7,
+                data_entregue = $8, retorno = $9, observacao = $10
             WHERE id = $11
             RETURNING id, consultor, cidade, razao_social
         `, [
-            registro.consultor, 
-            registro.razaoSocial, 
-            registro.cnpj, 
-            registro.cidade,
-            registro.telefone, 
-            registro.responsavel, 
-            registro.contabilidade,
-            registro.dataEntregue, 
-            registro.retorno, 
-            registro.observacao, 
-            registro.id
+            registro.consultor, registro.razaoSocial, registro.cnpj, registro.cidade,
+            registro.telefone, registro.responsavel, registro.contabilidade,
+            registro.dataEntregue, registro.retorno, registro.observacao, registro.id
         ]);
         
-        console.log('📊 Resultado do UPDATE:', updateResult.rows);
-        console.log('📊 Linhas afetadas:', updateResult.rowCount);
-        
         if (updateResult.rowCount > 0) {
-            console.log('✅ Registro ATUALIZADO com sucesso! ID:', registro.id);
-            console.log('📌 Novos valores:', updateResult.rows[0]);
             res.json({ success: true, updated: updateResult.rows[0] });
         } else {
-            console.log('❌ Nenhum registro encontrado com ID:', registro.id);
             res.status(404).json({ success: false, message: 'Registro não encontrado' });
         }
     } catch (error) {
@@ -263,7 +236,6 @@ app.post('/excluir-pos-venda', async (req, res) => {
         const result = await pool.query('SELECT id FROM pos_vendas ORDER BY id LIMIT 1 OFFSET $1', [index]);
         if (result.rows.length > 0) {
             await pool.query('DELETE FROM pos_vendas WHERE id = $1', [result.rows[0].id]);
-            console.log('✅ Registro excluído, ID:', result.rows[0].id);
         }
         res.json({ success: true });
     } catch (error) {
