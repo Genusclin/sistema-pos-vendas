@@ -1,15 +1,14 @@
 // Service Worker para cache offline
 const CACHE_NAME = 'pos-vendas-v1';
 const URLS_TO_CACHE = [
-    '/',
-    '/login.html',
-    '/admin.html',
-    '/posvenda.html',
-    '/style.css',
-    '/admin-menu.css',
-    '/Logo.png',
-    '/fundo.jpg',
-    '/offline.html'
+    '/frontend/login.html',
+    '/frontend/admin.html',
+    '/frontend/posvenda.html',
+    '/frontend/style.css',
+    '/frontend/admin-menu.css',
+    '/frontend/Logo.png',
+    '/frontend/fundo.jpg',
+    '/frontend/offline.html'
 ];
 
 // Instala o Service Worker e cacheia os arquivos
@@ -50,7 +49,7 @@ self.addEventListener('fetch', event => {
                 }
                 return fetch(event.request).catch(() => {
                     if (event.request.headers.get('accept').includes('text/html')) {
-                        return caches.match('/offline.html');
+                        return caches.match('/frontend/offline.html');
                     }
                 });
             })
