@@ -306,6 +306,45 @@
         let paginaAtualRES = 1;
         let dadosPaginadosRES = [];
 
+        // ========== SUPORTE OFFLINE ==========
+        function salvarCachePosVendas(dados) {
+            try {
+                localStorage.setItem('cache_pos_vendas', JSON.stringify(dados));
+                console.log('📦 Cache Pós Vendas salvo:', dados.length);
+            } catch(e) {}
+        }
+
+        function carregarCachePosVendas() {
+            try {
+                const cache = localStorage.getItem('cache_pos_vendas');
+                if (cache) {
+                    const dados = JSON.parse(cache);
+                    console.log('📂 Cache Pós Vendas carregado:', dados.length);
+                    return dados;
+                }
+            } catch(e) {}
+            return null;
+        }
+
+        function salvarCacheRespostas(dados) {
+            try {
+                localStorage.setItem('cache_respostas', JSON.stringify(dados));
+                console.log('📦 Cache Respostas salvo:', dados.length);
+            } catch(e) {}
+        }
+
+        function carregarCacheRespostas() {
+            try {
+                const cache = localStorage.getItem('cache_respostas');
+                if (cache) {
+                    const dados = JSON.parse(cache);
+                    console.log('📂 Cache Respostas carregado:', dados.length);
+                    return dados;
+                }
+            } catch(e) {}
+            return null;
+        }
+
         // ========== FUNÇÕES DE PAGINAÇÃO PÓS VENDAS ==========
         function atualizarPaginacaoPV() {
             const dados = dadosPosVendaFiltrados.length ? dadosPosVendaFiltrados : dadosPosVenda;
@@ -978,12 +1017,24 @@
                 const response = await fetch(`${API_URL}/buscar-pos-vendas`);
                 dadosPosVenda = await response.json();
                 console.log('📊 Pós Vendas recarregado:', dadosPosVenda.length);
+                // Salvar cache
+                salvarCachePosVendas(dadosPosVenda);
                 dadosPosVendaFiltrados = [];
                 paginaAtualPV = 1;
                 atualizarPaginacaoPV();
             } catch(e) {
-                console.error(e);
-                document.getElementById('corpoTabelaPosVendas').innerHTML = '<tr><td colspan="12">Erro ao carregar dados. Verifique o servidor.</td></tr>';
+                console.error('❌ Erro ao carregar Pós Vendas:', e);
+                // Tenta carregar do cache
+                const cache = carregarCachePosVendas();
+                if (cache) {
+                    dadosPosVenda = cache;
+                    dadosPosVendaFiltrados = [];
+                    paginaAtualPV = 1;
+                    atualizarPaginacaoPV();
+                    mostrarNotificacao('📂 Modo Offline - Dados carregados do cache');
+                } else {
+                    document.getElementById('corpoTabelaPosVendas').innerHTML = '<tr><td colspan="12">Erro ao carregar dados. Verifique o servidor.</td></tr>';
+                }
             }
         }
 
@@ -991,12 +1042,27 @@
             try {
                 const response = await fetch(`${API_URL}/buscar-respostas`);
                 dadosAtuais = await response.json();
+                // Salvar cache
+                salvarCacheRespostas(dadosAtuais);
                 dadosAtuaisFiltrados = [];
                 paginaAtualRES = 1;
                 atualizarPaginacaoRES();
                 await carregarUsuarios();
                 await carregarConsultores();
-            } catch(e) { console.error(e); }
+            } catch(e) {
+                console.error('❌ Erro ao carregar Respostas:', e);
+                // Tenta carregar do cache
+                const cache = carregarCacheRespostas();
+                if (cache) {
+                    dadosAtuais = cache;
+                    dadosAtuaisFiltrados = [];
+                    paginaAtualRES = 1;
+                    atualizarPaginacaoRES();
+                    mostrarNotificacao('📂 Modo Offline - Respostas carregadas do cache');
+                } else {
+                    document.getElementById('corpoTabela').innerHTML = '<tr><td colspan="16">Erro ao carregar dados. Verifique o servidor.</td></tr>';
+                }
+            }
         }
 
         async function carregarUsuarios() {

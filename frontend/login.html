@@ -46,29 +46,23 @@
     <script>
         const API_URL = 'https://sistema-pos-vendas-backend.onrender.com';
         
-        // USUÁRIOS OFFLINE (salvos localmente)
+        // ========== USUÁRIOS OFFLINE ==========
         const USUARIOS_OFFLINE_KEY = 'usuarios_offline';
         
-        // Usuários padrão (primeira vez)
         const USUARIOS_PADRAO = {
             'admin': { senha: 'admin123', role: 'admin', nome: 'Administrador' },
             'henrique': { senha: '30072021', role: 'admin', nome: 'Henrique Master' },
             'andressa': { senha: '123', role: 'pos', nome: 'Andressa' }
         };
 
-        // ========== FUNÇÕES OFFLINE ==========
-        
         function carregarUsuariosOffline() {
             try {
                 const saved = localStorage.getItem(USUARIOS_OFFLINE_KEY);
                 if (saved) {
                     const usuarios = JSON.parse(saved);
-                    // Mesclar com os padrão
                     return { ...USUARIOS_PADRAO, ...usuarios };
                 }
-            } catch (e) {
-                console.error('Erro ao carregar usuários offline:', e);
-            }
+            } catch (e) {}
             return USUARIOS_PADRAO;
         }
 
@@ -78,71 +72,85 @@
                 usuarios[username] = { senha, role, nome };
                 localStorage.setItem(USUARIOS_OFFLINE_KEY, JSON.stringify(usuarios));
                 console.log('✅ Usuário salvo offline:', username);
-            } catch (e) {
-                console.error('Erro ao salvar usuário offline:', e);
-            }
+            } catch (e) {}
         }
 
         function sincronizarUsuariosOffline() {
-            // Busca usuários do servidor e salva localmente
+            if (!navigator.onLine) return;
             fetch(`${API_URL}/buscar-usuarios`)
                 .then(res => res.json())
                 .then(usuarios => {
                     const offline = carregarUsuariosOffline();
                     usuarios.forEach(u => {
-                        offline[u.usuario] = { 
-                            senha: u.senha, 
-                            role: u.tipo, 
-                            nome: u.nome 
-                        };
+                        offline[u.usuario] = { senha: u.senha, role: u.tipo, nome: u.nome };
                     });
                     localStorage.setItem(USUARIOS_OFFLINE_KEY, JSON.stringify(offline));
                     console.log('✅ Usuários sincronizados offline');
                 })
-                .catch(err => console.log('⚠️ Não foi possível sincronizar usuários (modo offline)'));
-        }
-
-        // ========== FUNÇÕES DE LOGIN ==========
-        
-        function mostrarErro(mensagem) {
-            const erroDiv = document.getElementById('mensagemErro');
-            erroDiv.textContent = mensagem;
-            erroDiv.style.display = 'block';
-            setTimeout(() => {
-                erroDiv.style.display = 'none';
-            }, 5000);
-        }
-
-        function esconderErro() {
-            document.getElementById('mensagemErro').style.display = 'none';
+                .catch(() => console.log('⚠️ Não foi possível sincronizar usuários'));
         }
 
         // ========== LOGIN OFFLINE ==========
         function loginOffline(username, password) {
             const usuarios = carregarUsuariosOffline();
             const user = usuarios[username];
-            
             if (user && user.senha === password) {
                 return { success: true, role: user.role, nome: user.nome };
             }
             return { success: false };
         }
 
-        // ========== EVENTOS ==========
-        
-        window.addEventListener('DOMContentLoaded', function() {
-            // Verifica se está offline
-            if (!navigator.onLine) {
-                document.getElementById('statusOffline').style.display = 'block';
-                mostrarErro('📱 Modo Offline - Usando credenciais salvas localmente');
+        // ========== LOGIN PRINCIPAL ==========
+        async function fazerLogin(username, password) {
+            // Tenta online primeiro
+            if (navigator.onLine) {
+                try {
+                    const response = await fetch(`${API_URL}/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+                    const data = await response.json();
+                    if (response.ok && data.success) {
+                        sincronizarUsuariosOffline();
+                        return { success: true, role: data.role, nome: data.nome };
+                    }
+                } catch (error) {
+                    console.log('⚠️ Erro no login online, tentando offline:', error);
+                }
             }
             
-            // Tenta sincronizar usuários (se tiver internet)
+            // Fallback offline
+            const offlineResult = loginOffline(username, password);
+            if (offlineResult.success) {
+                console.log('✅ Login OFFLINE bem sucedido');
+                return offlineResult;
+            }
+            
+            return { success: false };
+        }
+
+        // ========== EVENTOS ==========
+        function mostrarErro(mensagem) {
+            const erroDiv = document.getElementById('mensagemErro');
+            erroDiv.textContent = mensagem;
+            erroDiv.style.display = 'block';
+            setTimeout(() => erroDiv.style.display = 'none', 5000);
+        }
+
+        function esconderErro() {
+            document.getElementById('mensagemErro').style.display = 'none';
+        }
+
+        window.addEventListener('DOMContentLoaded', function() {
+            if (!navigator.onLine) {
+                document.getElementById('statusOffline').style.display = 'block';
+            }
+            
             if (navigator.onLine) {
                 sincronizarUsuariosOffline();
             }
             
-            // Carregar login salvo
             const manterConectado = localStorage.getItem('manterConectado') === 'true';
             const loginSalvo = localStorage.getItem('loginSalvo');
             const senhaSalva = localStorage.getItem('senhaSalva');
@@ -152,8 +160,20 @@
                 document.getElementById('password').value = senhaSalva;
                 document.getElementById('manterConectado').checked = true;
                 
-                // Tenta login automático (offline ou online)
-                fazerLogin(loginSalvo, senhaSalva);
+                // Login automático
+                fazerLogin(loginSalvo, senhaSalva).then(result => {
+                    if (result.success) {
+                        localStorage.setItem('userRole', result.role);
+                        localStorage.setItem('userName', result.nome);
+                        localStorage.setItem('usuarioLogado', loginSalvo);
+                        localStorage.setItem('sessaoAtiva', 'true');
+                        if (result.role === 'admin') {
+                            window.location.href = 'admin.html';
+                        } else {
+                            window.location.href = 'posvenda.html';
+                        }
+                    }
+                });
             }
         });
 
@@ -166,11 +186,9 @@
             const manterConectado = document.getElementById('manterConectado').checked;
             
             const submitButton = e.target.querySelector('button[type="submit"]');
-            const textoOriginal = submitButton.textContent;
             submitButton.textContent = '⏳ Entrando...';
             submitButton.disabled = true;
             
-            // Tenta fazer login
             const resultado = await fazerLogin(username, password);
             
             if (resultado.success) {
@@ -190,7 +208,6 @@
                 localStorage.setItem('sessaoAtiva', 'true');
                 localStorage.setItem('ultimoAcesso', new Date().getTime());
                 
-                // Salva usuário offline para próximos logins
                 salvarUsuarioOffline(username, password, resultado.role, resultado.nome);
                 
                 if (resultado.role === 'admin') {
@@ -199,53 +216,13 @@
                     window.location.href = 'posvenda.html';
                 }
             } else {
-                mostrarErro('❌ Usuário ou senha inválidos. Verifique e tente novamente.');
-                submitButton.textContent = textoOriginal;
+                mostrarErro('❌ Usuário ou senha inválidos. Tente novamente.');
+                submitButton.textContent = 'Entrar';
                 submitButton.disabled = false;
                 document.getElementById('password').value = '';
                 document.getElementById('password').focus();
             }
         });
-
-        // ========== FUNÇÃO DE LOGIN (ONLINE + OFFLINE) ==========
-        async function fazerLogin(username, password) {
-            // Primeiro: tenta login online
-            if (navigator.onLine) {
-                try {
-                    const response = await fetch(`${API_URL}/login`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username, password })
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (response.ok && data.success) {
-                        // Sincroniza usuários após login bem sucedido
-                        sincronizarUsuariosOffline();
-                        return { success: true, role: data.role, nome: data.nome };
-                    }
-                } catch (error) {
-                    console.log('⚠️ Erro no login online, tentando offline:', error);
-                }
-            }
-            
-            // Segundo: tenta login offline (se online falhou ou está offline)
-            const offlineResult = loginOffline(username, password);
-            if (offlineResult.success) {
-                console.log('✅ Login offline bem sucedido');
-                return offlineResult;
-            }
-            
-            return { success: false };
-        }
-
-        // Registrar Service Worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
-                .then(reg => console.log('✅ Service Worker registrado!'))
-                .catch(err => console.log('❌ Service Worker erro:', err));
-        }
     </script>
 </body>
 </html>
