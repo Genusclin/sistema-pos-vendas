@@ -2,14 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { Pool } = require('pg');
-const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
-
-// Serve arquivos estáticos da pasta frontend
-app.use(express.static(path.join(__dirname, 'frontend')));
 
 // CONEXÃO COM POSTGRESQL (Render)
 const pool = new Pool({
@@ -316,17 +312,6 @@ app.post('/excluir-usuario', async (req, res) => {
         console.error(error);
         res.status(500).json({ success: false });
     }
-});
-
-// ==================== SERVER ARQUIVOS ESTÁTICOS (SERVICE WORKER) ====================
-// Rota específica para o service-worker.js
-app.get('/service-worker.js', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend', 'service-worker.js'));
-});
-
-// Rota para offline.html
-app.get('/offline.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend', 'offline.html'));
 });
 
 // ==================== INICIAR SERVIDOR ====================
