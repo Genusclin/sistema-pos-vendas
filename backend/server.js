@@ -9,7 +9,7 @@ app.use(bodyParser.json());
 
 // CONEXÃO COM POSTGRESQL (Render)
 const pool = new Pool({
-    connectionString: 'postgresql://henrique:X54Ykj0yrnqOrRMENHtRWrOqP1BFyhBe@dpg-d8o67f0g4nts73d1gjl0-a/posvendas',
+    connectionString: 'postgresql://henrique:X54Ykj0yrnqOrRMENHtRWrOqP1BFyhBe@dpg-d8o67f0g4nts73d1gjl0-a.ohio-postgres.render.com/posvendas',
     ssl: { rejectUnauthorized: false }
 });
 
@@ -53,7 +53,8 @@ async function initDatabase() {
                 contabilidade TEXT,
                 data_entregue TEXT,
                 retorno TEXT,
-                observacao TEXT
+                observacao TEXT,
+                preenchido TEXT DEFAULT 'NÃO'
             )
         `);
         
@@ -108,7 +109,6 @@ app.post('/login', async (req, res) => {
 app.post('/salvar-resposta', async (req, res) => {
     try {
         const resposta = req.body;
-        // CORRIGIDO: Fuso horário de Brasília (UTC-3)
         const agora = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
         await pool.query(`
             INSERT INTO respostas (
@@ -170,7 +170,8 @@ app.post('/salvar-todos-dados', async (req, res) => {
 // ==================== ROTAS DE PÓS VENDAS ====================
 app.get('/buscar-pos-vendas', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM pos_vendas ORDER BY id DESC');
+        const result = await pool.query('SELECT id, consultor, razao_social, cnpj, cidade, telefone, responsavel, contabilidade, data_entregue, retorno, observacao, preenchido FROM pos_vendas ORDER BY id DESC');
+        console.log('📊 Registros retornados:', result.rows.length);
         res.json(result.rows);
     } catch (error) {
         console.error(error);
@@ -184,12 +185,13 @@ app.post('/adicionar-pos-venda', async (req, res) => {
         const result = await pool.query(`
             INSERT INTO pos_vendas (
                 consultor, razao_social, cnpj, cidade, telefone, responsavel,
-                contabilidade, data_entregue, retorno, observacao
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                contabilidade, data_entregue, retorno, observacao, preenchido
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
             RETURNING id
         `, [registro.consultor, registro.razaoSocial, registro.cnpj, registro.cidade,
             registro.telefone, registro.responsavel, registro.contabilidade,
-            registro.dataEntregue, registro.retorno, registro.observacao]);
+            registro.dataEntregue, registro.retorno, registro.observacao, 'NÃO']);
+        console.log('✅ Registro adicionado com ID:', result.rows[0].id);
         res.json({ success: true, id: result.rows[0].id });
     } catch (error) {
         console.error(error);
@@ -202,24 +204,41 @@ app.post('/salvar-pos-venda', async (req, res) => {
         const { registro, index } = req.body;
         
         if (!registro.id) {
-            console.log('❌ ERRO: ID não enviado!');
             return res.status(400).json({ success: false, message: 'ID não enviado' });
         }
         
         const updateResult = await pool.query(`
             UPDATE pos_vendas SET
-                consultor = $1, razao_social = $2, cnpj = $3, cidade = $4,
-                telefone = $5, responsavel = $6, contabilidade = $7,
-                data_entregue = $8, retorno = $9, observacao = $10
-            WHERE id = $11
-            RETURNING id, consultor, cidade, razao_social
+                consultor = $1, 
+                razao_social = $2, 
+                cnpj = $3, 
+                cidade = $4,
+                telefone = $5, 
+                responsavel = $6, 
+                contabilidade = $7,
+                data_entregue = $8, 
+                retorno = $9, 
+                observacao = $10,
+                preenchido = $11
+            WHERE id = $12
+            RETURNING id, consultor, cidade, razao_social, preenchido
         `, [
-            registro.consultor, registro.razaoSocial, registro.cnpj, registro.cidade,
-            registro.telefone, registro.responsavel, registro.contabilidade,
-            registro.dataEntregue, registro.retorno, registro.observacao, registro.id
+            registro.consultor, 
+            registro.razaoSocial, 
+            registro.cnpj, 
+            registro.cidade,
+            registro.telefone, 
+            registro.responsavel, 
+            registro.contabilidade,
+            registro.dataEntregue, 
+            registro.retorno, 
+            registro.observacao,
+            registro.preenchido || 'NÃO', 
+            registro.id
         ]);
         
         if (updateResult.rowCount > 0) {
+            console.log('✅ Registro atualizado:', updateResult.rows[0]);
             res.json({ success: true, updated: updateResult.rows[0] });
         } else {
             res.status(404).json({ success: false, message: 'Registro não encontrado' });
@@ -236,6 +255,7 @@ app.post('/excluir-pos-venda', async (req, res) => {
         const result = await pool.query('SELECT id FROM pos_vendas ORDER BY id LIMIT 1 OFFSET $1', [index]);
         if (result.rows.length > 0) {
             await pool.query('DELETE FROM pos_vendas WHERE id = $1', [result.rows[0].id]);
+            console.log('✅ Registro excluído, ID:', result.rows[0].id);
         }
         res.json({ success: true });
     } catch (error) {

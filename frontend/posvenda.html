@@ -13,7 +13,7 @@
         <div class="form-box">
             <div class="header">
                 <div class="logo-mini">
-                    <img src="logo.png" alt="Logo" class="logo-pequena" id="logoMini" onerror="this.style.display='none'">
+                    <img src="Logo.png" alt="Logo" class="logo-pequena" id="logoMini" onerror="this.style.display='none'">
                 </div>
                 <h1>Área do Vendedor</h1>
                 <p>Vendedor: <strong id="vendedorNome"></strong></p>
@@ -31,6 +31,7 @@
                 </ul>
             </div>
 
+            <!-- ABA 1: MINHAS PÓS VENDAS (FILTRA APENAS NÃO PREENCHIDOS) -->
             <div id="minhas-posvendas" class="tab-content ativo">
                 <div class="tabela-container">
                     <h3>📋 Registros de Pós Vendas - Consultor: <span id="consultorNome"></span></h3>
@@ -41,7 +42,6 @@
                                     <th>RAZAO SOCIAL</th>
                                     <th>CNPJ</th>
                                     <th>CIDADE</th>
-                                    <th>TELEFONE</th>
                                     <th>RESPONSAVEL</th>
                                     <th>CONTABILIDADE</th>
                                     <th>DATA ENTREGUE</th>
@@ -51,13 +51,14 @@
                                 </tr>
                             </thead>
                             <tbody id="corpoMinhasPosVendas">
-                                <tr><td colspan="10">Carregando dados...</td</tr>
+                                <tr><td colspan="9">Carregando dados...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
+            <!-- ABA 2: QUESTIONÁRIO -->
             <div id="questionario" class="tab-content">
                 <form id="questionarioForm">
                     <div class="section">
@@ -132,6 +133,7 @@
         </div>
     </div>
 
+    <!-- MODAL PREENCHER QUESTIONÁRIO -->
     <div id="modalPreencherQuestionario" class="modal">
         <div class="modal-content">
             <div class="modal-header"><h3>📝 Preencher Questionário</h3><span class="modal-fechar" onclick="fecharModalPreencher()">&times;</span></div>
@@ -139,6 +141,7 @@
                 <p>Deseja preencher o questionário para a empresa:</p>
                 <p><strong id="modalEmpresaNome"></strong></p>
                 <p>Os dados da empresa serão pré-preenchidos automaticamente.</p>
+                <p><small>Após preencher, este registro não aparecerá mais na lista de pendentes.</small></p>
             </div>
             <div class="modal-footer">
                 <button onclick="fecharModalPreencher()" class="btn-cancelar">Cancelar</button>
@@ -209,7 +212,6 @@
         }
 
         function preencherQuestionario(empresa) {
-            // CORRIGIDO: usa razao_social (do banco) ou razaoSocial (fallback)
             document.getElementById('empresa').value = empresa.razao_social || empresa.razaoSocial || '';
             document.getElementById('cnpj').value = empresa.cnpj || '';
             document.getElementById('responsavel').value = empresa.responsavel || '';
@@ -227,6 +229,38 @@
             mostrarNotificacao('📝 Dados da empresa pré-preenchidos!');
         }
 
+        async function marcarComoPreenchido(id) {
+            try {
+                const response = await fetch(`${API_URL}/buscar-pos-vendas`);
+                const todos = await response.json();
+                const item = todos.find(i => i.id === id);
+                
+                if (item) {
+                    const registro = {
+                        id: item.id,
+                        consultor: item.consultor,
+                        razaoSocial: item.razao_social || item.razaoSocial,
+                        cnpj: item.cnpj,
+                        cidade: item.cidade,
+                        telefone: item.telefone,
+                        responsavel: item.responsavel,
+                        contabilidade: item.contabilidade,
+                        dataEntregue: item.data_entregue || item.dataEntregue,
+                        retorno: item.retorno,
+                        observacao: item.observacao,
+                        preenchido: 'SIM'
+                    };
+                    
+                    await fetch(`${API_URL}/salvar-pos-venda`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ registro, index: 0 })
+                    });
+                    mostrarNotificacao('✅ Registro marcado como preenchido!');
+                }
+            } catch(e) { console.error('Erro ao marcar como preenchido:', e); }
+        }
+
         function abrirModalPreencher(empresa) {
             empresaSelecionada = empresa;
             document.getElementById('modalEmpresaNome').textContent = empresa.razao_social || empresa.razaoSocial || 'Empresa';
@@ -239,6 +273,10 @@
             if (empresaSelecionada) {
                 preencherQuestionario(empresaSelecionada);
                 fecharModalPreencher();
+                
+                // MARCAR COMO PREENCHIDO
+                marcarComoPreenchido(empresaSelecionada.id);
+                
                 document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('ativo'));
                 document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('ativo'));
                 document.querySelector('.nav-link[data-tab="questionario"]').classList.add('ativo');
@@ -250,42 +288,54 @@
             try {
                 const response = await fetch(`${API_URL}/buscar-pos-vendas`);
                 const todosRegistros = await response.json();
-                const meusRegistros = todosRegistros.filter(item => item.consultor === vendedorNome);
+                
+                // FILTRO: Mostra apenas registros com preenchido = NÃO ou vazio
+                const meusRegistros = todosRegistros.filter(item => 
+                    item.consultor === vendedorNome && 
+                    (item.preenchido !== 'SIM')
+                );
+                
                 const tbody = document.getElementById('corpoMinhasPosVendas');
                 if (!meusRegistros.length) {
-                    tbody.innerHTML = '<tr><td colspan="10">Nenhum registro encontrado para o consultor ' + vendedorNome + '.</td>';
+                    tbody.innerHTML = '<tr><td colspan="9">Nenhum registro pendente para preencher.</td></tr>';
                 } else {
                     tbody.innerHTML = '';
                     meusRegistros.forEach((item) => {
                         const row = tbody.insertRow();
-                        // CORRIGIDO: usa razao_social (do banco)
                         row.insertCell(0).innerHTML = item.razao_social || item.razaoSocial || '-';
                         row.insertCell(1).innerHTML = item.cnpj || '-';
                         row.insertCell(2).innerHTML = item.cidade || '-';
-                        row.insertCell(3).innerHTML = item.telefone || '-';
-                        row.insertCell(4).innerHTML = item.responsavel || '-';
-                        row.insertCell(5).innerHTML = item.contabilidade || '-';
-                        row.insertCell(6).innerHTML = formatarData(item.data_entregue || item.dataEntregue);
-                        row.insertCell(7).innerHTML = formatarData(item.retorno);
-                        row.insertCell(8).innerHTML = item.observacao || '-';
-                        const actionCell = row.insertCell(9);
+                        row.insertCell(3).innerHTML = item.responsavel || '-';
+                        row.insertCell(4).innerHTML = item.contabilidade || '-';
+                        row.insertCell(5).innerHTML = formatarData(item.data_entregue || item.dataEntregue);
+                        row.insertCell(6).innerHTML = formatarData(item.retorno);
+                        row.insertCell(7).innerHTML = item.observacao || '-';
+                        const actionCell = row.insertCell(8);
                         actionCell.className = 'acoes-botoes';
                         actionCell.innerHTML = `<button onclick='abrirModalPreencher(${JSON.stringify(item).replace(/'/g, "&#39;")})' class="btn-preencher" title="Preencher Questionário">📝 Preencher</button>`;
                     });
                 }
-            } catch(e) { console.error(e); document.getElementById('corpoMinhasPosVendas').innerHTML = '<tr><td colspan="10">Erro ao carregar dados直视'; }
+            } catch(e) { console.error(e); document.getElementById('corpoMinhasPosVendas').innerHTML = '<tr><td colspan="9">Erro ao carregar dados</td></tr>'; }
         }
 
         document.getElementById('questionarioForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const resposta = {
-                vendedor: vendedorNome, empresa: document.getElementById('empresa').value, cnpj: document.getElementById('cnpj').value,
-                responsavel: document.getElementById('responsavel').value, telefone: document.getElementById('telefone').value,
-                pergunta1: document.getElementById('p1').value, pergunta2: document.getElementById('p2').value,
-                pergunta3: document.getElementById('p3').value, pergunta4: document.getElementById('p4').value,
-                pergunta5: document.getElementById('p5').value, pergunta6: document.getElementById('p6').value,
-                pergunta7: document.getElementById('p7').value, pergunta8: document.getElementById('p8').value,
-                pergunta9: document.getElementById('p9').value, observacoes: document.getElementById('observacoes').value
+                vendedor: vendedorNome,
+                empresa: document.getElementById('empresa').value,
+                cnpj: document.getElementById('cnpj').value,
+                responsavel: document.getElementById('responsavel').value,
+                telefone: document.getElementById('telefone').value,
+                pergunta1: document.getElementById('p1').value,
+                pergunta2: document.getElementById('p2').value,
+                pergunta3: document.getElementById('p3').value,
+                pergunta4: document.getElementById('p4').value,
+                pergunta5: document.getElementById('p5').value,
+                pergunta6: document.getElementById('p6').value,
+                pergunta7: document.getElementById('p7').value,
+                pergunta8: document.getElementById('p8').value,
+                pergunta9: document.getElementById('p9').value,
+                observacoes: document.getElementById('observacoes').value
             };
             if (!resposta.empresa) { alert('Por favor, preencha o nome da empresa!'); return; }
             if (!resposta.pergunta1 || !resposta.pergunta2 || !resposta.pergunta3 || !resposta.pergunta4 || !resposta.pergunta5 || !resposta.pergunta7 || !resposta.pergunta8 || !resposta.pergunta9) {
@@ -299,8 +349,14 @@
             try {
                 const response = await fetch(`${API_URL}/salvar-resposta`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(resposta) });
                 const data = await response.json();
-                if (data.success) { alert('✅ Resposta salva com sucesso!'); document.getElementById('questionarioForm').reset(); }
-                else alert('❌ Erro ao salvar. Tente novamente.');
+                if (data.success) { 
+                    alert('✅ Resposta salva com sucesso!'); 
+                    document.getElementById('questionarioForm').reset(); 
+                    // Recarregar a lista de pendentes
+                    await carregarMinhasPosVendas();
+                } else { 
+                    alert('❌ Erro ao salvar. Tente novamente.'); 
+                }
             } catch (error) { console.error('Erro:', error); alert('❌ Erro ao conectar com o servidor.'); }
             finally { submitButton.textContent = textoOriginal; submitButton.disabled = false; }
         });

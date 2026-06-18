@@ -83,11 +83,11 @@
                                     <th>RAZAO SOCIAL</th>
                                     <th>CNPJ</th>
                                     <th>CIDADE</th>
-                                    <th>TELEFONE</th>
                                     <th>RESPONSAVEL</th>
                                     <th>CONTABILIDADE</th>
                                     <th>DATA ENTREGUE</th>
                                     <th>RETORNO</th>
+                                    <th>PREECHIDO</th>
                                     <th>OBSERVAÇÃO</th>
                                     <th>Ações</th>
                                 </tr>
@@ -232,7 +232,7 @@
         <div class="modal-footer"><button onclick="fecharModalNovoRegistro()" class="btn-cancelar">Cancelar</button><button onclick="salvarNovoRegistro()" class="btn-salvar-modal">💾 Salvar</button></div></div>
     </div>
 
-    <!-- MODAL EDITAR REGISTRO -->
+    <!-- MODAL EDITAR REGISTRO (COM TELEFONE E PREECHIDO) -->
     <div id="modalEditarRegistro" class="modal">
         <div class="modal-content"><div class="modal-header"><h3>✏️ Editar Registro</h3><span class="modal-fechar" onclick="fecharModalEditarRegistro()">&times;</span></div>
         <div class="modal-body"><div class="form-cadastro-modal">
@@ -245,6 +245,12 @@
             <div class="input-group"><label>CONTABILIDADE:</label><input type="text" id="editContabilidade"></div>
             <div class="input-group"><label>DATA ENTREGUE:</label><input type="date" id="editDataEntregue"></div>
             <div class="input-group"><label>RETORNO:</label><input type="date" id="editRetorno"></div>
+            <div class="input-group"><label>PREECHIDO:</label>
+                <select id="editPreenchido">
+                    <option value="SIM">SIM</option>
+                    <option value="NÃO">NÃO</option>
+                </select>
+            </div>
             <div class="input-group full-width"><label>OBS:</label><textarea id="editObservacao" rows="3"></textarea></div>
         </div></div>
         <div class="modal-footer"><button onclick="fecharModalEditarRegistro()" class="btn-cancelar">Cancelar</button><button onclick="salvarEdicaoRegistro()" class="btn-salvar-modal">💾 Salvar</button></div></div>
@@ -458,7 +464,6 @@
             mostrarNotificacao('🔄 Filtro removido');
         }
 
-        // ========== RENDERIZAR TABELA PÓS VENDAS (CORRIGIDA COM ID) ==========
         function renderizarTabelaPosVendas(dados) {
             const tbody = document.getElementById('corpoTabelaPosVendas');
             if (!dados || !dados.length) {
@@ -467,11 +472,16 @@
             }
             tbody.innerHTML = '';
             dados.forEach((item) => {
-                // ENCONTRA O ÍNDICE REAL USANDO O ID
                 const indexReal = dadosPosVenda.findIndex(el => el.id === item.id);
                 const idx = indexReal !== -1 ? indexReal : 0;
                 
                 const row = tbody.insertRow();
+                
+                // Se estiver preenchido, fica verde
+                if (item.preenchido === 'SIM') {
+                    row.style.backgroundColor = '#d4edda';
+                }
+                
                 const chkCell = row.insertCell(0);
                 const chk = document.createElement('input');
                 chk.type = 'checkbox';
@@ -484,12 +494,14 @@
                 row.insertCell(2).innerHTML = item.razao_social || item.razaoSocial || '-';
                 row.insertCell(3).innerHTML = item.cnpj || '-';
                 row.insertCell(4).innerHTML = item.cidade || '-';
-                row.insertCell(5).innerHTML = item.telefone || '-';
-                row.insertCell(6).innerHTML = item.responsavel || '-';
-                row.insertCell(7).innerHTML = item.contabilidade || '-';
-                row.insertCell(8).innerHTML = converterNumeroExcelParaData(item.data_entregue || item.dataEntregue);
-                row.insertCell(9).innerHTML = converterNumeroExcelParaData(item.retorno);
+                // TELEFONE REMOVIDO - só aparece no modal de edição
+                row.insertCell(5).innerHTML = item.responsavel || '-';
+                row.insertCell(6).innerHTML = item.contabilidade || '-';
+                row.insertCell(7).innerHTML = converterNumeroExcelParaData(item.data_entregue || item.dataEntregue);
+                row.insertCell(8).innerHTML = converterNumeroExcelParaData(item.retorno);
+                row.insertCell(9).innerHTML = item.preenchido || 'NÃO';
                 row.insertCell(10).innerHTML = item.observacao || '-';
+                
                 const actionCell = row.insertCell(11);
                 actionCell.className = 'acoes-botoes';
                 actionCell.innerHTML = `<button onclick="abrirModalEditarRegistro(${idx})" class="btn-editar">✏️</button><button onclick="excluirRegistroPosVenda(${idx})" class="btn-excluir">🗑️</button>`;
@@ -651,6 +663,7 @@
                 'CONTABILIDADE': d.contabilidade || '',
                 'DATA ENTREGUE': d.data_entregue || d.dataEntregue || '',
                 'RETORNO': d.retorno || '',
+                'PREECHIDO': d.preenchido || '',
                 'OBSERVAÇÃO': d.observacao || ''
             }));
             const ws = XLSX.utils.json_to_sheet(dadosExcel);
@@ -791,7 +804,7 @@
             else alert('❌ Erro ao adicionar');
         }
 
-        // ========== FUNÇÃO SALVAR EDIÇÃO (CORRIGIDA COM ID) ==========
+        // ========== FUNÇÃO SALVAR EDIÇÃO (COM PREECHIDO) ==========
         async function salvarEdicaoRegistro() {
             const consultor = document.getElementById('editConsultor').value;
             const razaoSocial = document.getElementById('editRazaoSocial').value.trim();
@@ -801,15 +814,14 @@
                 return;
             }
             
-            // PEGA O REGISTRO ORIGINAL COM ID
             const itemOriginal = dadosPosVenda[indiceEditando];
-            const id = itemOriginal.id;
-            
-            console.log('📤 EDITANDO - ID:', id);
-            console.log('📤 Índice:', indiceEditando);
+            if (!itemOriginal || !itemOriginal.id) {
+                alert('Erro: ID do registro não encontrado!');
+                return;
+            }
             
             const registro = {
-                id: id,
+                id: itemOriginal.id,
                 consultor: consultor,
                 razaoSocial: razaoSocial,
                 cnpj: document.getElementById('editCnpj').value.trim(),
@@ -819,10 +831,9 @@
                 contabilidade: document.getElementById('editContabilidade').value.trim(),
                 dataEntregue: document.getElementById('editDataEntregue').value,
                 retorno: document.getElementById('editRetorno').value,
-                observacao: document.getElementById('editObservacao').value.trim()
+                observacao: document.getElementById('editObservacao').value.trim(),
+                preenchido: document.getElementById('editPreenchido').value
             };
-            
-            console.log('📤 Enviando registro para salvar:', registro);
             
             try {
                 const response = await fetch(`${API_URL}/salvar-pos-venda`, {
@@ -832,47 +843,13 @@
                 });
                 
                 const data = await response.json();
-                console.log('📥 Resposta do servidor:', data);
                 
                 if (data.success) {
-                    // ATUALIZA O ARRAY ORIGINAL COM O ID INCLUSO
-                    dadosPosVenda[indiceEditando] = { 
-                        ...registro, 
-                        id: id,
-                        data_entregue: registro.dataEntregue,
-                        razao_social: registro.razaoSocial,
-                        consultor: registro.consultor
-                    };
-                    
-                    // ATUALIZA O ARRAY FILTRADO (se existir)
-                    if (dadosPosVendaFiltrados && dadosPosVendaFiltrados.length > 0) {
-                        const pos = dadosPosVendaFiltrados.findIndex(item => item.id === id);
-                        if (pos !== -1) {
-                            dadosPosVendaFiltrados[pos] = { 
-                                ...registro, 
-                                id: id,
-                                data_entregue: registro.dataEntregue,
-                                razao_social: registro.razaoSocial,
-                                consultor: registro.consultor
-                            };
-                        }
-                    }
-                    
                     mostrarNotificacao('✅ Registro atualizado com sucesso!');
                     fecharModalEditarRegistro();
-                    
-                    // RECARREGA A TABELA ATUAL (sem buscar do banco)
-                    if (dadosPosVendaFiltrados && dadosPosVendaFiltrados.length > 0) {
-                        renderizarTabelaPosVendas(dadosPosVendaFiltrados);
-                    } else {
-                        renderizarTabelaPosVendas(dadosPosVenda);
-                    }
-                    
-                    // RECARREGA DASHBOARD EM SEGUNDO PLANO
-                    setTimeout(() => {
-                        carregarDashboard();
-                    }, 500);
-                    
+                    await carregarPosVendas();
+                    await carregarDashboard();
+                    await carregarDados();
                 } else {
                     alert('❌ Erro ao salvar: ' + (data.message || 'Erro desconhecido'));
                 }
@@ -885,7 +862,6 @@
         function abrirModalEditarRegistro(index) {
             indiceEditando = index;
             const item = dadosPosVenda[index];
-            console.log('📝 Abrindo edição - ID:', item.id);
             document.getElementById('editConsultor').value = item.consultor || '';
             document.getElementById('editRazaoSocial').value = item.razao_social || item.razaoSocial || '';
             document.getElementById('editCnpj').value = item.cnpj || '';
@@ -895,6 +871,7 @@
             document.getElementById('editContabilidade').value = item.contabilidade || '';
             document.getElementById('editDataEntregue').value = converterNumeroExcelParaInput(item.data_entregue || item.dataEntregue);
             document.getElementById('editRetorno').value = converterNumeroExcelParaInput(item.retorno);
+            document.getElementById('editPreenchido').value = item.preenchido || 'NÃO';
             document.getElementById('editObservacao').value = item.observacao || '';
             document.getElementById('modalEditarRegistro').style.display = 'flex';
         }
@@ -990,10 +967,7 @@
             try {
                 const response = await fetch(`${API_URL}/buscar-pos-vendas`);
                 dadosPosVenda = await response.json();
-                console.log('📊 Pós Vendas - Dados recebidos:', dadosPosVenda.length);
-                if (dadosPosVenda.length > 0) {
-                    console.log('📌 Primeiro registro:', dadosPosVenda[0]);
-                }
+                console.log('📊 Pós Vendas recarregado:', dadosPosVenda.length);
                 dadosPosVendaFiltrados = [];
                 paginaAtualPV = 1;
                 atualizarPaginacaoPV();
