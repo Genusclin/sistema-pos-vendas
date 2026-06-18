@@ -163,8 +163,7 @@
         </div>
     </div>
 
-    <!-- MODAIS -->
-    <!-- MODAL FILTRO PÓS VENDAS -->
+    <!-- MODAL FILTRO PÓS VENDAS (COM PREECHIDO) -->
     <div id="modalFiltroPosVendas" class="modal">
         <div class="modal-content" style="max-width: 700px;">
             <div class="modal-header"><h3>🔍 Filtrar Pós Vendas</h3><span class="modal-fechar" onclick="fecharModalFiltroPosVendas()">&times;</span></div>
@@ -176,7 +175,15 @@
                     <div class="input-group"><label>CIDADE:</label><input type="text" id="filtroCidadePosVendas" placeholder="Digite para filtrar..."></div>
                     <div class="input-group"><label>CONTABILIDADE:</label><input type="text" id="filtroContabilidadePosVendas" placeholder="Digite para filtrar..."></div>
                     <div class="input-group"><label>DATA ENTREGUE:</label><input type="date" id="filtroDataEntreguePosVendas"></div>
-                    <div class="input-group" style="grid-column: span 2;"><label>RETORNO:</label><input type="date" id="filtroRetornoPosVendas"></div>
+                    <div class="input-group"><label>RETORNO:</label><input type="date" id="filtroRetornoPosVendas"></div>
+                    <div class="input-group">
+                        <label>PREECHIDO:</label>
+                        <select id="filtroPreenchidoPosVendas">
+                            <option value="">Todos</option>
+                            <option value="SIM">SIM (Realizada)</option>
+                            <option value="NÃO">NÃO (Pendente)</option>
+                        </select>
+                    </div>
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 10px;">
                     <button onclick="aplicarFiltroPosVendas()" class="btn-salvar-modal" style="flex:1;">✅ Aplicar Filtro</button>
@@ -232,7 +239,7 @@
         <div class="modal-footer"><button onclick="fecharModalNovoRegistro()" class="btn-cancelar">Cancelar</button><button onclick="salvarNovoRegistro()" class="btn-salvar-modal">💾 Salvar</button></div></div>
     </div>
 
-    <!-- MODAL EDITAR REGISTRO (COM TELEFONE E PREECHIDO) -->
+    <!-- MODAL EDITAR REGISTRO -->
     <div id="modalEditarRegistro" class="modal">
         <div class="modal-content"><div class="modal-header"><h3>✏️ Editar Registro</h3><span class="modal-fechar" onclick="fecharModalEditarRegistro()">&times;</span></div>
         <div class="modal-body"><div class="form-cadastro-modal">
@@ -424,6 +431,7 @@
             const contabilidade = document.getElementById('filtroContabilidadePosVendas').value.toLowerCase();
             const dataEntregue = document.getElementById('filtroDataEntreguePosVendas').value;
             const retorno = document.getElementById('filtroRetornoPosVendas').value;
+            const preenchido = document.getElementById('filtroPreenchidoPosVendas').value;
 
             dadosPosVendaFiltrados = dadosPosVenda.filter(item => {
                 let match = true;
@@ -440,6 +448,7 @@
                     const retornoItem = item.retorno || '';
                     if (!retornoItem.includes(retorno)) match = false;
                 }
+                if (preenchido && item.preenchido !== preenchido) match = false;
                 return match;
             });
 
@@ -457,6 +466,7 @@
             document.getElementById('filtroContabilidadePosVendas').value = '';
             document.getElementById('filtroDataEntreguePosVendas').value = '';
             document.getElementById('filtroRetornoPosVendas').value = '';
+            document.getElementById('filtroPreenchidoPosVendas').value = '';
             dadosPosVendaFiltrados = [];
             paginaAtualPV = 1;
             atualizarPaginacaoPV();
@@ -804,7 +814,7 @@
             else alert('❌ Erro ao adicionar');
         }
 
-        // ========== FUNÇÃO SALVAR EDIÇÃO (COM PREECHIDO) ==========
+        // ========== FUNÇÃO SALVAR EDIÇÃO ==========
         async function salvarEdicaoRegistro() {
             const consultor = document.getElementById('editConsultor').value;
             const razaoSocial = document.getElementById('editRazaoSocial').value.trim();
