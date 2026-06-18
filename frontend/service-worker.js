@@ -8,7 +8,8 @@ const URLS_TO_CACHE = [
     '/style.css',
     '/admin-menu.css',
     '/Logo.png',
-    '/fundo.jpg'
+    '/fundo.jpg',
+    '/offline.html'
 ];
 
 // Instala o Service Worker e cacheia os arquivos
@@ -44,13 +45,10 @@ self.addEventListener('fetch', event => {
     event.respondWith(
         caches.match(event.request)
             .then(response => {
-                // Se encontrou no cache, retorna
                 if (response) {
                     return response;
                 }
-                // Senão, tenta buscar da rede
                 return fetch(event.request).catch(() => {
-                    // Se falhar e for uma página, retorna página offline
                     if (event.request.headers.get('accept').includes('text/html')) {
                         return caches.match('/offline.html');
                     }
