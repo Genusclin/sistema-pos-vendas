@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - Sistema Pós Vendas</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background: #f7fafc;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        h1 { color: #667eea; }
+        .emoji { font-size: 64px; margin-bottom: 20px; }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover { background: #5a67d8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="emoji">📱</div>
+        <h1>Você está offline</h1>
+        <p>Parece que você não tem conexão com a internet.</p>
+        <p>Os dados que você preencheu foram salvos localmente e serão enviados quando a conexão voltar.</p>
+        <button onclick="location.reload()">🔄 Tentar novamente</button>
+    </div>
+</body>
+</html>
