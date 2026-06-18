@@ -31,7 +31,7 @@
                 </ul>
             </div>
 
-            <!-- ABA 1: MINHAS PÓS VENDAS (FILTRA APENAS NÃO PREENCHIDOS) -->
+            <!-- ABA 1: MINHAS PÓS VENDAS -->
             <div id="minhas-posvendas" class="tab-content ativo">
                 <div class="tabela-container">
                     <h3>📋 Registros de Pós Vendas - Consultor: <span id="consultorNome"></span></h3>
@@ -60,6 +60,9 @@
 
             <!-- ABA 2: QUESTIONÁRIO -->
             <div id="questionario" class="tab-content">
+                <!-- INDICADOR DE CONEXÃO -->
+                <div id="statusConexao" style="padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center; font-weight: bold; display: none;"></div>
+                
                 <form id="questionarioForm">
                     <div class="section">
                         <h3>🏢 Dados da Empresa</h3>
@@ -86,23 +89,43 @@
                         
                         <div class="pergunta">
                             <label>1 - Recebeu a documentação PGR e PCMSO?</label>
-                            <select id="p1" required><option value="">Selecione</option><option value="SIM">SIM</option><option value="NÃO">NÃO</option></select>
+                            <select id="p1" required>
+                                <option value="">Selecione</option>
+                                <option value="SIM">SIM</option>
+                                <option value="NÃO">NÃO</option>
+                            </select>
                         </div>
                         <div class="pergunta">
                             <label>2 - Foi explicado o documento?</label>
-                            <select id="p2" required><option value="">Selecione</option><option value="SIM">SIM</option><option value="NÃO">NÃO</option></select>
+                            <select id="p2" required>
+                                <option value="">Selecione</option>
+                                <option value="SIM">SIM</option>
+                                <option value="NÃO">NÃO</option>
+                            </select>
                         </div>
                         <div class="pergunta">
                             <label>3 - Foram realizados os periódicos?</label>
-                            <select id="p3" required><option value="">Selecione</option><option value="SIM">SIM</option><option value="NÃO">NÃO</option></select>
+                            <select id="p3" required>
+                                <option value="">Selecione</option>
+                                <option value="SIM">SIM</option>
+                                <option value="NÃO">NÃO</option>
+                            </select>
                         </div>
                         <div class="pergunta">
                             <label>4 - EPI's estão sendo utilizados conforme seu PGR?</label>
-                            <select id="p4" required><option value="">Selecione</option><option value="SIM">SIM</option><option value="NÃO">NÃO</option></select>
+                            <select id="p4" required>
+                                <option value="">Selecione</option>
+                                <option value="SIM">SIM</option>
+                                <option value="NÃO">NÃO</option>
+                            </select>
                         </div>
                         <div class="pergunta">
                             <label>5 - Tem ficha de entrega de EPI'S?</label>
-                            <select id="p5" required><option value="">Selecione</option><option value="SIM">SIM</option><option value="NÃO">NÃO</option></select>
+                            <select id="p5" required>
+                                <option value="">Selecione</option>
+                                <option value="SIM">SIM</option>
+                                <option value="NÃO">NÃO</option>
+                            </select>
                         </div>
                         <div class="pergunta">
                             <label>6 - Qual local compram os EPI'S atualmente?</label>
@@ -110,15 +133,27 @@
                         </div>
                         <div class="pergunta">
                             <label>7 - Foi feito o treinamento de NR-06?</label>
-                            <select id="p7" required><option value="">Selecione</option><option value="SIM">SIM</option><option value="NÃO">NÃO</option></select>
+                            <select id="p7" required>
+                                <option value="">Selecione</option>
+                                <option value="SIM">SIM</option>
+                                <option value="NÃO">NÃO</option>
+                            </select>
                         </div>
                         <div class="pergunta">
                             <label>8 - CIPA está vigente?</label>
-                            <select id="p8" required><option value="">Selecione</option><option value="SIM">SIM</option><option value="NÃO">NÃO</option></select>
+                            <select id="p8" required>
+                                <option value="">Selecione</option>
+                                <option value="SIM">SIM</option>
+                                <option value="NÃO">NÃO</option>
+                            </select>
                         </div>
                         <div class="pergunta">
                             <label>9 - Laudo Ergonômico (AET) foi realizado?</label>
-                            <select id="p9" required><option value="">Selecione</option><option value="SIM">SIM</option><option value="NÃO">NÃO</option></select>
+                            <select id="p9" required>
+                                <option value="">Selecione</option>
+                                <option value="SIM">SIM</option>
+                                <option value="NÃO">NÃO</option>
+                            </select>
                         </div>
                     </div>
 
@@ -127,7 +162,10 @@
                         <textarea id="observacoes" rows="4" placeholder="Digite aqui reclamações, solicitações ou informações adicionais..."></textarea>
                     </div>
 
-                    <button type="submit" class="btn-submit">✅ Salvar Resposta</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit" class="btn-submit" style="flex: 3;">✅ Salvar Resposta</button>
+                        <button type="button" onclick="salvarRascunho()" class="btn-salvar" style="flex: 1; background: #ed8936;">💾 Rascunho</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -176,7 +214,172 @@
         document.getElementById('consultorNome').textContent = vendedorNome;
 
         let empresaSelecionada = null;
+        let timerAutoSalvar = null;
 
+        // ========== FUNÇÃO DE CONEXÃO ==========
+        function verificarConexao() {
+            const statusDiv = document.getElementById('statusConexao');
+            if (navigator.onLine) {
+                statusDiv.style.display = 'none';
+                return true;
+            } else {
+                statusDiv.style.display = 'block';
+                statusDiv.style.backgroundColor = '#fed7d7';
+                statusDiv.style.color = '#c53030';
+                statusDiv.innerHTML = '⚠️ Sem conexão com a internet. Os dados serão salvos localmente e enviados quando a conexão voltar.';
+                return false;
+            }
+        }
+
+        // Monitorar mudanças de conexão
+        window.addEventListener('online', function() {
+            const statusDiv = document.getElementById('statusConexao');
+            statusDiv.style.display = 'none';
+            mostrarNotificacao('✅ Conexão restabelecida! Enviando dados pendentes...');
+            enviarPendentes();
+        });
+
+        window.addEventListener('offline', function() {
+            document.getElementById('statusConexao').style.display = 'block';
+            document.getElementById('statusConexao').style.backgroundColor = '#fed7d7';
+            document.getElementById('statusConexao').style.color = '#c53030';
+            document.getElementById('statusConexao').innerHTML = '⚠️ Sem conexão com a internet. Os dados serão salvos localmente.';
+        });
+
+        // ========== AUTO-SALVAMENTO ==========
+        function salvarRascunho() {
+            const dados = {
+                empresa: document.getElementById('empresa').value,
+                cnpj: document.getElementById('cnpj').value,
+                responsavel: document.getElementById('responsavel').value,
+                telefone: document.getElementById('telefone').value,
+                pergunta1: document.getElementById('p1').value,
+                pergunta2: document.getElementById('p2').value,
+                pergunta3: document.getElementById('p3').value,
+                pergunta4: document.getElementById('p4').value,
+                pergunta5: document.getElementById('p5').value,
+                pergunta6: document.getElementById('p6').value,
+                pergunta7: document.getElementById('p7').value,
+                pergunta8: document.getElementById('p8').value,
+                pergunta9: document.getElementById('p9').value,
+                observacoes: document.getElementById('observacoes').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            try {
+                localStorage.setItem('rascunho_questionario', JSON.stringify(dados));
+                mostrarNotificacao('💾 Rascunho salvo localmente!');
+                console.log('📝 Rascunho salvo:', dados.timestamp);
+            } catch (e) {
+                console.error('Erro ao salvar rascunho:', e);
+            }
+        }
+
+        function carregarRascunho() {
+            try {
+                const dados = JSON.parse(localStorage.getItem('rascunho_questionario'));
+                if (dados) {
+                    document.getElementById('empresa').value = dados.empresa || '';
+                    document.getElementById('cnpj').value = dados.cnpj || '';
+                    document.getElementById('responsavel').value = dados.responsavel || '';
+                    document.getElementById('telefone').value = dados.telefone || '';
+                    document.getElementById('p1').value = dados.pergunta1 || '';
+                    document.getElementById('p2').value = dados.pergunta2 || '';
+                    document.getElementById('p3').value = dados.pergunta3 || '';
+                    document.getElementById('p4').value = dados.pergunta4 || '';
+                    document.getElementById('p5').value = dados.pergunta5 || '';
+                    document.getElementById('p6').value = dados.pergunta6 || '';
+                    document.getElementById('p7').value = dados.pergunta7 || '';
+                    document.getElementById('p8').value = dados.pergunta8 || '';
+                    document.getElementById('p9').value = dados.pergunta9 || '';
+                    document.getElementById('observacoes').value = dados.observacoes || '';
+                    
+                    mostrarNotificacao('📂 Rascunho carregado!');
+                    return true;
+                }
+            } catch (e) {
+                console.error('Erro ao carregar rascunho:', e);
+            }
+            return false;
+        }
+
+        function iniciarAutoSalvar() {
+            if (timerAutoSalvar) clearInterval(timerAutoSalvar);
+            timerAutoSalvar = setInterval(salvarRascunho, 30000);
+            console.log('⏰ Auto-salvamento ativado (30s)');
+        }
+
+        function pararAutoSalvar() {
+            if (timerAutoSalvar) {
+                clearInterval(timerAutoSalvar);
+                timerAutoSalvar = null;
+                console.log('⏹️ Auto-salvamento desativado');
+            }
+        }
+
+        // ========== FUNÇÕES DE SINCRONIZAÇÃO OFFLINE ==========
+        function salvarRespostaOffline(resposta) {
+            try {
+                let pendentes = JSON.parse(localStorage.getItem('respostas_pendentes') || '[]');
+                pendentes.push({
+                    ...resposta,
+                    data_hora: new Date().toISOString(),
+                    tentativas: 0
+                });
+                localStorage.setItem('respostas_pendentes', JSON.stringify(pendentes));
+                console.log('📱 Resposta salva offline. Pendentes:', pendentes.length);
+                return true;
+            } catch (e) {
+                console.error('Erro ao salvar resposta offline:', e);
+                return false;
+            }
+        }
+
+        async function enviarPendentes() {
+            if (!navigator.onLine) return;
+            
+            try {
+                const pendentes = JSON.parse(localStorage.getItem('respostas_pendentes') || '[]');
+                if (pendentes.length === 0) return;
+                
+                console.log('📤 Enviando', pendentes.length, 'respostas pendentes...');
+                let enviados = 0;
+                let falhas = [];
+                
+                for (const resposta of pendentes) {
+                    try {
+                        const response = await fetch(`${API_URL}/salvar-resposta`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(resposta)
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            enviados++;
+                        } else {
+                            falhas.push(resposta);
+                        }
+                    } catch (e) {
+                        falhas.push(resposta);
+                    }
+                }
+                
+                if (enviados > 0) {
+                    // Remover apenas os que foram enviados com sucesso
+                    const novasPendentes = falhas;
+                    localStorage.setItem('respostas_pendentes', JSON.stringify(novasPendentes));
+                    mostrarNotificacao(`✅ ${enviados} respostas sincronizadas!`);
+                }
+                
+                if (falhas.length > 0) {
+                    console.log('⚠️', falhas.length, 'respostas ainda pendentes');
+                }
+            } catch (e) {
+                console.error('Erro ao enviar pendentes:', e);
+            }
+        }
+
+        // ========== FORMATAÇÃO ==========
         function formatarData(data) {
             if (!data || data === '-') return '-';
             if (data.includes('/')) return data;
@@ -185,6 +388,7 @@
             return data;
         }
 
+        // ========== NAVEGAÇÃO ENTRE ABAS ==========
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -196,21 +400,43 @@
             });
         });
 
+        // ========== LOGOUT ==========
         function logout() {
             const manter = confirm('Deseja manter seus dados salvos para o próximo acesso?');
-            if (!manter) { localStorage.removeItem('loginSalvo'); localStorage.removeItem('senhaSalva'); localStorage.removeItem('manterConectado'); }
-            localStorage.removeItem('userRole'); localStorage.removeItem('userName'); localStorage.removeItem('usuarioLogado');
-            localStorage.removeItem('sessaoAtiva'); localStorage.removeItem('ultimoAcesso');
+            if (!manter) { 
+                localStorage.removeItem('loginSalvo');
+                localStorage.removeItem('senhaSalva');
+                localStorage.removeItem('manterConectado');
+                localStorage.removeItem('rascunho_questionario');
+                localStorage.removeItem('respostas_pendentes');
+            }
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('usuarioLogado');
+            localStorage.removeItem('sessaoAtiva');
+            localStorage.removeItem('ultimoAcesso');
             window.location.href = 'login.html';
         }
 
+        // ========== NOTIFICAÇÃO ==========
         function mostrarNotificacao(mensagem) {
             let n = document.getElementById('notificacao');
-            if (!n) { n = document.createElement('div'); n.id = 'notificacao'; n.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#48bb78;color:white;padding:10px 20px;border-radius:5px;z-index:9999'; document.body.appendChild(n); }
-            n.textContent = mensagem; n.style.display = 'block';
-            setTimeout(() => n.style.display = 'none', 3000);
+            if (!n) { 
+                n = document.createElement('div'); 
+                n.id = 'notificacao'; 
+                n.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#48bb78;color:white;padding:10px 20px;border-radius:5px;z-index:9999;transition:opacity 0.3s;'; 
+                document.body.appendChild(n); 
+            }
+            n.textContent = mensagem;
+            n.style.display = 'block';
+            n.style.opacity = '1';
+            setTimeout(() => {
+                n.style.opacity = '0';
+                setTimeout(() => n.style.display = 'none', 300);
+            }, 3000);
         }
 
+        // ========== QUESTIONÁRIO ==========
         function preencherQuestionario(empresa) {
             document.getElementById('empresa').value = empresa.razao_social || empresa.razaoSocial || '';
             document.getElementById('cnpj').value = empresa.cnpj || '';
@@ -229,6 +455,7 @@
             mostrarNotificacao('📝 Dados da empresa pré-preenchidos!');
         }
 
+        // ========== MARCAR COMO PREENCHIDO ==========
         async function marcarComoPreenchido(id) {
             try {
                 const response = await fetch(`${API_URL}/buscar-pos-vendas`);
@@ -256,27 +483,35 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ registro, index: 0 })
                     });
-                    mostrarNotificacao('✅ Registro marcado como preenchido!');
+                    console.log('✅ Registro marcado como preenchido:', id);
                 }
-            } catch(e) { console.error('Erro ao marcar como preenchido:', e); }
+            } catch(e) { 
+                console.error('Erro ao marcar como preenchido:', e); 
+            }
         }
 
+        // ========== MODAL ==========
         function abrirModalPreencher(empresa) {
             empresaSelecionada = empresa;
             document.getElementById('modalEmpresaNome').textContent = empresa.razao_social || empresa.razaoSocial || 'Empresa';
             document.getElementById('modalPreencherQuestionario').style.display = 'flex';
         }
 
-        function fecharModalPreencher() { document.getElementById('modalPreencherQuestionario').style.display = 'none'; empresaSelecionada = null; }
+        function fecharModalPreencher() { 
+            document.getElementById('modalPreencherQuestionario').style.display = 'none'; 
+            empresaSelecionada = null; 
+        }
 
         function irParaQuestionario() {
             if (empresaSelecionada) {
                 preencherQuestionario(empresaSelecionada);
+                const id = empresaSelecionada.id;
                 fecharModalPreencher();
                 
-                // MARCAR COMO PREENCHIDO
-                marcarComoPreenchido(empresaSelecionada.id);
+                // Marcar como preenchido
+                marcarComoPreenchido(id);
                 
+                // Mudar para aba Questionário
                 document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('ativo'));
                 document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('ativo'));
                 document.querySelector('.nav-link[data-tab="questionario"]').classList.add('ativo');
@@ -284,6 +519,7 @@
             }
         }
 
+        // ========== CARREGAR MINHAS PÓS VENDAS ==========
         async function carregarMinhasPosVendas() {
             try {
                 const response = await fetch(`${API_URL}/buscar-pos-vendas`);
@@ -297,7 +533,7 @@
                 
                 const tbody = document.getElementById('corpoMinhasPosVendas');
                 if (!meusRegistros.length) {
-                    tbody.innerHTML = '<tr><td colspan="9">Nenhum registro pendente para preencher.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="9">✅ Nenhum registro pendente para preencher.</td></tr>';
                 } else {
                     tbody.innerHTML = '';
                     meusRegistros.forEach((item) => {
@@ -315,11 +551,19 @@
                         actionCell.innerHTML = `<button onclick='abrirModalPreencher(${JSON.stringify(item).replace(/'/g, "&#39;")})' class="btn-preencher" title="Preencher Questionário">📝 Preencher</button>`;
                     });
                 }
-            } catch(e) { console.error(e); document.getElementById('corpoMinhasPosVendas').innerHTML = '<tr><td colspan="9">Erro ao carregar dados</td></tr>'; }
+            } catch(e) { 
+                console.error(e); 
+                document.getElementById('corpoMinhasPosVendas').innerHTML = '<tr><td colspan="9">❌ Erro ao carregar dados</td></tr>';
+            }
         }
 
+        // ========== ENVIAR FORMULÁRIO ==========
         document.getElementById('questionarioForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // VERIFICAR CONEXÃO
+            const online = verificarConexao();
+            
             const resposta = {
                 vendedor: vendedorNome,
                 empresa: document.getElementById('empresa').value,
@@ -337,32 +581,90 @@
                 pergunta9: document.getElementById('p9').value,
                 observacoes: document.getElementById('observacoes').value
             };
-            if (!resposta.empresa) { alert('Por favor, preencha o nome da empresa!'); return; }
-            if (!resposta.pergunta1 || !resposta.pergunta2 || !resposta.pergunta3 || !resposta.pergunta4 || !resposta.pergunta5 || !resposta.pergunta7 || !resposta.pergunta8 || !resposta.pergunta9) {
+            
+            // VALIDAÇÃO
+            if (!resposta.empresa) { 
+                alert('Por favor, preencha o nome da empresa!'); 
+                return; 
+            }
+            if (!resposta.pergunta1 || !resposta.pergunta2 || !resposta.pergunta3 || 
+                !resposta.pergunta4 || !resposta.pergunta5 || !resposta.pergunta7 || 
+                !resposta.pergunta8 || !resposta.pergunta9) {
                 alert('Por favor, responda todas as perguntas obrigatórias!');
                 return;
             }
+            
+            pararAutoSalvar();
+            
             const submitButton = e.target.querySelector('button[type="submit"]');
             const textoOriginal = submitButton.textContent;
             submitButton.textContent = '⏳ Salvando...';
             submitButton.disabled = true;
+            
             try {
-                const response = await fetch(`${API_URL}/salvar-resposta`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(resposta) });
+                // SALVAR OFFLINE SE NÃO TIVER INTERNET
+                if (!online) {
+                    salvarRespostaOffline(resposta);
+                    localStorage.removeItem('rascunho_questionario');
+                    alert('✅ Resposta salva localmente! Ela será enviada quando a conexão voltar.');
+                    document.getElementById('questionarioForm').reset();
+                    await carregarMinhasPosVendas();
+                    submitButton.textContent = textoOriginal;
+                    submitButton.disabled = false;
+                    return;
+                }
+                
+                // ENVIAR PARA O SERVIDOR
+                const response = await fetch(`${API_URL}/salvar-resposta`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(resposta) 
+                });
+                
                 const data = await response.json();
-                if (data.success) { 
+                
+                if (data.success) {
+                    // LIMPAR RASCUNHO
+                    localStorage.removeItem('rascunho_questionario');
+                    
                     alert('✅ Resposta salva com sucesso!'); 
                     document.getElementById('questionarioForm').reset(); 
-                    // Recarregar a lista de pendentes
                     await carregarMinhasPosVendas();
                 } else { 
                     alert('❌ Erro ao salvar. Tente novamente.'); 
                 }
-            } catch (error) { console.error('Erro:', error); alert('❌ Erro ao conectar com o servidor.'); }
-            finally { submitButton.textContent = textoOriginal; submitButton.disabled = false; }
+            } catch (error) { 
+                console.error('Erro:', error);
+                
+                // SE FALHOU, SALVAR OFFLINE
+                if (salvarRespostaOffline(resposta)) {
+                    localStorage.removeItem('rascunho_questionario');
+                    alert('✅ Resposta salva localmente! Será enviada quando a conexão voltar.');
+                    document.getElementById('questionarioForm').reset();
+                    await carregarMinhasPosVendas();
+                } else {
+                    alert('❌ Erro ao salvar. Verifique sua conexão e tente novamente.');
+                }
+            } finally { 
+                submitButton.textContent = textoOriginal; 
+                submitButton.disabled = false;
+                iniciarAutoSalvar();
+            }
         });
-        
+
+        // ========== INICIALIZAÇÃO ==========
         carregarMinhasPosVendas();
-        window.onclick = function(event) { if (event.target === document.getElementById('modalPreencherQuestionario')) fecharModalPreencher(); }
+        carregarRascunho();
+        iniciarAutoSalvar();
+        verificarConexao();
+        
+        // Tenta enviar pendentes a cada 30 segundos
+        setInterval(enviarPendentes, 30000);
+        
+        // ========== FECHAR MODAL AO CLICAR FORA ==========
+        window.onclick = function(event) { 
+            if (event.target === document.getElementById('modalPreencherQuestionario')) fecharModalPreencher(); 
+        }
     </script>
 </body>
 </html>
