@@ -1086,28 +1086,34 @@
         }
 
         async function carregarPosVendas() {
-            try {
-                const response = await fetch(`${API_URL}/buscar-pos-vendas`);
-                dadosPosVenda = await response.json();
-                console.log('📊 Pós Vendas recarregado:', dadosPosVenda.length);
-                salvarCachePosVendas(dadosPosVenda);
-                dadosPosVendaFiltrados = [];
-                paginaAtualPV = 1;
-                atualizarPaginacaoPV();
-            } catch(e) {
-                console.error('❌ Erro ao carregar Pós Vendas:', e);
-                const cache = carregarCachePosVendas();
-                if (cache) {
-                    dadosPosVenda = cache;
-                    dadosPosVendaFiltrados = [];
-                    paginaAtualPV = 1;
-                    atualizarPaginacaoPV();
-                    mostrarNotificacao('📂 Modo Offline - Dados carregados do cache');
-                } else {
-                    document.getElementById('corpoTabelaPosVendas').innerHTML = '<tr><td colspan="12">Erro ao carregar dados. Verifique o servidor.</td></tr>';
-                }
-            }
+    try {
+        const response = await fetch(`${API_URL}/buscar-pos-vendas`);
+        dadosPosVenda = await response.json();
+        console.log('📊 Pós Vendas recarregado:', dadosPosVenda.length);
+        salvarCachePosVendas(dadosPosVenda);
+        dadosPosVendaFiltrados = [];
+        paginaAtualPV = 1;
+        
+        // ⚠️ ESTA LINHA É ESSENCIAL - ADICIONE ELA
+        atualizarPaginacaoPV();  // <-- É ISSO QUE FALTAVA!
+        
+    } catch(e) {
+        console.error('❌ Erro ao carregar Pós Vendas:', e);
+        const cache = carregarCachePosVendas();
+        if (cache) {
+            dadosPosVenda = cache;
+            dadosPosVendaFiltrados = [];
+            paginaAtualPV = 1;
+            
+            // ⚠️ TAMBÉM PRECISA AQUI NO CACHE
+            atualizarPaginacaoPV();
+            
+            mostrarNotificacao('📂 Modo Offline - Dados carregados do cache');
+        } else {
+            document.getElementById('corpoTabelaPosVendas').innerHTML = '<tr><td colspan="12">Erro ao carregar dados. Verifique o servidor.</td></tr>';
         }
+    }
+}
 
         async function carregarDados() {
             try {
