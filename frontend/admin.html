@@ -1091,6 +1091,25 @@
             } catch(e) { console.error(e); }
         }
 
+        // ==================== FUNÇÃO PARA DESTACAR ABAS COM DADOS ====================
+        function atualizarDestaquePosVendas() {
+            const abaPosVendas = document.querySelector('a[data-tab="posvendas"]');
+            if (!abaPosVendas) return;
+            
+            // Verifica se há dados preenchidos
+            const temPreenchido = dadosPosVenda.some(registro => registro.preenchido === 'SIM');
+            
+            if (temPreenchido) {
+                // Adiciona destaque apenas se não estiver ativo
+                if (!abaPosVendas.classList.contains('ativo')) {
+                    abaPosVendas.classList.add('destaque-preenchido');
+                }
+            } else {
+                // Remove destaque se não houver mais dados preenchidos
+                abaPosVendas.classList.remove('destaque-preenchido');
+            }
+        }
+
         async function carregarPosVendas() {
     try {
         const response = await fetch(`${API_URL}/buscar-pos-vendas`);
@@ -1103,6 +1122,9 @@
         // ⚠️ ESTA LINHA É ESSENCIAL - ADICIONE ELA
         atualizarPaginacaoPV();  // <-- É ISSO QUE FALTAVA!
         
+        // Atualiza destaque da aba
+        atualizarDestaquePosVendas();
+        
     } catch(e) {
         console.error('❌ Erro ao carregar Pós Vendas:', e);
         const cache = carregarCachePosVendas();
@@ -1113,6 +1135,9 @@
             
             // ⚠️ TAMBÉM PRECISA AQUI NO CACHE
             atualizarPaginacaoPV();
+            
+            // Atualiza destaque da aba
+            atualizarDestaquePosVendas();
             
             mostrarNotificacao('📂 Modo Offline - Dados carregados do cache');
         } else {
@@ -1246,6 +1271,8 @@
                 if (tabId === 'posvendas') { carregarPosVendas(); }
                 if (tabId === 'dashboard') { carregarDashboard(); }
                 if (tabId === 'resultado') { carregarDados(); }
+                // Mantém o destaque de pós vendas mesmo quando não está ativa
+                atualizarDestaquePosVendas();
             });
         });
 
@@ -1283,6 +1310,8 @@
         carregarDados();
         carregarPosVendas();
         carregarDashboard();
+        // Atualiza destaque da aba após carregar dados
+        setTimeout(() => atualizarDestaquePosVendas(), 1000);
         console.log('🚀 Sistema iniciado!');
     </script>
 </body>

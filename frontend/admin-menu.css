@@ -41,6 +41,18 @@
     color: white;
 }
 
+.nav-link.destaque-preenchido {
+    background: #c6f6d5;
+    color: #22543d;
+    font-weight: 600;
+    border: 2px solid #9ae6b4;
+}
+
+.nav-link.destaque-preenchido:hover {
+    background: #9ae6b4;
+    color: #1b4332;
+}
+
 /* Conteúdo de cada aba */
 .tab-content {
     display: none;
