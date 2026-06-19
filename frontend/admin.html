@@ -91,13 +91,12 @@
                                     <th>CONTABILIDADE</th>
                                     <th>DATA ENTREGUE</th>
                                     <th>RETORNO</th>
-                                    <th>PREECHIDO</th>
                                     <th>OBSERVAÇÃO</th>
                                     <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody id="corpoTabelaPosVendas">
-                                <tr><td colspan="12">Carregando dados...</td></tr>
+                                <tr><td colspan="11">Carregando dados...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -542,7 +541,6 @@
         row.insertCell(6).innerHTML = item.contabilidade || '-';
         row.insertCell(7).innerHTML = converterNumeroExcelParaData(item.data_entregue || item.dataEntregue);
         row.insertCell(8).innerHTML = converterNumeroExcelParaData(item.retorno);
-        row.insertCell(9).innerHTML = item.preenchido || 'NÃO';
         row.insertCell(10).innerHTML = item.observacao || '-';
         
         const actionCell = row.insertCell(11);
