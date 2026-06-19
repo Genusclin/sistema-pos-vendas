@@ -509,40 +509,48 @@
 
         // ==================== RENDERIZAR TABELAS ====================
         function renderizarTabelaPosVendas(dados) {
-            const tbody = document.getElementById('corpoTabelaPosVendas');
-            if (!dados || !dados.length) {
-                tbody.innerHTML = '<tr><td colspan="12">Nenhum registro encontrado.</td></tr>';
-                return;
-            }
-            tbody.innerHTML = '';
-            dados.forEach((item) => {
-                const indexReal = dadosPosVenda.findIndex(el => el.id === item.id);
-                const idx = indexReal !== -1 ? indexReal : 0;
-                const row = tbody.insertRow();
-                if (item.preenchido === 'SIM') { row.style.backgroundColor = '#d4edda'; }
-                const chkCell = row.insertCell(0);
-                const chk = document.createElement('input');
-                chk.type = 'checkbox';
-                chk.className = 'chk-selecionar-pv';
-                chk.setAttribute('data-index', idx);
-                chk.onclick = function() { verificarSelecionadosPV(); };
-                chkCell.appendChild(chk);
-                row.insertCell(1).innerHTML = item.consultor || '-';
-                row.insertCell(2).innerHTML = item.razao_social || item.razaoSocial || '-';
-                row.insertCell(3).innerHTML = item.cnpj || '-';
-                row.insertCell(4).innerHTML = item.cidade || '-';
-                row.insertCell(5).innerHTML = item.responsavel || '-';
-                row.insertCell(6).innerHTML = item.contabilidade || '-';
-                row.insertCell(7).innerHTML = converterNumeroExcelParaData(item.data_entregue || item.dataEntregue);
-                row.insertCell(8).innerHTML = converterNumeroExcelParaData(item.retorno);
-                row.insertCell(9).innerHTML = item.preenchido || 'NÃO';
-                row.insertCell(10).innerHTML = item.observacao || '-';
-                const actionCell = row.insertCell(11);
-                actionCell.className = 'acoes-botoes';
-                actionCell.innerHTML = `<button onclick="abrirModalEditarRegistro(${idx})" class="btn-editar">✏️</button><button onclick="excluirRegistroPosVenda(${idx})" class="btn-excluir">🗑️</button>`;
-            });
-            verificarSelecionadosPV();
+    const tbody = document.getElementById('corpoTabelaPosVendas');
+    if (!dados || !dados.length) {
+        tbody.innerHTML = '<tr><td colspan="12">Nenhum registro encontrado.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = '';
+    dados.forEach((item) => {
+        const id = item.id || item._id;
+        const row = tbody.insertRow();
+        
+        // ⬇️⬇️⬇️ COLOQUE A LINHA VERDE AQUI ⬇️⬇️⬇️
+        if (item.preenchido === 'SIM') {
+            row.style.backgroundColor = '#d4edda';
         }
+        // ⬆️⬆️⬆️ FIM DA LINHA VERDE ⬆️⬆️⬆️
+        
+        // Checkbox
+        const chkCell = row.insertCell(0);
+        const chk = document.createElement('input');
+        chk.type = 'checkbox';
+        chk.className = 'chk-selecionar-pv';
+        chk.setAttribute('data-id', id);
+        chk.onclick = function() { verificarSelecionadosPV(); };
+        chkCell.appendChild(chk);
+        
+        row.insertCell(1).innerHTML = item.consultor || '-';
+        row.insertCell(2).innerHTML = item.razao_social || item.razaoSocial || '-';
+        row.insertCell(3).innerHTML = item.cnpj || '-';
+        row.insertCell(4).innerHTML = item.cidade || '-';
+        row.insertCell(5).innerHTML = item.responsavel || '-';
+        row.insertCell(6).innerHTML = item.contabilidade || '-';
+        row.insertCell(7).innerHTML = converterNumeroExcelParaData(item.data_entregue || item.dataEntregue);
+        row.insertCell(8).innerHTML = converterNumeroExcelParaData(item.retorno);
+        row.insertCell(9).innerHTML = item.preenchido || 'NÃO';
+        row.insertCell(10).innerHTML = item.observacao || '-';
+        
+        const actionCell = row.insertCell(11);
+        actionCell.className = 'acoes-botoes';
+        actionCell.innerHTML = `<button onclick="abrirModalEditarRegistro('${id}')" class="btn-editar">✏️</button><button onclick="excluirRegistroPosVenda('${id}')" class="btn-excluir">🗑️</button>`;
+    });
+    verificarSelecionadosPV();
+}
 
         function renderizarTabelaResultado(dados) {
             const tbody = document.getElementById('corpoTabela');
