@@ -65,11 +65,15 @@
                             <button onclick="exportarExcelPosVendas()" class="btn-exportar-pequeno">📎 Exportar</button>
                             <button onclick="abrirModalNovoRegistro()" class="btn-adicionar">➕ Novo Registro</button>
                             <button id="btnExcluirSelecionadosPV" class="btn-excluir-massa" style="display: none;">🗑️ Excluir Selecionados</button>
-                            <div class="dropdown" style="display: inline-block;">
-                                <button onclick="toggleDropdown()" class="btn-importar-dropdown">📂 Importar ▼</button>
-                                <div id="dropdownMenu" class="dropdown-content">
-                                    <a href="#" onclick="importarExcelPosVenda(); fecharDropdown(); return false;">📎 Importar Excel</a>
-                                    <a href="#" onclick="baixarModeloExcel(); fecharDropdown(); return false;">📄 Baixar Modelo</a>
+                            <div class="dropdown" style="display: inline-block; position: relative;">
+                                <button onclick="toggleDropdown(event)" class="btn-importar-dropdown">📂 Importar ▼</button>
+                                <div id="dropdownMenu" class="dropdown-content" style="display: none; position: absolute; background: white; min-width: 200px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); z-index: 1000; border-radius: 8px; padding: 5px 0;">
+                                    <a href="#" onclick="importarExcelPosVenda(); return false;" style="display: block; padding: 10px 15px; text-decoration: none; color: #333; border-bottom: 1px solid #eee;">
+                                        📎 Importar Excel
+                                    </a>
+                                    <a href="#" onclick="baixarModeloExcel(); return false;" style="display: block; padding: 10px 15px; text-decoration: none; color: #333;">
+                                        📄 Baixar Modelo
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -163,7 +167,7 @@
         </div>
     </div>
 
-    <!-- MODAIS -->
+    <!-- MODAIS (mantidos os mesmos) -->
     <!-- MODAL FILTRO PÓS VENDAS -->
     <div id="modalFiltroPosVendas" class="modal">
         <div class="modal-content" style="max-width: 700px;">
@@ -857,6 +861,245 @@
             }
         }
 
+        // ========== FUNÇÕES DE IMPORTAÇÃO E DOWNLOAD CORRIGIDAS ==========
+
+        function toggleDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('dropdownMenu');
+            if (dropdown.style.display === 'block') {
+                dropdown.style.display = 'none';
+            } else {
+                dropdown.style.display = 'block';
+            }
+        }
+
+        function fecharDropdown() {
+            const dropdown = document.getElementById('dropdownMenu');
+            if (dropdown) {
+                dropdown.style.display = 'none';
+            }
+        }
+
+        // Fechar dropdown ao clicar fora
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('dropdownMenu');
+            const button = document.querySelector('.btn-importar-dropdown');
+            if (dropdown && button) {
+                if (!dropdown.contains(event.target) && !button.contains(event.target)) {
+                    dropdown.style.display = 'none';
+                }
+            }
+        });
+
+        function baixarModeloExcel() {
+            console.log('📄 Baixar modelo clicado');
+            try {
+                if (typeof XLSX === 'undefined') {
+                    alert('❌ Biblioteca XLSX não carregada. Verifique sua conexão com a internet.');
+                    return;
+                }
+                
+                // Criar modelo com cabeçalhos em português
+                const modelo = [{ 
+                    'CONSULTOR': 'Exemplo: João Silva',
+                    'RAZAO SOCIAL': 'Empresa Exemplo LTDA',
+                    'CNPJ': '12.345.678/0001-99',
+                    'CIDADE': 'São Paulo',
+                    'TELEFONE': '(11) 99999-9999',
+                    'RESPONSAVEL': 'Maria Santos',
+                    'CONTABILIDADE': 'Contabilidade Exemplo',
+                    'DATA ENTREGUE': '2026-06-19',
+                    'RETORNO': '2026-06-26',
+                    'OBSERVAÇÃO': 'Observação de exemplo'
+                }];
+                
+                // Criar planilha com formatação
+                const ws = XLSX.utils.json_to_sheet(modelo);
+                
+                // Definir largura das colunas
+                ws['!cols'] = [
+                    { wch: 20 }, // CONSULTOR
+                    { wch: 30 }, // RAZAO SOCIAL
+                    { wch: 20 }, // CNPJ
+                    { wch: 20 }, // CIDADE
+                    { wch: 18 }, // TELEFONE
+                    { wch: 20 }, // RESPONSAVEL
+                    { wch: 25 }, // CONTABILIDADE
+                    { wch: 15 }, // DATA ENTREGUE
+                    { wch: 15 }, // RETORNO
+                    { wch: 40 }  // OBSERVAÇÃO
+                ];
+                
+                // Criar workbook e salvar
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'MODELO_POS_VENDAS');
+                
+                // Gerar e baixar o arquivo
+                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                const blob = new Blob([wbout], { type: 'application/octet-stream' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `modelo_pos_vendas_${new Date().toISOString().split('T')[0]}.xlsx`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+                
+                mostrarNotificacao('✅ Modelo baixado com sucesso!');
+                fecharDropdown();
+            } catch (e) {
+                console.error('❌ Erro ao baixar modelo:', e);
+                alert('❌ Erro ao baixar modelo: ' + e.message);
+            }
+        }
+
+        function importarExcelPosVenda() {
+            console.log('📂 Importar Excel clicado');
+            if (typeof XLSX === 'undefined') {
+                alert('❌ Biblioteca XLSX não carregada. Verifique sua conexão com a internet.');
+                return;
+            }
+            
+            fecharDropdown();
+            
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.xlsx, .xls';
+            input.onchange = async function(e) {
+                const file = e.target.files[0];
+                if (!file) {
+                    mostrarNotificacao('⚠️ Nenhum arquivo selecionado');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(sheet);
+                        
+                        console.log('📊 Dados lidos do Excel:', jsonData.length, 'linhas');
+                        
+                        if (jsonData.length === 0) {
+                            alert('⚠️ O arquivo não contém dados!');
+                            return;
+                        }
+                        
+                        let importados = 0;
+                        let erros = [];
+                        
+                        // Função para converter data
+                        function converterData(dataStr) {
+                            if (!dataStr) return '';
+                            if (typeof dataStr !== 'string') dataStr = String(dataStr);
+                            
+                            // Se já está no formato YYYY-MM-DD
+                            if (dataStr.match(/^\d{4}-\d{2}-\d{2}$/)) return dataStr;
+                            
+                            // Se está no formato DD/MM/YYYY
+                            if (dataStr.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                                const partes = dataStr.split('/');
+                                return `${partes[2]}-${partes[1]}-${partes[0]}`;
+                            }
+                            
+                            // Se está no formato DD/MM/YYYY com hora
+                            if (dataStr.includes(' ')) {
+                                const dataParte = dataStr.split(' ')[0];
+                                if (dataParte.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                                    const partes = dataParte.split('/');
+                                    return `${partes[2]}-${partes[1]}-${partes[0]}`;
+                                }
+                            }
+                            
+                            // Se é número serial do Excel
+                            if (/^\d+$/.test(dataStr) && dataStr.length > 4) {
+                                const date = new Date((parseInt(dataStr) - 25569) * 86400000);
+                                if (!isNaN(date.getTime())) {
+                                    return date.toISOString().split('T')[0];
+                                }
+                            }
+                            
+                            return '';
+                        }
+                        
+                        // Processar cada linha
+                        for (let i = 0; i < jsonData.length; i++) {
+                            const row = jsonData[i];
+                            
+                            // Buscar campos com diferentes possíveis nomes
+                            const consultor = row['CONSULTOR'] || row['consultor'] || row['Consultor'] || '';
+                            const razaoSocial = row['RAZAO SOCIAL'] || row['razao social'] || row['RAZAO_SOCIAL'] || 
+                                                row['Razao Social'] || row['Empresa'] || row['empresa'] || '';
+                            
+                            if (!consultor) {
+                                erros.push(`Linha ${i+1}: Consultor vazio`);
+                                continue;
+                            }
+                            
+                            if (!razaoSocial) {
+                                erros.push(`Linha ${i+1}: Razão Social vazia`);
+                                continue;
+                            }
+                            
+                            const novoRegistro = {
+                                consultor: consultor,
+                                razaoSocial: razaoSocial,
+                                cnpj: row['CNPJ'] || row['cnpj'] || row['Cnpj'] || '',
+                                cidade: row['CIDADE'] || row['cidade'] || row['Cidade'] || '',
+                                telefone: row['TELEFONE'] || row['telefone'] || row['Telefone'] || '',
+                                responsavel: row['RESPONSAVEL'] || row['responsavel'] || row['Responsavel'] || '',
+                                contabilidade: row['CONTABILIDADE'] || row['contabilidade'] || row['Contabilidade'] || '',
+                                dataEntregue: converterData(row['DATA ENTREGUE'] || row['data entregue'] || row['Data Entregue'] || ''),
+                                retorno: converterData(row['RETORNO'] || row['retorno'] || row['Retorno'] || ''),
+                                observacao: row['OBSERVAÇÃO'] || row['observacao'] || row['OBS'] || row['obs'] || ''
+                            };
+                            
+                            try {
+                                const response = await fetch(`${API_URL}/adicionar-pos-venda`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ registro: novoRegistro })
+                                });
+                                
+                                const result = await response.json();
+                                if (result.success) {
+                                    importados++;
+                                } else {
+                                    erros.push(`Linha ${i+1}: ${result.message || 'Erro ao salvar'}`);
+                                }
+                            } catch (err) {
+                                erros.push(`Linha ${i+1}: ${err.message}`);
+                            }
+                        }
+                        
+                        // Mostrar resultado
+                        let mensagem = `✅ ${importados} registros importados com sucesso!`;
+                        if (erros.length > 0) {
+                            mensagem += `\n⚠️ ${erros.length} erros:\n${erros.slice(0, 10).join('\n')}`;
+                            if (erros.length > 10) mensagem += `\n... e mais ${erros.length - 10} erros`;
+                        }
+                        alert(mensagem);
+                        
+                        if (importados > 0) {
+                            await carregarPosVendas();
+                            await carregarDashboard();
+                            mostrarNotificacao(`✅ ${importados} registros importados!`);
+                        }
+                        
+                    } catch (e) {
+                        console.error('❌ Erro ao importar:', e);
+                        alert('❌ Erro ao importar: ' + e.message);
+                    }
+                };
+                
+                reader.readAsArrayBuffer(file);
+            };
+            
+            input.click();
+        }
+
         // ========== CARREGAR DADOS ==========
         async function carregarConsultores() {
             try {
@@ -1026,139 +1269,16 @@
             });
         });
 
-        // ========== FUNÇÕES DE IMPORTAÇÃO E DOWNLOAD ==========
-        function baixarModeloExcel() {
-            console.log('📄 Baixar modelo clicado');
-            try {
-                if (typeof XLSX === 'undefined') {
-                    alert('❌ Biblioteca XLSX não carregada. Verifique sua conexão com a internet.');
-                    return;
-                }
-                const modelo = [{ 
-                    'CONSULTOR': '', 'RAZAO SOCIAL': '', 'CNPJ': '', 'CIDADE': '', 'TELEFONE': '',
-                    'RESPONSAVEL': '', 'CONTABILIDADE': '', 'DATA ENTREGUE': '', 'RETORNO': '', 'OBSERVAÇÃO': ''
-                }];
-                const ws = XLSX.utils.json_to_sheet(modelo);
-                ws['!cols'] = [{ wch: 20 }, { wch: 30 }, { wch: 18 }, { wch: 20 }, { wch: 15 }, { wch: 20 }, { wch: 25 }, { wch: 15 }, { wch: 15 }, { wch: 40 }];
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'MODELO_POS_VENDAS');
-                XLSX.writeFile(wb, 'modelo_pos_vendas.xlsx');
-                mostrarNotificacao('📄 Modelo baixado com sucesso!');
-            } catch (e) {
-                console.error('Erro ao baixar modelo:', e);
-                alert('❌ Erro ao baixar modelo: ' + e.message);
-            }
-        }
-
-        function importarExcelPosVenda() {
-            console.log('📂 Importar Excel clicado');
-            if (typeof XLSX === 'undefined') {
-                alert('❌ Biblioteca XLSX não carregada. Verifique sua conexão com a internet.');
-                return;
-            }
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.xlsx, .xls';
-            input.onchange = async function(e) {
-                const file = e.target.files[0];
-                if (!file) {
-                    mostrarNotificacao('⚠️ Nenhum arquivo selecionado');
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = async function(e) {
-                    try {
-                        const data = new Uint8Array(e.target.result);
-                        const workbook = XLSX.read(data, { type: 'array' });
-                        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const jsonData = XLSX.utils.sheet_to_json(sheet);
-                        console.log('📊 Dados lidos do Excel:', jsonData.length, 'linhas');
-                        if (jsonData.length === 0) {
-                            alert('⚠️ O arquivo não contém dados!');
-                            return;
-                        }
-                        let importados = 0;
-                        let erros = [];
-                        function converterData(dataStr) {
-                            if (!dataStr) return '';
-                            if (typeof dataStr !== 'string') dataStr = String(dataStr);
-                            if (dataStr.match(/^\d{4}-\d{2}-\d{2}$/)) return dataStr;
-                            if (dataStr.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-                                const partes = dataStr.split('/');
-                                return `${partes[2]}-${partes[1]}-${partes[0]}`;
-                            }
-                            if (dataStr.includes(' ')) {
-                                const dataParte = dataStr.split(' ')[0];
-                                if (dataParte.match(/^\d{4}-\d{2}-\d{2}$/)) return dataParte;
-                            }
-                            if (/^\d+$/.test(dataStr) && dataStr.length > 4) {
-                                const date = new Date((parseInt(dataStr) - 25569) * 86400000);
-                                return date.toISOString().split('T')[0];
-                            }
-                            return '';
-                        }
-                        for (let i = 0; i < jsonData.length; i++) {
-                            const row = jsonData[i];
-                            const consultor = row['CONSULTOR'] || row['consultor'] || '';
-                            const razaoSocial = row['RAZAO SOCIAL'] || row['razao social'] || row['RAZAO_SOCIAL'] || row['Empresa'] || '';
-                            if (!consultor) { erros.push(`Linha ${i+1}: Consultor vazio`); continue; }
-                            if (!razaoSocial) { erros.push(`Linha ${i+1}: Razão Social vazia`); continue; }
-                            const novoRegistro = {
-                                consultor: consultor,
-                                razaoSocial: razaoSocial,
-                                cnpj: row['CNPJ'] || row['cnpj'] || '',
-                                cidade: row['CIDADE'] || row['cidade'] || '',
-                                telefone: row['TELEFONE'] || row['telefone'] || '',
-                                responsavel: row['RESPONSAVEL'] || row['responsavel'] || '',
-                                contabilidade: row['CONTABILIDADE'] || row['contabilidade'] || '',
-                                dataEntregue: converterData(row['DATA ENTREGUE'] || row['data entregue'] || ''),
-                                retorno: converterData(row['RETORNO'] || row['retorno'] || ''),
-                                observacao: row['OBSERVAÇÃO'] || row['observacao'] || row['OBS'] || ''
-                            };
-                            try {
-                                const response = await fetch(`${API_URL}/adicionar-pos-venda`, {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ registro: novoRegistro })
-                                });
-                                const result = await response.json();
-                                if (result.success) { importados++; }
-                                else { erros.push(`Linha ${i+1}: ${result.message || 'Erro ao salvar'}`); }
-                            } catch (err) { erros.push(`Linha ${i+1}: ${err.message}`); }
-                        }
-                        let mensagem = `✅ ${importados} registros importados com sucesso!`;
-                        if (erros.length > 0) {
-                            mensagem += `\n⚠️ ${erros.length} erros:\n${erros.slice(0, 5).join('\n')}`;
-                            if (erros.length > 5) mensagem += `\n... e mais ${erros.length - 5} erros`;
-                        }
-                        alert(mensagem);
-                        if (importados > 0) {
-                            await carregarPosVendas();
-                            await carregarDashboard();
-                        }
-                    } catch (e) {
-                        console.error('❌ Erro ao importar:', e);
-                        alert('Erro ao importar: ' + e.message);
-                    }
-                };
-                reader.readAsArrayBuffer(file);
-            };
-            input.click();
-        }
-
         // ========== FUNÇÕES GERAIS ==========
-        function toggleDropdown() {
-            const d = document.getElementById('dropdownMenu');
-            d.style.display = d.style.display === 'block' ? 'none' : 'block';
-        }
-        function fecharDropdown() { document.getElementById('dropdownMenu').style.display = 'none'; }
         function mostrarNotificacao(mensagem) {
             let n = document.getElementById('notificacao');
-            if (!n) { n = document.createElement('div'); n.id = 'notificacao'; n.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#48bb78;color:white;padding:10px 20px;border-radius:5px;z-index:9999'; document.body.appendChild(n); }
+            if (!n) { n = document.createElement('div'); n.id = 'notificacao'; n.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#48bb78;color:white;padding:10px 20px;border-radius:5px;z-index:9999;box-shadow:0 4px 6px rgba(0,0,0,0.1);'; document.body.appendChild(n); }
             n.textContent = mensagem;
             n.style.display = 'block';
-            setTimeout(() => n.style.display = 'none', 3000);
+            clearTimeout(n._timeout);
+            n._timeout = setTimeout(() => n.style.display = 'none', 4000);
         }
+
         function logout() {
             const manter = confirm('Manter dados salvos?');
             if (!manter) { localStorage.removeItem('loginSalvo'); localStorage.removeItem('senhaSalva'); localStorage.removeItem('manterConectado'); }
@@ -1172,7 +1292,6 @@
         document.getElementById('btnExcluirSelecionadosRES')?.addEventListener('click', excluirSelecionadosRES);
 
         window.onclick = function(e) {
-            if (!e.target.matches('.btn-importar-dropdown')) document.getElementById('dropdownMenu').style.display = 'none';
             if (e.target === document.getElementById('modalNovoRegistro')) fecharModalNovoRegistro();
             if (e.target === document.getElementById('modalEditarRegistro')) fecharModalEditarRegistro();
             if (e.target === document.getElementById('modalEditarResposta')) fecharModalEditarResposta();
