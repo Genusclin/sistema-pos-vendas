@@ -163,7 +163,8 @@
         </div>
     </div>
 
-    <!-- MODAL FILTRO PÓS VENDAS (COM PREECHIDO) -->
+    <!-- MODAIS -->
+    <!-- MODAL FILTRO PÓS VENDAS -->
     <div id="modalFiltroPosVendas" class="modal">
         <div class="modal-content" style="max-width: 700px;">
             <div class="modal-header"><h3>🔍 Filtrar Pós Vendas</h3><span class="modal-fechar" onclick="fecharModalFiltroPosVendas()">&times;</span></div>
@@ -298,51 +299,29 @@
         let graficoDesempenho = null, graficoComparativo = null;
         let dadosDesempenhoConvertido = [];
 
-        // Controles de página Pós Vendas
         let paginaAtualPV = 1;
         let dadosPaginadosPV = [];
-
-        // Controles de página Resultado
         let paginaAtualRES = 1;
         let dadosPaginadosRES = [];
 
         // ========== SUPORTE OFFLINE ==========
         function salvarCachePosVendas(dados) {
-            try {
-                localStorage.setItem('cache_pos_vendas', JSON.stringify(dados));
-                console.log('📦 Cache Pós Vendas salvo:', dados.length);
-            } catch(e) {}
+            try { localStorage.setItem('cache_pos_vendas', JSON.stringify(dados)); } catch(e) {}
         }
-
         function carregarCachePosVendas() {
             try {
                 const cache = localStorage.getItem('cache_pos_vendas');
-                if (cache) {
-                    const dados = JSON.parse(cache);
-                    console.log('📂 Cache Pós Vendas carregado:', dados.length);
-                    return dados;
-                }
-            } catch(e) {}
-            return null;
+                return cache ? JSON.parse(cache) : null;
+            } catch(e) { return null; }
         }
-
         function salvarCacheRespostas(dados) {
-            try {
-                localStorage.setItem('cache_respostas', JSON.stringify(dados));
-                console.log('📦 Cache Respostas salvo:', dados.length);
-            } catch(e) {}
+            try { localStorage.setItem('cache_respostas', JSON.stringify(dados)); } catch(e) {}
         }
-
         function carregarCacheRespostas() {
             try {
                 const cache = localStorage.getItem('cache_respostas');
-                if (cache) {
-                    const dados = JSON.parse(cache);
-                    console.log('📂 Cache Respostas carregado:', dados.length);
-                    return dados;
-                }
-            } catch(e) {}
-            return null;
+                return cache ? JSON.parse(cache) : null;
+            } catch(e) { return null; }
         }
 
         // ========== FUNÇÕES DE PAGINAÇÃO ==========
@@ -351,22 +330,15 @@
             const totalPaginas = Math.ceil(dados.length / LINHAS_POR_PAGINA) || 1;
             if (paginaAtualPV > totalPaginas) paginaAtualPV = totalPaginas;
             if (paginaAtualPV < 1) paginaAtualPV = 1;
-
             const inicio = (paginaAtualPV - 1) * LINHAS_POR_PAGINA;
             const fim = inicio + LINHAS_POR_PAGINA;
             dadosPaginadosPV = dados.slice(inicio, fim);
-
             document.getElementById('infoPaginaPV').textContent = `Página ${paginaAtualPV} de ${totalPaginas}`;
             document.getElementById('btnAnteriorPV').disabled = paginaAtualPV <= 1;
             document.getElementById('btnProximaPV').disabled = paginaAtualPV >= totalPaginas;
-
             renderizarTabelaPosVendas(dadosPaginadosPV);
         }
-
-        function paginaAnteriorPV() {
-            if (paginaAtualPV > 1) { paginaAtualPV--; atualizarPaginacaoPV(); }
-        }
-
+        function paginaAnteriorPV() { if (paginaAtualPV > 1) { paginaAtualPV--; atualizarPaginacaoPV(); } }
         function proximaPaginaPV() {
             const dados = dadosPosVendaFiltrados.length ? dadosPosVendaFiltrados : dadosPosVenda;
             const totalPaginas = Math.ceil(dados.length / LINHAS_POR_PAGINA) || 1;
@@ -378,22 +350,15 @@
             const totalPaginas = Math.ceil(dados.length / LINHAS_POR_PAGINA) || 1;
             if (paginaAtualRES > totalPaginas) paginaAtualRES = totalPaginas;
             if (paginaAtualRES < 1) paginaAtualRES = 1;
-
             const inicio = (paginaAtualRES - 1) * LINHAS_POR_PAGINA;
             const fim = inicio + LINHAS_POR_PAGINA;
             dadosPaginadosRES = dados.slice(inicio, fim);
-
             document.getElementById('infoPaginaRES').textContent = `Página ${paginaAtualRES} de ${totalPaginas}`;
             document.getElementById('btnAnteriorRES').disabled = paginaAtualRES <= 1;
             document.getElementById('btnProximaRES').disabled = paginaAtualRES >= totalPaginas;
-
             renderizarTabelaResultado(dadosPaginadosRES);
         }
-
-        function paginaAnteriorRES() {
-            if (paginaAtualRES > 1) { paginaAtualRES--; atualizarPaginacaoRES(); }
-        }
-
+        function paginaAnteriorRES() { if (paginaAtualRES > 1) { paginaAtualRES--; atualizarPaginacaoRES(); } }
         function proximaPaginaRES() {
             const dados = dadosAtuaisFiltrados.length ? dadosAtuaisFiltrados : dadosAtuais;
             const totalPaginas = Math.ceil(dados.length / LINHAS_POR_PAGINA) || 1;
@@ -422,7 +387,6 @@
             }
             return numero || '-';
         }
-
         function converterNumeroExcelParaInput(numero) {
             if (!numero) return '';
             if (typeof numero === 'string') {
@@ -439,7 +403,6 @@
             }
             return '';
         }
-
         function converterDataParaDate(dataStr) {
             if (!dataStr) return null;
             if (dataStr.includes(',')) {
@@ -458,9 +421,7 @@
             listaConsultores.forEach(c => { select.innerHTML += `<option value="${c}">${c}</option>`; });
             document.getElementById('modalFiltroPosVendas').style.display = 'flex';
         }
-
         function fecharModalFiltroPosVendas() { document.getElementById('modalFiltroPosVendas').style.display = 'none'; }
-
         function aplicarFiltroPosVendas() {
             const consultor = document.getElementById('filtroConsultorPosVendas').value;
             const razao = document.getElementById('filtroRazaoPosVendas').value.toLowerCase();
@@ -470,7 +431,6 @@
             const dataEntregue = document.getElementById('filtroDataEntreguePosVendas').value;
             const retorno = document.getElementById('filtroRetornoPosVendas').value;
             const preenchido = document.getElementById('filtroPreenchidoPosVendas').value;
-
             dadosPosVendaFiltrados = dadosPosVenda.filter(item => {
                 let match = true;
                 if (consultor && item.consultor !== consultor) match = false;
@@ -478,33 +438,18 @@
                 if (cnpj && !(item.cnpj || '').toLowerCase().includes(cnpj)) match = false;
                 if (cidade && !(item.cidade || '').toLowerCase().includes(cidade)) match = false;
                 if (contabilidade && !(item.contabilidade || '').toLowerCase().includes(contabilidade)) match = false;
-                if (dataEntregue) {
-                    const dataItem = item.data_entregue || item.dataEntregue || '';
-                    if (!dataItem.includes(dataEntregue)) match = false;
-                }
-                if (retorno) {
-                    const retornoItem = item.retorno || '';
-                    if (!retornoItem.includes(retorno)) match = false;
-                }
+                if (dataEntregue) { const dataItem = item.data_entregue || item.dataEntregue || ''; if (!dataItem.includes(dataEntregue)) match = false; }
+                if (retorno) { const retornoItem = item.retorno || ''; if (!retornoItem.includes(retorno)) match = false; }
                 if (preenchido && item.preenchido !== preenchido) match = false;
                 return match;
             });
-
             paginaAtualPV = 1;
             atualizarPaginacaoPV();
             fecharModalFiltroPosVendas();
-            mostrarNotificacao(`✅ Filtro aplicado: ${dadosPosVendaFiltrados.length} registros encontrados`);
+            mostrarNotificacao(`✅ Filtro aplicado: ${dadosPosVendaFiltrados.length} registros`);
         }
-
         function limparFiltroPosVendas() {
-            document.getElementById('filtroConsultorPosVendas').value = '';
-            document.getElementById('filtroRazaoPosVendas').value = '';
-            document.getElementById('filtroCnpjPosVendas').value = '';
-            document.getElementById('filtroCidadePosVendas').value = '';
-            document.getElementById('filtroContabilidadePosVendas').value = '';
-            document.getElementById('filtroDataEntreguePosVendas').value = '';
-            document.getElementById('filtroRetornoPosVendas').value = '';
-            document.getElementById('filtroPreenchidoPosVendas').value = '';
+            ['filtroConsultorPosVendas','filtroRazaoPosVendas','filtroCnpjPosVendas','filtroCidadePosVendas','filtroContabilidadePosVendas','filtroDataEntreguePosVendas','filtroRetornoPosVendas','filtroPreenchidoPosVendas'].forEach(id => document.getElementById(id).value = '');
             dadosPosVendaFiltrados = [];
             paginaAtualPV = 1;
             atualizarPaginacaoPV();
@@ -518,9 +463,7 @@
             listaConsultores.forEach(c => { select.innerHTML += `<option value="${c}">${c}</option>`; });
             document.getElementById('modalFiltroResultado').style.display = 'flex';
         }
-
         function fecharModalFiltroResultado() { document.getElementById('modalFiltroResultado').style.display = 'none'; }
-
         function aplicarFiltroResultado() {
             const data = document.getElementById('filtroDataResultado').value;
             const consultor = document.getElementById('filtroConsultorResultado').value;
@@ -535,13 +478,9 @@
             const notaVisita = document.getElementById('filtroNotaVisitaResultado').value.toLowerCase();
             const vendedor = document.getElementById('filtroVendedorResultado').value.toLowerCase();
             const vendido = document.getElementById('filtroVendidoResultado').value;
-
             dadosAtuaisFiltrados = dadosAtuais.filter(item => {
                 let match = true;
-                if (data) {
-                    const dataItem = item.data_hora || item.dataHora || '';
-                    if (!dataItem.includes(data)) match = false;
-                }
+                if (data) { const dataItem = item.data_hora || item.dataHora || ''; if (!dataItem.includes(data)) match = false; }
                 if (consultor && item.vendedor !== consultor) match = false;
                 if (cnpj && !(item.cnpj || '').toLowerCase().includes(cnpj)) match = false;
                 if (empresa && !(item.empresa || '').toLowerCase().includes(empresa)) match = false;
@@ -556,27 +495,13 @@
                 if (vendido && item.vendido !== vendido) match = false;
                 return match;
             });
-
             paginaAtualRES = 1;
             atualizarPaginacaoRES();
             fecharModalFiltroResultado();
-            mostrarNotificacao(`✅ Filtro aplicado: ${dadosAtuaisFiltrados.length} registros encontrados`);
+            mostrarNotificacao(`✅ Filtro aplicado: ${dadosAtuaisFiltrados.length} registros`);
         }
-
         function limparFiltroResultado() {
-            document.getElementById('filtroDataResultado').value = '';
-            document.getElementById('filtroConsultorResultado').value = '';
-            document.getElementById('filtroCnpjResultado').value = '';
-            document.getElementById('filtroEmpresaResultado').value = '';
-            document.getElementById('filtroPosVendaResultado').value = '';
-            document.getElementById('filtroAetResultado').value = '';
-            document.getElementById('filtroNr06Resultado').value = '';
-            document.getElementById('filtroCipaResultado').value = '';
-            document.getElementById('filtroPeriodicoResultado').value = '';
-            document.getElementById('filtroEpisResultado').value = '';
-            document.getElementById('filtroNotaVisitaResultado').value = '';
-            document.getElementById('filtroVendedorResultado').value = '';
-            document.getElementById('filtroVendidoResultado').value = '';
+            ['filtroDataResultado','filtroConsultorResultado','filtroCnpjResultado','filtroEmpresaResultado','filtroPosVendaResultado','filtroAetResultado','filtroNr06Resultado','filtroCipaResultado','filtroPeriodicoResultado','filtroEpisResultado','filtroNotaVisitaResultado','filtroVendedorResultado','filtroVendidoResultado'].forEach(id => document.getElementById(id).value = '');
             dadosAtuaisFiltrados = [];
             paginaAtualRES = 1;
             atualizarPaginacaoRES();
@@ -595,13 +520,8 @@
             dados.forEach((item) => {
                 const indexReal = dadosPosVenda.findIndex(el => el.id === item.id);
                 const idx = indexReal !== -1 ? indexReal : 0;
-                
                 const row = tbody.insertRow();
-                
-                if (item.preenchido === 'SIM') {
-                    row.style.backgroundColor = '#d4edda';
-                }
-                
+                if (item.preenchido === 'SIM') { row.style.backgroundColor = '#d4edda'; }
                 const chkCell = row.insertCell(0);
                 const chk = document.createElement('input');
                 chk.type = 'checkbox';
@@ -609,7 +529,6 @@
                 chk.setAttribute('data-index', idx);
                 chk.onclick = function() { verificarSelecionadosPV(); };
                 chkCell.appendChild(chk);
-
                 row.insertCell(1).innerHTML = item.consultor || '-';
                 row.insertCell(2).innerHTML = item.razao_social || item.razaoSocial || '-';
                 row.insertCell(3).innerHTML = item.cnpj || '-';
@@ -620,7 +539,6 @@
                 row.insertCell(8).innerHTML = converterNumeroExcelParaData(item.retorno);
                 row.insertCell(9).innerHTML = item.preenchido || 'NÃO';
                 row.insertCell(10).innerHTML = item.observacao || '-';
-                
                 const actionCell = row.insertCell(11);
                 actionCell.className = 'acoes-botoes';
                 actionCell.innerHTML = `<button onclick="abrirModalEditarRegistro(${idx})" class="btn-editar">✏️</button><button onclick="excluirRegistroPosVenda(${idx})" class="btn-excluir">🗑️</button>`;
@@ -638,7 +556,6 @@
             dados.forEach((item) => {
                 const indexReal = dadosAtuais.indexOf(item);
                 const row = tbody.insertRow();
-                
                 const chkCell = row.insertCell(0);
                 const chk = document.createElement('input');
                 chk.type = 'checkbox';
@@ -646,7 +563,6 @@
                 chk.setAttribute('data-index', indexReal);
                 chk.onclick = function() { verificarSelecionadosRES(); };
                 chkCell.appendChild(chk);
-                
                 row.insertCell(1).innerHTML = item.data_hora || item.dataHora || '-';
                 row.insertCell(2).innerHTML = item.vendedor || '-';
                 row.insertCell(3).innerHTML = item.cnpj || '-';
@@ -674,24 +590,18 @@
             const selecionados = Array.from(checkboxes).filter(chk => chk.checked);
             const btnExcluir = document.getElementById('btnExcluirSelecionadosRES');
             const chkTodos = document.getElementById('chkSelecionarTodosRES');
-            
             if (selecionados.length > 0) {
                 btnExcluir.style.display = 'inline-block';
                 btnExcluir.textContent = `🗑️ Excluir Selecionados (${selecionados.length})`;
-            } else {
-                btnExcluir.style.display = 'none';
-            }
+            } else { btnExcluir.style.display = 'none'; }
             if (chkTodos) {
                 const todosCheckboxes = document.querySelectorAll('.chk-selecionar-res');
-                const todosMarcados = todosCheckboxes.length > 0 && Array.from(todosCheckboxes).every(chk => chk.checked);
-                chkTodos.checked = todosMarcados;
+                chkTodos.checked = todosCheckboxes.length > 0 && Array.from(todosCheckboxes).every(chk => chk.checked);
             }
         }
-
         function selecionarTodosRES() {
             const chkTodos = document.getElementById('chkSelecionarTodosRES');
-            const checkboxes = document.querySelectorAll('.chk-selecionar-res');
-            checkboxes.forEach(chk => chk.checked = chkTodos.checked);
+            document.querySelectorAll('.chk-selecionar-res').forEach(chk => chk.checked = chkTodos.checked);
             verificarSelecionadosRES();
         }
 
@@ -703,20 +613,15 @@
             if (selecionados.length > 0) {
                 btnExcluir.style.display = 'inline-block';
                 btnExcluir.textContent = `🗑️ Excluir Selecionados (${selecionados.length})`;
-            } else {
-                btnExcluir.style.display = 'none';
-            }
+            } else { btnExcluir.style.display = 'none'; }
             if (chkTodos) {
                 const todosCheckboxes = document.querySelectorAll('.chk-selecionar-pv');
-                const todosMarcados = todosCheckboxes.length > 0 && Array.from(todosCheckboxes).every(chk => chk.checked);
-                chkTodos.checked = todosMarcados;
+                chkTodos.checked = todosCheckboxes.length > 0 && Array.from(todosCheckboxes).every(chk => chk.checked);
             }
         }
-
         function selecionarTodosPV() {
             const chkTodos = document.getElementById('chkSelecionarTodosPV');
-            const checkboxes = document.querySelectorAll('.chk-selecionar-pv');
-            checkboxes.forEach(chk => chk.checked = chkTodos.checked);
+            document.querySelectorAll('.chk-selecionar-pv').forEach(chk => chk.checked = chkTodos.checked);
             verificarSelecionadosPV();
         }
 
@@ -747,7 +652,6 @@
         function exportarExcelResultado() {
             const checkboxes = document.querySelectorAll('.chk-selecionar-res:checked');
             let dadosParaExportar;
-            
             if (checkboxes.length > 0) {
                 const indices = Array.from(checkboxes).map(chk => parseInt(chk.getAttribute('data-index')));
                 dadosParaExportar = indices.map(idx => dadosAtuais[idx]);
@@ -756,9 +660,7 @@
                 dadosParaExportar = dadosAtuaisFiltrados.length ? dadosAtuaisFiltrados : dadosAtuais;
                 mostrarNotificacao(`📎 Exportando todos os ${dadosParaExportar.length} registros`);
             }
-            
             if (!dadosParaExportar?.length) { alert('Sem dados para exportar'); return; }
-            
             const dadosExcel = dadosParaExportar.map(d => ({
                 'DATA': d.data_hora || d.dataHora || '',
                 'CONSULTOR': d.vendedor || '',
@@ -789,14 +691,8 @@
             if (indices.length === 0) return;
             if (!confirm(`⚠️ Tem certeza que deseja excluir ${indices.length} resposta(s)?`)) return;
             indices.sort((a, b) => b - a);
-            for (const idx of indices) {
-                dadosAtuais.splice(idx, 1);
-            }
-            const response = await fetch(`${API_URL}/salvar-todos-dados`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ dados: dadosAtuais })
-            });
+            for (const idx of indices) { dadosAtuais.splice(idx, 1); }
+            const response = await fetch(`${API_URL}/salvar-todos-dados`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dados: dadosAtuais }) });
             if ((await response.json()).success) {
                 mostrarNotificacao(`✅ ${indices.length} resposta(s) excluída(s)!`);
                 await carregarDados();
@@ -811,11 +707,7 @@
             if (!confirm(`⚠️ Tem certeza que deseja excluir ${indices.length} registro(s)?`)) return;
             indices.sort((a, b) => b - a);
             for (const idx of indices) {
-                await fetch(`${API_URL}/excluir-pos-venda`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ index: idx })
-                });
+                await fetch(`${API_URL}/excluir-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ index: idx }) });
             }
             mostrarNotificacao(`✅ ${indices.length} registro(s) excluído(s)!`);
             await carregarPosVendas();
@@ -852,18 +744,9 @@
         async function salvarEdicaoRegistro() {
             const consultor = document.getElementById('editConsultor').value;
             const razaoSocial = document.getElementById('editRazaoSocial').value.trim();
-            
-            if (!consultor || !razaoSocial) {
-                alert('Preencha consultor e razão social!');
-                return;
-            }
-            
+            if (!consultor || !razaoSocial) { alert('Preencha consultor e razão social!'); return; }
             const itemOriginal = dadosPosVenda[indiceEditando];
-            if (!itemOriginal || !itemOriginal.id) {
-                alert('Erro: ID do registro não encontrado!');
-                return;
-            }
-            
+            if (!itemOriginal || !itemOriginal.id) { alert('Erro: ID do registro não encontrado!'); return; }
             const registro = {
                 id: itemOriginal.id,
                 consultor: consultor,
@@ -878,29 +761,17 @@
                 observacao: document.getElementById('editObservacao').value.trim(),
                 preenchido: document.getElementById('editPreenchido').value
             };
-            
             try {
-                const response = await fetch(`${API_URL}/salvar-pos-venda`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ registro, index: indiceEditando })
-                });
-                
+                const response = await fetch(`${API_URL}/salvar-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ registro, index: indiceEditando }) });
                 const data = await response.json();
-                
                 if (data.success) {
-                    mostrarNotificacao('✅ Registro atualizado com sucesso!');
+                    mostrarNotificacao('✅ Registro atualizado!');
                     fecharModalEditarRegistro();
                     await carregarPosVendas();
                     await carregarDashboard();
                     await carregarDados();
-                } else {
-                    alert('❌ Erro ao salvar: ' + (data.message || 'Erro desconhecido'));
-                }
-            } catch (error) {
-                console.error('❌ Erro:', error);
-                alert('❌ Erro ao conectar com o servidor');
-            }
+                } else { alert('❌ Erro ao salvar: ' + (data.message || 'Erro desconhecido')); }
+            } catch (error) { console.error('❌ Erro:', error); alert('❌ Erro ao conectar com o servidor'); }
         }
 
         function abrirModalEditarRegistro(index) {
@@ -966,11 +837,7 @@
             item.vendido = document.getElementById('editVendido').value;
             item.observacoes = document.getElementById('editObsResposta').value;
             try {
-                const response = await fetch(`${API_URL}/salvar-todos-dados`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ dados: dadosAtuais })
-                });
+                const response = await fetch(`${API_URL}/salvar-todos-dados`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dados: dadosAtuais }) });
                 const data = await response.json();
                 if (data.success) {
                     mostrarNotificacao('✅ Resposta atualizada!');
@@ -1080,14 +947,12 @@
                 const respostas = await (await fetch(`${API_URL}/buscar-respostas`)).json();
                 const posVendas = await (await fetch(`${API_URL}/buscar-pos-vendas`)).json();
                 const usuarios = await (await fetch(`${API_URL}/buscar-usuarios`)).json();
-
                 const mesAtual = new Date().getMonth(), anoAtual = new Date().getFullYear();
                 const visitasMensais = respostas.filter(r => {
                     const d = converterDataParaDate(r.data_hora || r.dataHora);
                     return d && d.getMonth() === mesAtual && d.getFullYear() === anoAtual;
                 }).length;
                 document.getElementById('totalVisitas').textContent = visitasMensais;
-
                 const hoje = new Date();
                 const hojeStr = `${hoje.getDate().toString().padStart(2,'0')}/${(hoje.getMonth()+1).toString().padStart(2,'0')}/${hoje.getFullYear()}`;
                 const visitasHoje = respostas.filter(r => {
@@ -1096,17 +961,13 @@
                     return data.includes(',') ? data.split(',')[0] === hojeStr : new Date(data).toLocaleDateString('pt-BR') === hojeStr;
                 }).length;
                 document.getElementById('totalVisitasHoje').textContent = visitasHoje;
-
                 const cnpjsUnicos = new Set();
                 posVendas.forEach(p => { if (p.cnpj && p.cnpj.trim()) cnpjsUnicos.add(p.cnpj); });
                 document.getElementById('totalEmpresasCadastradas').textContent = cnpjsUnicos.size;
-
                 const conformidade = respostas.filter(r => r.pergunta1 === 'SIM').length;
                 document.getElementById('taxaConformidade').textContent = respostas.length ? Math.round((conformidade/respostas.length)*100)+'%' : '0%';
-
                 const consultoresPos = usuarios.filter(u => u.tipo === 'pos' && u.usuario !== 'henrique').map(u => u.nome);
                 const cadastradasPorConsultor = [], visitadasPorConsultor = [], convertidasPorConsultor = [], naoRespondidasPorConsultor = [];
-
                 for (const c of consultoresPos) {
                     const cadastradas = posVendas.filter(p => p.consultor === c).length;
                     const visitadas = respostas.filter(r => r.vendedor === c).length;
@@ -1118,7 +979,6 @@
                 }
                 dadosDesempenhoConvertido = convertidasPorConsultor;
                 atualizarGraficos(consultoresPos, cadastradasPorConsultor, visitadasPorConsultor, naoRespondidasPorConsultor);
-
                 const corpo = document.getElementById('corpoDesempenho');
                 if (!consultoresPos.length) corpo.innerHTML = '<tr><td colspan="4">Nenhum consultor cadastrado</td>';
                 else {
@@ -1160,85 +1020,42 @@
                 this.classList.add('ativo');
                 const tabId = this.getAttribute('data-tab');
                 document.getElementById(tabId).classList.add('ativo');
-                
-                if (tabId === 'posvendas') {
-                    carregarPosVendas();
-                }
-                if (tabId === 'dashboard') {
-                    carregarDashboard();
-                }
-                if (tabId === 'resultado') {
-                    carregarDados();
-                }
+                if (tabId === 'posvendas') { carregarPosVendas(); }
+                if (tabId === 'dashboard') { carregarDashboard(); }
+                if (tabId === 'resultado') { carregarDados(); }
             });
         });
 
-        // ========== FUNÇÕES GERAIS ==========
-        function toggleDropdown() {
-            const d = document.getElementById('dropdownMenu');
-            d.style.display = d.style.display === 'block' ? 'none' : 'block';
-        }
-        function fecharDropdown() { document.getElementById('dropdownMenu').style.display = 'none'; }
-
-        function mostrarNotificacao(mensagem) {
-            let n = document.getElementById('notificacao');
-            if (!n) { n = document.createElement('div'); n.id = 'notificacao'; n.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#48bb78;color:white;padding:10px 20px;border-radius:5px;z-index:9999'; document.body.appendChild(n); }
-            n.textContent = mensagem;
-            n.style.display = 'block';
-            setTimeout(() => n.style.display = 'none', 3000);
-        }
-
-        function logout() {
-            const manter = confirm('Manter dados salvos?');
-            if (!manter) { localStorage.removeItem('loginSalvo'); localStorage.removeItem('senhaSalva'); localStorage.removeItem('manterConectado'); }
-            localStorage.removeItem('userRole'); localStorage.removeItem('userName'); localStorage.removeItem('usuarioLogado');
-            localStorage.removeItem('sessaoAtiva'); localStorage.removeItem('ultimoAcesso');
-            window.location.href = 'login.html';
-        }
-
-        // ========== FUNÇÕES DE IMPORTAÇÃO E MODELO ==========
+        // ========== FUNÇÕES DE IMPORTAÇÃO E DOWNLOAD ==========
         function baixarModeloExcel() {
-            fecharDropdown();
+            console.log('📄 Baixar modelo clicado');
             try {
+                if (typeof XLSX === 'undefined') {
+                    alert('❌ Biblioteca XLSX não carregada. Verifique sua conexão com a internet.');
+                    return;
+                }
                 const modelo = [{ 
-                    'CONSULTOR': '',
-                    'RAZAO SOCIAL': '',
-                    'CNPJ': '',
-                    'CIDADE': '',
-                    'TELEFONE': '',
-                    'RESPONSAVEL': '',
-                    'CONTABILIDADE': '',
-                    'DATA ENTREGUE': '',
-                    'RETORNO': '',
-                    'OBSERVAÇÃO': ''
+                    'CONSULTOR': '', 'RAZAO SOCIAL': '', 'CNPJ': '', 'CIDADE': '', 'TELEFONE': '',
+                    'RESPONSAVEL': '', 'CONTABILIDADE': '', 'DATA ENTREGUE': '', 'RETORNO': '', 'OBSERVAÇÃO': ''
                 }];
-                
                 const ws = XLSX.utils.json_to_sheet(modelo);
-                ws['!cols'] = [
-                    { wch: 20 }, // CONSULTOR
-                    { wch: 30 }, // RAZAO SOCIAL
-                    { wch: 18 }, // CNPJ
-                    { wch: 20 }, // CIDADE
-                    { wch: 15 }, // TELEFONE
-                    { wch: 20 }, // RESPONSAVEL
-                    { wch: 25 }, // CONTABILIDADE
-                    { wch: 15 }, // DATA ENTREGUE
-                    { wch: 15 }, // RETORNO
-                    { wch: 40 }  // OBSERVAÇÃO
-                ];
-                
+                ws['!cols'] = [{ wch: 20 }, { wch: 30 }, { wch: 18 }, { wch: 20 }, { wch: 15 }, { wch: 20 }, { wch: 25 }, { wch: 15 }, { wch: 15 }, { wch: 40 }];
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, 'MODELO_POS_VENDAS');
                 XLSX.writeFile(wb, 'modelo_pos_vendas.xlsx');
                 mostrarNotificacao('📄 Modelo baixado com sucesso!');
             } catch (e) {
                 console.error('Erro ao baixar modelo:', e);
-                alert('Erro ao baixar modelo: ' + e.message);
+                alert('❌ Erro ao baixar modelo: ' + e.message);
             }
         }
 
         function importarExcelPosVenda() {
-            fecharDropdown();
+            console.log('📂 Importar Excel clicado');
+            if (typeof XLSX === 'undefined') {
+                alert('❌ Biblioteca XLSX não carregada. Verifique sua conexão com a internet.');
+                return;
+            }
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = '.xlsx, .xls';
@@ -1248,7 +1065,6 @@
                     mostrarNotificacao('⚠️ Nenhum arquivo selecionado');
                     return;
                 }
-                
                 const reader = new FileReader();
                 reader.onload = async function(e) {
                     try {
@@ -1256,17 +1072,13 @@
                         const workbook = XLSX.read(data, { type: 'array' });
                         const sheet = workbook.Sheets[workbook.SheetNames[0]];
                         const jsonData = XLSX.utils.sheet_to_json(sheet);
-                        
                         console.log('📊 Dados lidos do Excel:', jsonData.length, 'linhas');
-                        
                         if (jsonData.length === 0) {
                             alert('⚠️ O arquivo não contém dados!');
                             return;
                         }
-                        
                         let importados = 0;
                         let erros = [];
-                        
                         function converterData(dataStr) {
                             if (!dataStr) return '';
                             if (typeof dataStr !== 'string') dataStr = String(dataStr);
@@ -1285,24 +1097,12 @@
                             }
                             return '';
                         }
-                        
                         for (let i = 0; i < jsonData.length; i++) {
                             const row = jsonData[i];
-                            
                             const consultor = row['CONSULTOR'] || row['consultor'] || '';
                             const razaoSocial = row['RAZAO SOCIAL'] || row['razao social'] || row['RAZAO_SOCIAL'] || row['Empresa'] || '';
-                            
-                            console.log(`Linha ${i+1}: Consultor="${consultor}", Razao="${razaoSocial}"`);
-                            
-                            if (!consultor) {
-                                erros.push(`Linha ${i+1}: Consultor vazio`);
-                                continue;
-                            }
-                            if (!razaoSocial) {
-                                erros.push(`Linha ${i+1}: Razão Social vazia`);
-                                continue;
-                            }
-                            
+                            if (!consultor) { erros.push(`Linha ${i+1}: Consultor vazio`); continue; }
+                            if (!razaoSocial) { erros.push(`Linha ${i+1}: Razão Social vazia`); continue; }
                             const novoRegistro = {
                                 consultor: consultor,
                                 razaoSocial: razaoSocial,
@@ -1315,7 +1115,6 @@
                                 retorno: converterData(row['RETORNO'] || row['retorno'] || ''),
                                 observacao: row['OBSERVAÇÃO'] || row['observacao'] || row['OBS'] || ''
                             };
-                            
                             try {
                                 const response = await fetch(`${API_URL}/adicionar-pos-venda`, {
                                     method: 'POST',
@@ -1323,29 +1122,20 @@
                                     body: JSON.stringify({ registro: novoRegistro })
                                 });
                                 const result = await response.json();
-                                if (result.success) {
-                                    importados++;
-                                    console.log(`✅ Importado: ${novoRegistro.razaoSocial}`);
-                                } else {
-                                    erros.push(`Linha ${i+1}: ${result.message || 'Erro ao salvar'}`);
-                                }
-                            } catch (err) {
-                                erros.push(`Linha ${i+1}: ${err.message}`);
-                            }
+                                if (result.success) { importados++; }
+                                else { erros.push(`Linha ${i+1}: ${result.message || 'Erro ao salvar'}`); }
+                            } catch (err) { erros.push(`Linha ${i+1}: ${err.message}`); }
                         }
-                        
                         let mensagem = `✅ ${importados} registros importados com sucesso!`;
                         if (erros.length > 0) {
                             mensagem += `\n⚠️ ${erros.length} erros:\n${erros.slice(0, 5).join('\n')}`;
                             if (erros.length > 5) mensagem += `\n... e mais ${erros.length - 5} erros`;
                         }
                         alert(mensagem);
-                        
                         if (importados > 0) {
                             await carregarPosVendas();
                             await carregarDashboard();
                         }
-                        
                     } catch (e) {
                         console.error('❌ Erro ao importar:', e);
                         alert('Erro ao importar: ' + e.message);
@@ -1354,6 +1144,27 @@
                 reader.readAsArrayBuffer(file);
             };
             input.click();
+        }
+
+        // ========== FUNÇÕES GERAIS ==========
+        function toggleDropdown() {
+            const d = document.getElementById('dropdownMenu');
+            d.style.display = d.style.display === 'block' ? 'none' : 'block';
+        }
+        function fecharDropdown() { document.getElementById('dropdownMenu').style.display = 'none'; }
+        function mostrarNotificacao(mensagem) {
+            let n = document.getElementById('notificacao');
+            if (!n) { n = document.createElement('div'); n.id = 'notificacao'; n.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#48bb78;color:white;padding:10px 20px;border-radius:5px;z-index:9999'; document.body.appendChild(n); }
+            n.textContent = mensagem;
+            n.style.display = 'block';
+            setTimeout(() => n.style.display = 'none', 3000);
+        }
+        function logout() {
+            const manter = confirm('Manter dados salvos?');
+            if (!manter) { localStorage.removeItem('loginSalvo'); localStorage.removeItem('senhaSalva'); localStorage.removeItem('manterConectado'); }
+            localStorage.removeItem('userRole'); localStorage.removeItem('userName'); localStorage.removeItem('usuarioLogado');
+            localStorage.removeItem('sessaoAtiva'); localStorage.removeItem('ultimoAcesso');
+            window.location.href = 'login.html';
         }
 
         // ========== EVENT LISTENERS ==========
