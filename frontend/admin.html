@@ -345,7 +345,7 @@
             return null;
         }
 
-        // ========== FUNÇÕES DE PAGINAÇÃO PÓS VENDAS ==========
+        // ========== FUNÇÕES DE PAGINAÇÃO ==========
         function atualizarPaginacaoPV() {
             const dados = dadosPosVendaFiltrados.length ? dadosPosVendaFiltrados : dadosPosVenda;
             const totalPaginas = Math.ceil(dados.length / LINHAS_POR_PAGINA) || 1;
@@ -373,7 +373,6 @@
             if (paginaAtualPV < totalPaginas) { paginaAtualPV++; atualizarPaginacaoPV(); }
         }
 
-        // ========== FUNÇÕES DE PAGINAÇÃO RESULTADO ==========
         function atualizarPaginacaoRES() {
             const dados = dadosAtuaisFiltrados.length ? dadosAtuaisFiltrados : dadosAtuais;
             const totalPaginas = Math.ceil(dados.length / LINHAS_POR_PAGINA) || 1;
@@ -452,7 +451,7 @@
             return new Date(dataStr);
         }
 
-        // ========== FUNÇÕES DE FILTRO PÓS VENDAS ==========
+        // ========== FUNÇÕES DE FILTRO ==========
         function abrirModalFiltroPosVendas() {
             const select = document.getElementById('filtroConsultorPosVendas');
             select.innerHTML = '<option value="">Todos</option>';
@@ -513,52 +512,6 @@
             mostrarNotificacao('🔄 Filtro removido');
         }
 
-        function renderizarTabelaPosVendas(dados) {
-            const tbody = document.getElementById('corpoTabelaPosVendas');
-            if (!dados || !dados.length) {
-                tbody.innerHTML = '<tr><td colspan="12">Nenhum registro encontrado.</td></tr>';
-                return;
-            }
-            tbody.innerHTML = '';
-            dados.forEach((item) => {
-                const indexReal = dadosPosVenda.findIndex(el => el.id === item.id);
-                const idx = indexReal !== -1 ? indexReal : 0;
-                
-                const row = tbody.insertRow();
-                
-                // Se estiver preenchido, fica verde
-                if (item.preenchido === 'SIM') {
-                    row.style.backgroundColor = '#d4edda';
-                }
-                
-                const chkCell = row.insertCell(0);
-                const chk = document.createElement('input');
-                chk.type = 'checkbox';
-                chk.className = 'chk-selecionar-pv';
-                chk.setAttribute('data-index', idx);
-                chk.onclick = function() { verificarSelecionadosPV(); };
-                chkCell.appendChild(chk);
-
-                row.insertCell(1).innerHTML = item.consultor || '-';
-                row.insertCell(2).innerHTML = item.razao_social || item.razaoSocial || '-';
-                row.insertCell(3).innerHTML = item.cnpj || '-';
-                row.insertCell(4).innerHTML = item.cidade || '-';
-                // TELEFONE REMOVIDO - só aparece no modal de edição
-                row.insertCell(5).innerHTML = item.responsavel || '-';
-                row.insertCell(6).innerHTML = item.contabilidade || '-';
-                row.insertCell(7).innerHTML = converterNumeroExcelParaData(item.data_entregue || item.dataEntregue);
-                row.insertCell(8).innerHTML = converterNumeroExcelParaData(item.retorno);
-                row.insertCell(9).innerHTML = item.preenchido || 'NÃO';
-                row.insertCell(10).innerHTML = item.observacao || '-';
-                
-                const actionCell = row.insertCell(11);
-                actionCell.className = 'acoes-botoes';
-                actionCell.innerHTML = `<button onclick="abrirModalEditarRegistro(${idx})" class="btn-editar">✏️</button><button onclick="excluirRegistroPosVenda(${idx})" class="btn-excluir">🗑️</button>`;
-            });
-            verificarSelecionadosPV();
-        }
-
-        // ========== FUNÇÕES DE FILTRO RESULTADO ==========
         function abrirModalFiltroResultado() {
             const select = document.getElementById('filtroConsultorResultado');
             select.innerHTML = '<option value="">Todos</option>';
@@ -631,6 +584,50 @@
             mostrarNotificacao('🔄 Filtro removido');
         }
 
+        // ========== RENDERIZAR TABELAS ==========
+        function renderizarTabelaPosVendas(dados) {
+            const tbody = document.getElementById('corpoTabelaPosVendas');
+            if (!dados || !dados.length) {
+                tbody.innerHTML = '<tr><td colspan="12">Nenhum registro encontrado.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = '';
+            dados.forEach((item) => {
+                const indexReal = dadosPosVenda.findIndex(el => el.id === item.id);
+                const idx = indexReal !== -1 ? indexReal : 0;
+                
+                const row = tbody.insertRow();
+                
+                if (item.preenchido === 'SIM') {
+                    row.style.backgroundColor = '#d4edda';
+                }
+                
+                const chkCell = row.insertCell(0);
+                const chk = document.createElement('input');
+                chk.type = 'checkbox';
+                chk.className = 'chk-selecionar-pv';
+                chk.setAttribute('data-index', idx);
+                chk.onclick = function() { verificarSelecionadosPV(); };
+                chkCell.appendChild(chk);
+
+                row.insertCell(1).innerHTML = item.consultor || '-';
+                row.insertCell(2).innerHTML = item.razao_social || item.razaoSocial || '-';
+                row.insertCell(3).innerHTML = item.cnpj || '-';
+                row.insertCell(4).innerHTML = item.cidade || '-';
+                row.insertCell(5).innerHTML = item.responsavel || '-';
+                row.insertCell(6).innerHTML = item.contabilidade || '-';
+                row.insertCell(7).innerHTML = converterNumeroExcelParaData(item.data_entregue || item.dataEntregue);
+                row.insertCell(8).innerHTML = converterNumeroExcelParaData(item.retorno);
+                row.insertCell(9).innerHTML = item.preenchido || 'NÃO';
+                row.insertCell(10).innerHTML = item.observacao || '-';
+                
+                const actionCell = row.insertCell(11);
+                actionCell.className = 'acoes-botoes';
+                actionCell.innerHTML = `<button onclick="abrirModalEditarRegistro(${idx})" class="btn-editar">✏️</button><button onclick="excluirRegistroPosVenda(${idx})" class="btn-excluir">🗑️</button>`;
+            });
+            verificarSelecionadosPV();
+        }
+
         function renderizarTabelaResultado(dados) {
             const tbody = document.getElementById('corpoTabela');
             if (!dados.length) {
@@ -671,7 +668,7 @@
             verificarSelecionadosRES();
         }
 
-        // ========== SELEÇÃO E EXPORTAÇÃO RESULTADO ==========
+        // ========== SELEÇÃO E EXPORTAÇÃO ==========
         function verificarSelecionadosRES() {
             const checkboxes = document.querySelectorAll('.chk-selecionar-res');
             const selecionados = Array.from(checkboxes).filter(chk => chk.checked);
@@ -696,6 +693,31 @@
             const checkboxes = document.querySelectorAll('.chk-selecionar-res');
             checkboxes.forEach(chk => chk.checked = chkTodos.checked);
             verificarSelecionadosRES();
+        }
+
+        function verificarSelecionadosPV() {
+            const checkboxes = document.querySelectorAll('.chk-selecionar-pv');
+            const selecionados = Array.from(checkboxes).filter(chk => chk.checked);
+            const btnExcluir = document.getElementById('btnExcluirSelecionadosPV');
+            const chkTodos = document.getElementById('chkSelecionarTodosPV');
+            if (selecionados.length > 0) {
+                btnExcluir.style.display = 'inline-block';
+                btnExcluir.textContent = `🗑️ Excluir Selecionados (${selecionados.length})`;
+            } else {
+                btnExcluir.style.display = 'none';
+            }
+            if (chkTodos) {
+                const todosCheckboxes = document.querySelectorAll('.chk-selecionar-pv');
+                const todosMarcados = todosCheckboxes.length > 0 && Array.from(todosCheckboxes).every(chk => chk.checked);
+                chkTodos.checked = todosMarcados;
+            }
+        }
+
+        function selecionarTodosPV() {
+            const chkTodos = document.getElementById('chkSelecionarTodosPV');
+            const checkboxes = document.querySelectorAll('.chk-selecionar-pv');
+            checkboxes.forEach(chk => chk.checked = chkTodos.checked);
+            verificarSelecionadosPV();
         }
 
         // ========== EXPORTAR ==========
@@ -760,7 +782,7 @@
             mostrarNotificacao(`✅ ${dadosParaExportar.length} registros exportados com sucesso!`);
         }
 
-        // ========== EXCLUSÃO EM MASSA RESULTADO ==========
+        // ========== EXCLUSÃO EM MASSA ==========
         async function excluirSelecionadosRES() {
             const checkboxes = document.querySelectorAll('.chk-selecionar-res:checked');
             const indices = Array.from(checkboxes).map(chk => parseInt(chk.getAttribute('data-index')));
@@ -780,32 +802,6 @@
                 await carregarDados();
                 await carregarDashboard();
             } else { alert('❌ Erro ao excluir'); }
-        }
-
-        // ========== SELEÇÃO E EXCLUSÃO PÓS VENDAS ==========
-        function verificarSelecionadosPV() {
-            const checkboxes = document.querySelectorAll('.chk-selecionar-pv');
-            const selecionados = Array.from(checkboxes).filter(chk => chk.checked);
-            const btnExcluir = document.getElementById('btnExcluirSelecionadosPV');
-            const chkTodos = document.getElementById('chkSelecionarTodosPV');
-            if (selecionados.length > 0) {
-                btnExcluir.style.display = 'inline-block';
-                btnExcluir.textContent = `🗑️ Excluir Selecionados (${selecionados.length})`;
-            } else {
-                btnExcluir.style.display = 'none';
-            }
-            if (chkTodos) {
-                const todosCheckboxes = document.querySelectorAll('.chk-selecionar-pv');
-                const todosMarcados = todosCheckboxes.length > 0 && Array.from(todosCheckboxes).every(chk => chk.checked);
-                chkTodos.checked = todosMarcados;
-            }
-        }
-
-        function selecionarTodosPV() {
-            const chkTodos = document.getElementById('chkSelecionarTodosPV');
-            const checkboxes = document.querySelectorAll('.chk-selecionar-pv');
-            checkboxes.forEach(chk => chk.checked = chkTodos.checked);
-            verificarSelecionadosPV();
         }
 
         async function excluirSelecionadosPV() {
@@ -853,7 +849,6 @@
             else alert('❌ Erro ao adicionar');
         }
 
-        // ========== FUNÇÃO SALVAR EDIÇÃO ==========
         async function salvarEdicaoRegistro() {
             const consultor = document.getElementById('editConsultor').value;
             const razaoSocial = document.getElementById('editRazaoSocial').value.trim();
@@ -1017,14 +1012,12 @@
                 const response = await fetch(`${API_URL}/buscar-pos-vendas`);
                 dadosPosVenda = await response.json();
                 console.log('📊 Pós Vendas recarregado:', dadosPosVenda.length);
-                // Salvar cache
                 salvarCachePosVendas(dadosPosVenda);
                 dadosPosVendaFiltrados = [];
                 paginaAtualPV = 1;
                 atualizarPaginacaoPV();
             } catch(e) {
                 console.error('❌ Erro ao carregar Pós Vendas:', e);
-                // Tenta carregar do cache
                 const cache = carregarCachePosVendas();
                 if (cache) {
                     dadosPosVenda = cache;
@@ -1042,7 +1035,6 @@
             try {
                 const response = await fetch(`${API_URL}/buscar-respostas`);
                 dadosAtuais = await response.json();
-                // Salvar cache
                 salvarCacheRespostas(dadosAtuais);
                 dadosAtuaisFiltrados = [];
                 paginaAtualRES = 1;
@@ -1051,7 +1043,6 @@
                 await carregarConsultores();
             } catch(e) {
                 console.error('❌ Erro ao carregar Respostas:', e);
-                // Tenta carregar do cache
                 const cache = carregarCacheRespostas();
                 if (cache) {
                     dadosAtuais = cache;
@@ -1203,6 +1194,166 @@
             localStorage.removeItem('userRole'); localStorage.removeItem('userName'); localStorage.removeItem('usuarioLogado');
             localStorage.removeItem('sessaoAtiva'); localStorage.removeItem('ultimoAcesso');
             window.location.href = 'login.html';
+        }
+
+        // ========== FUNÇÕES DE IMPORTAÇÃO E MODELO ==========
+        function baixarModeloExcel() {
+            fecharDropdown();
+            try {
+                const modelo = [{ 
+                    'CONSULTOR': '',
+                    'RAZAO SOCIAL': '',
+                    'CNPJ': '',
+                    'CIDADE': '',
+                    'TELEFONE': '',
+                    'RESPONSAVEL': '',
+                    'CONTABILIDADE': '',
+                    'DATA ENTREGUE': '',
+                    'RETORNO': '',
+                    'OBSERVAÇÃO': ''
+                }];
+                
+                const ws = XLSX.utils.json_to_sheet(modelo);
+                ws['!cols'] = [
+                    { wch: 20 }, // CONSULTOR
+                    { wch: 30 }, // RAZAO SOCIAL
+                    { wch: 18 }, // CNPJ
+                    { wch: 20 }, // CIDADE
+                    { wch: 15 }, // TELEFONE
+                    { wch: 20 }, // RESPONSAVEL
+                    { wch: 25 }, // CONTABILIDADE
+                    { wch: 15 }, // DATA ENTREGUE
+                    { wch: 15 }, // RETORNO
+                    { wch: 40 }  // OBSERVAÇÃO
+                ];
+                
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'MODELO_POS_VENDAS');
+                XLSX.writeFile(wb, 'modelo_pos_vendas.xlsx');
+                mostrarNotificacao('📄 Modelo baixado com sucesso!');
+            } catch (e) {
+                console.error('Erro ao baixar modelo:', e);
+                alert('Erro ao baixar modelo: ' + e.message);
+            }
+        }
+
+        function importarExcelPosVenda() {
+            fecharDropdown();
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.xlsx, .xls';
+            input.onchange = async function(e) {
+                const file = e.target.files[0];
+                if (!file) {
+                    mostrarNotificacao('⚠️ Nenhum arquivo selecionado');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(sheet);
+                        
+                        console.log('📊 Dados lidos do Excel:', jsonData.length, 'linhas');
+                        
+                        if (jsonData.length === 0) {
+                            alert('⚠️ O arquivo não contém dados!');
+                            return;
+                        }
+                        
+                        let importados = 0;
+                        let erros = [];
+                        
+                        function converterData(dataStr) {
+                            if (!dataStr) return '';
+                            if (typeof dataStr !== 'string') dataStr = String(dataStr);
+                            if (dataStr.match(/^\d{4}-\d{2}-\d{2}$/)) return dataStr;
+                            if (dataStr.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                                const partes = dataStr.split('/');
+                                return `${partes[2]}-${partes[1]}-${partes[0]}`;
+                            }
+                            if (dataStr.includes(' ')) {
+                                const dataParte = dataStr.split(' ')[0];
+                                if (dataParte.match(/^\d{4}-\d{2}-\d{2}$/)) return dataParte;
+                            }
+                            if (/^\d+$/.test(dataStr) && dataStr.length > 4) {
+                                const date = new Date((parseInt(dataStr) - 25569) * 86400000);
+                                return date.toISOString().split('T')[0];
+                            }
+                            return '';
+                        }
+                        
+                        for (let i = 0; i < jsonData.length; i++) {
+                            const row = jsonData[i];
+                            
+                            const consultor = row['CONSULTOR'] || row['consultor'] || '';
+                            const razaoSocial = row['RAZAO SOCIAL'] || row['razao social'] || row['RAZAO_SOCIAL'] || row['Empresa'] || '';
+                            
+                            console.log(`Linha ${i+1}: Consultor="${consultor}", Razao="${razaoSocial}"`);
+                            
+                            if (!consultor) {
+                                erros.push(`Linha ${i+1}: Consultor vazio`);
+                                continue;
+                            }
+                            if (!razaoSocial) {
+                                erros.push(`Linha ${i+1}: Razão Social vazia`);
+                                continue;
+                            }
+                            
+                            const novoRegistro = {
+                                consultor: consultor,
+                                razaoSocial: razaoSocial,
+                                cnpj: row['CNPJ'] || row['cnpj'] || '',
+                                cidade: row['CIDADE'] || row['cidade'] || '',
+                                telefone: row['TELEFONE'] || row['telefone'] || '',
+                                responsavel: row['RESPONSAVEL'] || row['responsavel'] || '',
+                                contabilidade: row['CONTABILIDADE'] || row['contabilidade'] || '',
+                                dataEntregue: converterData(row['DATA ENTREGUE'] || row['data entregue'] || ''),
+                                retorno: converterData(row['RETORNO'] || row['retorno'] || ''),
+                                observacao: row['OBSERVAÇÃO'] || row['observacao'] || row['OBS'] || ''
+                            };
+                            
+                            try {
+                                const response = await fetch(`${API_URL}/adicionar-pos-venda`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ registro: novoRegistro })
+                                });
+                                const result = await response.json();
+                                if (result.success) {
+                                    importados++;
+                                    console.log(`✅ Importado: ${novoRegistro.razaoSocial}`);
+                                } else {
+                                    erros.push(`Linha ${i+1}: ${result.message || 'Erro ao salvar'}`);
+                                }
+                            } catch (err) {
+                                erros.push(`Linha ${i+1}: ${err.message}`);
+                            }
+                        }
+                        
+                        let mensagem = `✅ ${importados} registros importados com sucesso!`;
+                        if (erros.length > 0) {
+                            mensagem += `\n⚠️ ${erros.length} erros:\n${erros.slice(0, 5).join('\n')}`;
+                            if (erros.length > 5) mensagem += `\n... e mais ${erros.length - 5} erros`;
+                        }
+                        alert(mensagem);
+                        
+                        if (importados > 0) {
+                            await carregarPosVendas();
+                            await carregarDashboard();
+                        }
+                        
+                    } catch (e) {
+                        console.error('❌ Erro ao importar:', e);
+                        alert('Erro ao importar: ' + e.message);
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            };
+            input.click();
         }
 
         // ========== EVENT LISTENERS ==========
