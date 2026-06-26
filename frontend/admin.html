@@ -514,79 +514,66 @@
         return;
     }
     tbody.innerHTML = '';
-    dados.forEach((item) => {
-        const id = item.id || item._id;
+    
+    dados.forEach((item, index) => {
         const row = tbody.insertRow();
         
-        // ⬇️⬇️⬇️ COLOQUE A LINHA VERDE AQUI ⬇️⬇️⬇️
-        if (item.preenchido === 'SIM') {
-            row.style.backgroundColor = '#d4edda';
+        // Acessa o índice real no array original
+        const idx = dadosPosVenda.findIndex(el => el.id === item.id);
+        const realIndex = idx !== -1 ? idx : index;
+        
+        // Estilo para registros preenchidos
+        if (item.preenchido === 'SIM') { 
+            row.style.backgroundColor = '#d4edda'; 
         }
-        // ⬆️⬆️⬆️ FIM DA LINHA VERDE ⬆️⬆️⬆️
         
-        // Checkbox
-        const chkCell = row.insertCell(0);
-        const chk = document.createElement('input');
-        chk.type = 'checkbox';
-        chk.className = 'chk-selecionar-pv';
-        chk.setAttribute('data-id', id);
-        chk.onclick = function() { verificarSelecionadosPV(); };
-        chkCell.appendChild(chk);
-        
-        row.insertCell(1).innerHTML = item.consultor || '-';
-        row.insertCell(2).innerHTML = item.razao_social || item.razaoSocial || '-';
-        row.insertCell(3).innerHTML = item.cnpj || '-';
-        row.insertCell(4).innerHTML = item.cidade || '-';
-        row.insertCell(5).innerHTML = item.responsavel || '-';
-        row.insertCell(6).innerHTML = item.contabilidade || '-';
-        row.insertCell(7).innerHTML = converterNumeroExcelParaData(item.data_entregue || item.dataEntregue);
-        row.insertCell(8).innerHTML = converterNumeroExcelParaData(item.retorno);
-        row.insertCell(10).innerHTML = item.observacao || '-';
-        
-        const actionCell = row.insertCell(11);
-        actionCell.className = 'acoes-botoes';
-        actionCell.innerHTML = `<button onclick="abrirModalEditarRegistro('${id}')" class="btn-editar">✏️</button><button onclick="excluirRegistroPosVenda('${id}')" class="btn-excluir">🗑️</button>`;
-    });
-    verificarSelecionadosPV();
-}
-
-        function renderizarTabelaResultado(dados) {
-            const tbody = document.getElementById('corpoTabela');
-            if (!dados.length) {
-                tbody.innerHTML = '<tr><td colspan="16">Nenhuma resposta encontrada.</td></tr>';
-                return;
-            }
-            tbody.innerHTML = '';
-            dados.forEach((item) => {
-                const indexReal = dadosAtuais.indexOf(item);
-                const row = tbody.insertRow();
-                const chkCell = row.insertCell(0);
+        // Criar todas as colunas explicitamente
+        const colunas = [
+            () => { // Checkbox
                 const chk = document.createElement('input');
                 chk.type = 'checkbox';
-                chk.className = 'chk-selecionar-res';
-                chk.setAttribute('data-index', indexReal);
-                chk.onclick = function() { verificarSelecionadosRES(); };
-                chkCell.appendChild(chk);
-                row.insertCell(1).innerHTML = item.data_hora || item.dataHora || '-';
-                row.insertCell(2).innerHTML = item.vendedor || '-';
-                row.insertCell(3).innerHTML = item.cnpj || '-';
-                row.insertCell(4).innerHTML = item.empresa || '-';
-                row.insertCell(5).innerHTML = 'SIM';
-                row.insertCell(6).innerHTML = item.pergunta9 || '-';
-                row.insertCell(7).innerHTML = item.pergunta7 || '-';
-                row.insertCell(8).innerHTML = item.pergunta8 || '-';
-                row.insertCell(9).innerHTML = item.pergunta3 || '-';
-                row.insertCell(10).innerHTML = item.pergunta4 || '-';
-                row.insertCell(11).innerHTML = item.nota_visita || item.notaVisita || '-';
-                row.insertCell(12).innerHTML = item.vendedor_nome || item.vendedorNome || '-';
-                row.insertCell(13).innerHTML = item.vendido || '-';
-                row.insertCell(14).innerHTML = item.observacoes || '-';
-                const actionCell = row.insertCell(15);
-                actionCell.className = 'acoes-botoes';
-                actionCell.innerHTML = `<button onclick="abrirModalEditarResposta(${indexReal})" class="btn-editar">✏️</button><button onclick="excluirResposta(${indexReal})" class="btn-excluir">🗑️</button>`;
-            });
-            verificarSelecionadosRES();
-        }
+                chk.className = 'chk-selecionar-pv';
+                chk.setAttribute('data-index', realIndex);
+                chk.onclick = function() { verificarSelecionadosPV(); };
+                return chk;
+            },
+            () => item.consultor || '-',
+            () => item.razao_social || item.razaoSocial || '-',
+            () => item.cnpj || '-',
+            () => item.cidade || '-',
+            () => item.responsavel || '-',
+            () => item.contabilidade || '-',
+            () => converterNumeroExcelParaData(item.data_entregue || item.dataEntregue),
+            () => converterNumeroExcelParaData(item.retorno),
+            () => item.preenchido || 'NÃO',
+            () => item.observacao || '-',
+            () => { // Ações
+                const div = document.createElement('div');
+                div.className = 'acoes-botoes';
+                div.innerHTML = `
+                    <button onclick="abrirModalEditarRegistro(${realIndex})" class="btn-editar">✏️</button>
+                    <button onclick="excluirRegistroPosVenda(${realIndex})" class="btn-excluir">🗑️</button>
+                `;
+                return div;
+            }
+        ];
+        
+        // Inserir cada coluna
+        colunas.forEach((conteudo, i) => {
+            const cell = row.insertCell(i);
+            const valor = conteudo();
+            if (typeof valor === 'string') {
+                cell.innerHTML = valor;
+            } else if (valor instanceof HTMLElement) {
+                cell.appendChild(valor);
+            } else {
+                cell.innerHTML = String(valor);
+            }
+        });
+    });
+    
+    verificarSelecionadosPV();
+}
 
         // ==================== SELEÇÃO E EXPORTAÇÃO ====================
         function verificarSelecionadosRES() {
