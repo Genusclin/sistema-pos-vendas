@@ -576,6 +576,75 @@
 }
 
         // ==================== SELEÇÃO E EXPORTAÇÃO ====================
+        function renderizarTabelaResultado(dados) {
+            const tbody = document.getElementById('corpoTabela');
+            if (!tbody) return;
+
+            if (!dados || !dados.length) {
+                tbody.innerHTML = '<tr><td colspan="16">Nenhuma resposta encontrada.</td></tr>';
+                verificarSelecionadosRES();
+                return;
+            }
+
+            tbody.innerHTML = '';
+
+            dados.forEach((item, index) => {
+                const row = tbody.insertRow();
+                const idx = typeof item.id !== 'undefined' && item.id !== null
+                    ? dadosAtuais.findIndex(el => el.id === item.id)
+                    : index;
+                const realIndex = idx !== -1 ? idx : index;
+
+                const colunas = [
+                    () => {
+                        const chk = document.createElement('input');
+                        chk.type = 'checkbox';
+                        chk.className = 'chk-selecionar-res';
+                        chk.setAttribute('data-index', realIndex);
+                        chk.onclick = verificarSelecionadosRES;
+                        return chk;
+                    },
+                    () => item.data_hora || item.dataHora || '-',
+                    () => item.vendedor || '-',
+                    () => item.cnpj || '-',
+                    () => item.empresa || '-',
+                    () => item.pos_venda || item.posVenda || item.vendido || '-',
+                    () => item.pergunta9 || '-',
+                    () => item.pergunta7 || '-',
+                    () => item.pergunta8 || '-',
+                    () => item.pergunta3 || '-',
+                    () => item.pergunta4 || '-',
+                    () => item.nota_visita || item.notaVisita || '-',
+                    () => item.vendedor_nome || item.vendedorNome || '-',
+                    () => item.vendido || '-',
+                    () => item.observacoes || '-',
+                    () => {
+                        const div = document.createElement('div');
+                        div.className = 'acoes-botoes';
+                        div.innerHTML = `
+                            <button onclick="abrirModalEditarResposta(${realIndex})" class="btn-editar">✏️</button>
+                            <button onclick="excluirResposta(${realIndex})" class="btn-excluir">🗑️</button>
+                        `;
+                        return div;
+                    }
+                ];
+
+                colunas.forEach((conteudo, i) => {
+                    const cell = row.insertCell(i);
+                    const valor = conteudo();
+                    if (typeof valor === 'string') {
+                        cell.innerHTML = valor;
+                    } else if (valor instanceof HTMLElement) {
+                        cell.appendChild(valor);
+                    } else {
+                        cell.innerHTML = String(valor);
+                    }
+                });
+            });
+
+            verificarSelecionadosRES();
+        }
+
         function verificarSelecionadosRES() {
             const checkboxes = document.querySelectorAll('.chk-selecionar-res');
             const selecionados = Array.from(checkboxes).filter(chk => chk.checked);
