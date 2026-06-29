@@ -83,13 +83,15 @@
                             <thead>
                                 <tr>
                                     <th style="width: 30px;"><input type="checkbox" id="chkSelecionarTodosPV" onclick="selecionarTodosPV()"></th>
-                                    <th>MÊS</th>
                                     <th>CONSULTOR</th>
+                                    <th>MÊS</th>
                                     <th>RAZAO SOCIAL</th>
                                     <th>CNPJ</th>
                                     <th>CIDADE</th>
+                                    <th>TELEFONE</th>
                                     <th>RESPONSAVEL</th>
                                     <th>CONTABILIDADE</th>
+                                    <th>MÊS VIGÊNCIA</th>
                                     <th>DATA ENTREGUE</th>
                                     <th>RETORNO</th>
                                     <th>OBSERVAÇÃO</th>
@@ -97,7 +99,7 @@
                                 </tr>
                             </thead>
                             <tbody id="corpoTabelaPosVendas">
-                                <tr><td colspan="11">Carregando dados...</td></tr>
+                                <tr><td colspan="14">Carregando dados...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -174,6 +176,7 @@
             <div class="modal-body">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <div class="input-group"><label>MÊS:</label><select id="filtroMesPosVendas"><option value="">Todos</option><option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option><option value="Março">Março</option><option value="Abril">Abril</option><option value="Maio">Maio</option><option value="Junho">Junho</option><option value="Julho">Julho</option><option value="Agosto">Agosto</option><option value="Setembro">Setembro</option><option value="Outubro">Outubro</option><option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option></select></div>
+                    <div class="input-group"><label>MÊS VIGÊNCIA:</label><select id="filtroMesVigenciaPosVendas"><option value="">Todos</option><option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option><option value="Março">Março</option><option value="Abril">Abril</option><option value="Maio">Maio</option><option value="Junho">Junho</option><option value="Julho">Julho</option><option value="Agosto">Agosto</option><option value="Setembro">Setembro</option><option value="Outubro">Outubro</option><option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option></select></div>
                     <div class="input-group"><label>CONSULTOR:</label><select id="filtroConsultorPosVendas"><option value="">Todos</option></select></div>
                     <div class="input-group"><label>RAZAO SOCIAL:</label><input type="text" id="filtroRazaoPosVendas" placeholder="Digite para filtrar..."></div>
                     <div class="input-group"><label>CNPJ:</label><input type="text" id="filtroCnpjPosVendas" placeholder="Digite para filtrar..."></div>
@@ -230,6 +233,8 @@
         <div class="modal-body"><div class="form-cadastro-modal">
             <div class="input-group"><label>MÊS:</label><select id="modalMes"><option value="">Selecione...</option><option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option><option value="Março">Março</option><option value="Abril">Abril</option><option value="Maio">Maio</option><option value="Junho">Junho</option><option value="Julho">Julho</option><option value="Agosto">Agosto</option><option value="Setembro">Setembro</option><option value="Outubro">Outubro</option><option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option></select></div>
             <div class="input-group"><label>CONSULTOR:</label><select id="modalConsultor"></select></div>
+            <div class="input-group"><label>MÊS:</label><select id="modalMes"><option value="">Selecione...</option><option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option><option value="Março">Março</option><option value="Abril">Abril</option><option value="Maio">Maio</option><option value="Junho">Junho</option><option value="Julho">Julho</option><option value="Agosto">Agosto</option><option value="Setembro">Setembro</option><option value="Outubro">Outubro</option><option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option></select></div>
+            <div class="input-group"><label>MÊS VIGÊNCIA:</label><select id="modalMesVigencia"><option value="">Selecione...</option><option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option><option value="Março">Março</option><option value="Abril">Abril</option><option value="Maio">Maio</option><option value="Junho">Junho</option><option value="Julho">Julho</option><option value="Agosto">Agosto</option><option value="Setembro">Setembro</option><option value="Outubro">Outubro</option><option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option></select></div>
             <div class="input-group"><label>RAZÃO SOCIAL:</label><input type="text" id="modalRazaoSocial"></div>
             <div class="input-group"><label>CNPJ:</label><input type="text" id="modalCnpj"></div>
             <div class="input-group"><label>CIDADE:</label><input type="text" id="modalCidade"></div>
@@ -248,6 +253,8 @@
         <div class="modal-body"><div class="form-cadastro-modal">
             <div class="input-group"><label>MÊS:</label><select id="editMes"><option value="">Selecione...</option><option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option><option value="Março">Março</option><option value="Abril">Abril</option><option value="Maio">Maio</option><option value="Junho">Junho</option><option value="Julho">Julho</option><option value="Agosto">Agosto</option><option value="Setembro">Setembro</option><option value="Outubro">Outubro</option><option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option></select></div>
             <div class="input-group"><label>CONSULTOR:</label><select id="editConsultor"></select></div>
+            <div class="input-group"><label>MÊS:</label><select id="editMes"><option value="">Selecione...</option><option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option><option value="Março">Março</option><option value="Abril">Abril</option><option value="Maio">Maio</option><option value="Junho">Junho</option><option value="Julho">Julho</option><option value="Agosto">Agosto</option><option value="Setembro">Setembro</option><option value="Outubro">Outubro</option><option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option></select></div>
+            <div class="input-group"><label>MÊS VIGÊNCIA:</label><select id="editMesVigencia"><option value="">Selecione...</option><option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option><option value="Março">Março</option><option value="Abril">Abril</option><option value="Maio">Maio</option><option value="Junho">Junho</option><option value="Julho">Julho</option><option value="Agosto">Agosto</option><option value="Setembro">Setembro</option><option value="Outubro">Outubro</option><option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option></select></div>
             <div class="input-group"><label>RAZÃO SOCIAL:</label><input type="text" id="editRazaoSocial"></div>
             <div class="input-group"><label>CNPJ:</label><input type="text" id="editCnpj"></div>
             <div class="input-group"><label>CIDADE:</label><input type="text" id="editCidade"></div>
@@ -445,6 +452,7 @@
         function aplicarFiltroPosVendas() {
             const consultor = document.getElementById('filtroConsultorPosVendas').value;
             const mes = normalizarMes(document.getElementById('filtroMesPosVendas').value);
+            const mesVigencia = normalizarMes(document.getElementById('filtroMesVigenciaPosVendas').value);
             const razao = document.getElementById('filtroRazaoPosVendas').value.toLowerCase();
             const cnpj = document.getElementById('filtroCnpjPosVendas').value.toLowerCase();
             const cidade = document.getElementById('filtroCidadePosVendas').value.toLowerCase();
@@ -455,7 +463,9 @@
             dadosPosVendaFiltrados = dadosPosVenda.filter(item => {
                 let match = true;
                 const itemMes = normalizarMes(item.mes || item.mês || item.month || '');
+                const itemMesVigencia = normalizarMes(item.mes_vigencia || item.mesVigencia || item['mes vigencia'] || item['MÊS VIGÊNCIA'] || '');
                 if (mes && itemMes !== mes) match = false;
+                if (mesVigencia && itemMesVigencia !== mesVigencia) match = false;
                 if (consultor && item.consultor !== consultor) match = false;
                 if (razao && !(item.razao_social || item.razaoSocial || '').toLowerCase().includes(razao)) match = false;
                 if (cnpj && !(item.cnpj || '').toLowerCase().includes(cnpj)) match = false;
@@ -472,7 +482,7 @@
             mostrarNotificacao(`✅ Filtro aplicado: ${dadosPosVendaFiltrados.length} registros`);
         }
         function limparFiltroPosVendas() {
-            ['filtroMesPosVendas','filtroConsultorPosVendas','filtroRazaoPosVendas','filtroCnpjPosVendas','filtroCidadePosVendas','filtroContabilidadePosVendas','filtroDataEntreguePosVendas','filtroRetornoPosVendas','filtroPreenchidoPosVendas'].forEach(id => document.getElementById(id).value = '');
+            ['filtroMesPosVendas','filtroMesVigenciaPosVendas','filtroConsultorPosVendas','filtroRazaoPosVendas','filtroCnpjPosVendas','filtroCidadePosVendas','filtroContabilidadePosVendas','filtroDataEntreguePosVendas','filtroRetornoPosVendas','filtroPreenchidoPosVendas'].forEach(id => document.getElementById(id).value = '');
             dadosPosVendaFiltrados = [];
             paginaAtualPV = 1;
             atualizarPaginacaoPV();
@@ -536,7 +546,7 @@
         function renderizarTabelaPosVendas(dados) {
     const tbody = document.getElementById('corpoTabelaPosVendas');
     if (!dados || !dados.length) {
-        tbody.innerHTML = '<tr><td colspan="13">Nenhum registro encontrado.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="14">Nenhum registro encontrado.</td></tr>';
         return;
     }
     tbody.innerHTML = '';
@@ -563,16 +573,17 @@
                 chk.onclick = function() { verificarSelecionadosPV(); };
                 return chk;
             },
-            () => normalizarMes(item.mes || item.mês || item.month || '') || '-',
             () => item.consultor || '-',
+            () => normalizarMes(item.mes || item.mês || item.month || '') || '-',
             () => item.razao_social || item.razaoSocial || '-',
             () => item.cnpj || '-',
             () => item.cidade || '-',
+            () => item.telefone || '-',
             () => item.responsavel || '-',
             () => item.contabilidade || '-',
+            () => normalizarMes(item.mes_vigencia || item.mesVigencia || item['mes vigencia'] || item['MÊS VIGÊNCIA'] || '') || '-',
             () => converterNumeroExcelParaData(item.data_entregue || item.dataEntregue),
             () => converterNumeroExcelParaData(item.retorno),
-            () => item.preenchido || 'NÃO',
             () => item.observacao || '-',
             () => { // Ações
                 const div = document.createElement('div');
@@ -804,7 +815,7 @@
 
         // ==================== FUNÇÕES DE MODAIS ====================
         function abrirModalNovoRegistro() {
-            ['modalMes','modalConsultor','modalRazaoSocial','modalCnpj','modalCidade','modalTelefone','modalResponsavel','modalContabilidade','modalDataEntregue','modalRetorno','modalObservacao'].forEach(id => document.getElementById(id).value = '');
+            ['modalMes','modalMesVigencia','modalConsultor','modalRazaoSocial','modalCnpj','modalCidade','modalTelefone','modalResponsavel','modalContabilidade','modalDataEntregue','modalRetorno','modalObservacao'].forEach(id => document.getElementById(id).value = '');
             document.getElementById('modalNovoRegistro').style.display = 'flex';
         }
         function fecharModalNovoRegistro() { document.getElementById('modalNovoRegistro').style.display = 'none'; }
@@ -869,6 +880,8 @@
             const item = dadosPosVenda[index];
             document.getElementById('editMes').value = normalizarMes(item.mes || item.mês || item.month || '');
             document.getElementById('editConsultor').value = item.consultor || '';
+            document.getElementById('editMes').value = normalizarMes(item.mes || item.mês || item.month || '');
+            document.getElementById('editMesVigencia').value = normalizarMes(item.mes_vigencia || item.mesVigencia || item['mes vigencia'] || item['MÊS VIGÊNCIA'] || '');
             document.getElementById('editRazaoSocial').value = item.razao_social || item.razaoSocial || '';
             document.getElementById('editCnpj').value = item.cnpj || '';
             document.getElementById('editCidade').value = item.cidade || '';
