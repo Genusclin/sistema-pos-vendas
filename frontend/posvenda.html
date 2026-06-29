@@ -34,7 +34,12 @@
             <!-- ABA 1: MINHAS PÓS VENDAS -->
             <div id="minhas-posvendas" class="tab-content ativo">
                 <div class="tabela-container">
-                    <h3>📋 Registros de Pós Vendas - Consultor: <span id="consultorNome"></span></h3>
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+                        <h3 style="margin:0;">📋 Registros de Pós Vendas - Consultor: <span id="consultorNome"></span></h3>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <button onclick="abrirModalFiltroMinhasPosVendas()" class="btn-filtro">🔍 Filtrar</button>
+                        </div>
+                    </div>
                     <div style="overflow-x: auto;">
                         <table id="tabelaMinhasPosVendas">
                             <thead>
@@ -190,8 +195,104 @@
         </div>
     </div>
 
+            <!-- MODAL FILTRO MINHAS PÓS VENDAS -->
+            <div id="modalFiltroMinhasPosVendas" class="modal">
+                <div class="modal-content" style="max-width:600px;">
+                    <div class="modal-header"><h3>🔍 Filtrar Minhas Pós Vendas</h3><span class="modal-fechar" onclick="fecharModalFiltroMinhasPosVendas()">&times;</span></div>
+                    <div class="modal-body">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                            <div class="input-group"><label>MÊS:</label><select id="filtroMesMinhasPosVendas"><option value="">Todos</option><option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option><option value="Março">Março</option><option value="Abril">Abril</option><option value="Maio">Maio</option><option value="Junho">Junho</option><option value="Julho">Julho</option><option value="Agosto">Agosto</option><option value="Setembro">Setembro</option><option value="Outubro">Outubro</option><option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option></select></div>
+                            <div class="input-group"><label>MÊS VIGÊNCIA:</label><select id="filtroMesVigenciaMinhasPosVendas"><option value="">Todos</option><option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option><option value="Março">Março</option><option value="Abril">Abril</option><option value="Maio">Maio</option><option value="Junho">Junho</option><option value="Julho">Julho</option><option value="Agosto">Agosto</option><option value="Setembro">Setembro</option><option value="Outubro">Outubro</option><option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option></select></div>
+                        </div>
+                        <div style="display:flex;gap:10px;margin-top:10px;">
+                            <button onclick="aplicarFiltroMinhasPosVendas()" class="btn-salvar-modal" style="flex:1;">✅ Aplicar Filtro</button>
+                            <button onclick="limparFiltroMinhasPosVendas()" class="btn-cancelar" style="flex:1;">🔄 Limpar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
     <script>
         const API_URL = 'https://sistema-pos-vendas-backend.onrender.com';
+
+        // Variáveis para filtro local
+        let meusRegistrosData = [];
+        let meusRegistrosFiltrados = [];
+
+        function abrirModalFiltroMinhasPosVendas() {
+            document.getElementById('modalFiltroMinhasPosVendas').style.display = 'flex';
+        }
+        function fecharModalFiltroMinhasPosVendas() { document.getElementById('modalFiltroMinhasPosVendas').style.display = 'none'; }
+
+        function aplicarFiltroMinhasPosVendas() {
+            const mes = normalizarMes(document.getElementById('filtroMesMinhasPosVendas').value);
+            const mesVigencia = normalizarMes(document.getElementById('filtroMesVigenciaMinhasPosVendas').value);
+            meusRegistrosFiltrados = (meusRegistrosData || []).filter(item => {
+                let match = true;
+                const itemMes = normalizarMes(item.mes || item.mês || item.month || '');
+                const itemMesVigencia = normalizarMes(item.mes_vigencia || item.mesVigencia || item['mes vigencia'] || '');
+                if (mes && itemMes !== mes) match = false;
+                if (mesVigencia && itemMesVigencia !== mesVigencia) match = false;
+                return match;
+            });
+            renderizarMinhasPosVendas(meusRegistrosFiltrados.length ? meusRegistrosFiltrados : meusRegistrosData);
+            fecharModalFiltroMinhasPosVendas();
+            mostrarNotificacao(`✅ Filtro aplicado: ${ (meusRegistrosFiltrados||[]).length } registros`);
+        }
+
+        function limparFiltroMinhasPosVendas() {
+            document.getElementById('filtroMesMinhasPosVendas').value = '';
+            document.getElementById('filtroMesVigenciaMinhasPosVendas').value = '';
+            meusRegistrosFiltrados = [];
+            renderizarMinhasPosVendas(meusRegistrosData);
+            fecharModalFiltroMinhasPosVendas();
+            mostrarNotificacao('🔄 Filtro removido');
+        }
+
+        function renderizarMinhasPosVendas(dados) {
+            const tbody = document.getElementById('corpoMinhasPosVendas');
+            if (!dados || !dados.length) {
+                tbody.innerHTML = '<tr><td colspan="11">✅ Nenhum registro pendente para preencher.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = '';
+            dados.forEach((item) => {
+                const row = tbody.insertRow();
+                row.insertCell(0).innerHTML = normalizarMes(item.mes || item.mês || item.month || '') || '-';
+                row.insertCell(1).innerHTML = normalizarMes(item.mes_vigencia || item.mesVigencia || item['mes vigencia'] || item['MÊS VIGÊNCIA'] || '') || '-';
+                row.insertCell(2).innerHTML = item.razao_social || item.razaoSocial || '-';
+                row.insertCell(3).innerHTML = item.cnpj || '-';
+                row.insertCell(4).innerHTML = item.cidade || '-';
+                row.insertCell(5).innerHTML = item.responsavel || '-';
+                row.insertCell(6).innerHTML = item.contabilidade || '-';
+                row.insertCell(7).innerHTML = formatarData(item.data_entregue || item.dataEntregue);
+                row.insertCell(8).innerHTML = formatarData(item.retorno);
+                row.insertCell(9).innerHTML = item.observacao || '-';
+                const actionCell = row.insertCell(10);
+                actionCell.className = 'acoes-botoes';
+                actionCell.innerHTML = `<button onclick='abrirModalPreencher(${JSON.stringify(item).replace(/'/g, "&#39;")})' class="btn-preencher" title="Preencher Questionário">📝 Preencher</button>`;
+            });
+        }
+
+        function normalizarMes(valor) {
+            if (valor === null || valor === undefined || valor === '') return '';
+            const texto = String(valor).trim().toLowerCase();
+            const mapa = {
+                '1': 'Janeiro', '01': 'Janeiro', 'janeiro': 'Janeiro', 'jan': 'Janeiro',
+                '2': 'Fevereiro', '02': 'Fevereiro', 'fevereiro': 'Fevereiro', 'fev': 'Fevereiro',
+                '3': 'Março', '03': 'Março', 'março': 'Março', 'mar': 'Março',
+                '4': 'Abril', '04': 'Abril', 'abril': 'Abril', 'abr': 'Abril',
+                '5': 'Maio', '05': 'Maio', 'maio': 'Maio',
+                '6': 'Junho', '06': 'Junho', 'junho': 'Junho', 'jun': 'Junho',
+                '7': 'Julho', '07': 'Julho', 'julho': 'Julho', 'jul': 'Julho',
+                '8': 'Agosto', '08': 'Agosto', 'agosto': 'Agosto', 'ago': 'Agosto',
+                '9': 'Setembro', '09': 'Setembro', 'setembro': 'Setembro', 'set': 'Setembro',
+                '10': 'Outubro', 'outubro': 'Outubro', 'out': 'Outubro',
+                '11': 'Novembro', 'novembro': 'Novembro', 'nov': 'Novembro',
+                '12': 'Dezembro', 'dezembro': 'Dezembro', 'dez': 'Dezembro'
+            };
+            return mapa[texto] || String(valor).trim();
+        }
         
         const userRole = localStorage.getItem('userRole');
         const vendedorNome = localStorage.getItem('userName');
@@ -533,28 +634,9 @@
                     (item.preenchido !== 'SIM')
                 );
                 
-                const tbody = document.getElementById('corpoMinhasPosVendas');
-                    if (!meusRegistros.length) {
-                    tbody.innerHTML = '<tr><td colspan="11">✅ Nenhum registro pendente para preencher.</td></tr>';
-                } else {
-                    tbody.innerHTML = '';
-                    meusRegistros.forEach((item) => {
-                        const row = tbody.insertRow();
-                        row.insertCell(0).innerHTML = normalizarMes(item.mes || item.mês || item.month || '') || '-';
-                        row.insertCell(1).innerHTML = normalizarMes(item.mes_vigencia || item.mesVigencia || item['mes vigencia'] || item['MÊS VIGÊNCIA'] || '') || '-';
-                        row.insertCell(2).innerHTML = item.razao_social || item.razaoSocial || '-';
-                        row.insertCell(3).innerHTML = item.cnpj || '-';
-                        row.insertCell(4).innerHTML = item.cidade || '-';
-                        row.insertCell(5).innerHTML = item.responsavel || '-';
-                        row.insertCell(6).innerHTML = item.contabilidade || '-';
-                        row.insertCell(7).innerHTML = formatarData(item.data_entregue || item.dataEntregue);
-                        row.insertCell(8).innerHTML = formatarData(item.retorno);
-                        row.insertCell(9).innerHTML = item.observacao || '-';
-                        const actionCell = row.insertCell(10);
-                        actionCell.className = 'acoes-botoes';
-                        actionCell.innerHTML = `<button onclick='abrirModalPreencher(${JSON.stringify(item).replace(/'/g, "&#39;")})' class="btn-preencher" title="Preencher Questionário">📝 Preencher</button>`;
-                    });
-                }
+                // armazenar localmente e renderizar (com suporte a filtro)
+                meusRegistrosData = meusRegistros;
+                renderizarMinhasPosVendas(meusRegistrosData);
             } catch(e) { 
                 console.error(e); 
                 document.getElementById('corpoMinhasPosVendas').innerHTML = '<tr><td colspan="9">❌ Erro ao carregar dados</td></tr>';
@@ -668,6 +750,7 @@
         // ========== FECHAR MODAL AO CLICAR FORA ==========
         window.onclick = function(event) { 
             if (event.target === document.getElementById('modalPreencherQuestionario')) fecharModalPreencher(); 
+            if (event.target === document.getElementById('modalFiltroMinhasPosVendas')) fecharModalFiltroMinhasPosVendas();
         }
     </script>
 </body>
