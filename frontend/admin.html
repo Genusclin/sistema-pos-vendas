@@ -83,6 +83,7 @@
                             <thead>
                                 <tr>
                                     <th style="width: 30px;"><input type="checkbox" id="chkSelecionarTodosPV" onclick="selecionarTodosPV()"></th>
+                                    <th>MÊS</th>
                                     <th>CONSULTOR</th>
                                     <th>RAZAO SOCIAL</th>
                                     <th>CNPJ</th>
@@ -172,6 +173,7 @@
             <div class="modal-header"><h3>🔍 Filtrar Pós Vendas</h3><span class="modal-fechar" onclick="fecharModalFiltroPosVendas()">&times;</span></div>
             <div class="modal-body">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="input-group"><label>MÊS:</label><select id="filtroMesPosVendas"><option value="">Todos</option><option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option><option value="Março">Março</option><option value="Abril">Abril</option><option value="Maio">Maio</option><option value="Junho">Junho</option><option value="Julho">Julho</option><option value="Agosto">Agosto</option><option value="Setembro">Setembro</option><option value="Outubro">Outubro</option><option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option></select></div>
                     <div class="input-group"><label>CONSULTOR:</label><select id="filtroConsultorPosVendas"><option value="">Todos</option></select></div>
                     <div class="input-group"><label>RAZAO SOCIAL:</label><input type="text" id="filtroRazaoPosVendas" placeholder="Digite para filtrar..."></div>
                     <div class="input-group"><label>CNPJ:</label><input type="text" id="filtroCnpjPosVendas" placeholder="Digite para filtrar..."></div>
@@ -226,6 +228,7 @@
     <div id="modalNovoRegistro" class="modal">
         <div class="modal-content"><div class="modal-header"><h3>➕ Novo Registro</h3><span class="modal-fechar" onclick="fecharModalNovoRegistro()">&times;</span></div>
         <div class="modal-body"><div class="form-cadastro-modal">
+            <div class="input-group"><label>MÊS:</label><select id="modalMes"><option value="">Selecione...</option><option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option><option value="Março">Março</option><option value="Abril">Abril</option><option value="Maio">Maio</option><option value="Junho">Junho</option><option value="Julho">Julho</option><option value="Agosto">Agosto</option><option value="Setembro">Setembro</option><option value="Outubro">Outubro</option><option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option></select></div>
             <div class="input-group"><label>CONSULTOR:</label><select id="modalConsultor"></select></div>
             <div class="input-group"><label>RAZÃO SOCIAL:</label><input type="text" id="modalRazaoSocial"></div>
             <div class="input-group"><label>CNPJ:</label><input type="text" id="modalCnpj"></div>
@@ -243,6 +246,7 @@
     <div id="modalEditarRegistro" class="modal">
         <div class="modal-content"><div class="modal-header"><h3>✏️ Editar Registro</h3><span class="modal-fechar" onclick="fecharModalEditarRegistro()">&times;</span></div>
         <div class="modal-body"><div class="form-cadastro-modal">
+            <div class="input-group"><label>MÊS:</label><select id="editMes"><option value="">Selecione...</option><option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option><option value="Março">Março</option><option value="Abril">Abril</option><option value="Maio">Maio</option><option value="Junho">Junho</option><option value="Julho">Julho</option><option value="Agosto">Agosto</option><option value="Setembro">Setembro</option><option value="Outubro">Outubro</option><option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option></select></div>
             <div class="input-group"><label>CONSULTOR:</label><select id="editConsultor"></select></div>
             <div class="input-group"><label>RAZÃO SOCIAL:</label><input type="text" id="editRazaoSocial"></div>
             <div class="input-group"><label>CNPJ:</label><input type="text" id="editCnpj"></div>
@@ -410,6 +414,25 @@
             }
             return new Date(dataStr);
         }
+        function normalizarMes(valor) {
+            if (valor === null || valor === undefined || valor === '') return '';
+            const texto = String(valor).trim().toLowerCase();
+            const mapa = {
+                '1': 'Janeiro', '01': 'Janeiro', 'janeiro': 'Janeiro', 'jan': 'Janeiro',
+                '2': 'Fevereiro', '02': 'Fevereiro', 'fevereiro': 'Fevereiro', 'fev': 'Fevereiro',
+                '3': 'Março', '03': 'Março', 'março': 'Março', 'mar': 'Março',
+                '4': 'Abril', '04': 'Abril', 'abril': 'Abril', 'abr': 'Abril',
+                '5': 'Maio', '05': 'Maio', 'maio': 'Maio',
+                '6': 'Junho', '06': 'Junho', 'junho': 'Junho', 'jun': 'Junho',
+                '7': 'Julho', '07': 'Julho', 'julho': 'Julho', 'jul': 'Julho',
+                '8': 'Agosto', '08': 'Agosto', 'agosto': 'Agosto', 'ago': 'Agosto',
+                '9': 'Setembro', '09': 'Setembro', 'setembro': 'Setembro', 'set': 'Setembro',
+                '10': 'Outubro', 'outubro': 'Outubro', 'out': 'Outubro',
+                '11': 'Novembro', 'novembro': 'Novembro', 'nov': 'Novembro',
+                '12': 'Dezembro', 'dezembro': 'Dezembro', 'dez': 'Dezembro'
+            };
+            return mapa[texto] || String(valor).trim();
+        }
 
         // ==================== FUNÇÕES DE FILTRO ====================
         function abrirModalFiltroPosVendas() {
@@ -421,6 +444,7 @@
         function fecharModalFiltroPosVendas() { document.getElementById('modalFiltroPosVendas').style.display = 'none'; }
         function aplicarFiltroPosVendas() {
             const consultor = document.getElementById('filtroConsultorPosVendas').value;
+            const mes = normalizarMes(document.getElementById('filtroMesPosVendas').value);
             const razao = document.getElementById('filtroRazaoPosVendas').value.toLowerCase();
             const cnpj = document.getElementById('filtroCnpjPosVendas').value.toLowerCase();
             const cidade = document.getElementById('filtroCidadePosVendas').value.toLowerCase();
@@ -430,6 +454,8 @@
             const preenchido = document.getElementById('filtroPreenchidoPosVendas').value;
             dadosPosVendaFiltrados = dadosPosVenda.filter(item => {
                 let match = true;
+                const itemMes = normalizarMes(item.mes || item.mês || item.month || '');
+                if (mes && itemMes !== mes) match = false;
                 if (consultor && item.consultor !== consultor) match = false;
                 if (razao && !(item.razao_social || item.razaoSocial || '').toLowerCase().includes(razao)) match = false;
                 if (cnpj && !(item.cnpj || '').toLowerCase().includes(cnpj)) match = false;
@@ -446,7 +472,7 @@
             mostrarNotificacao(`✅ Filtro aplicado: ${dadosPosVendaFiltrados.length} registros`);
         }
         function limparFiltroPosVendas() {
-            ['filtroConsultorPosVendas','filtroRazaoPosVendas','filtroCnpjPosVendas','filtroCidadePosVendas','filtroContabilidadePosVendas','filtroDataEntreguePosVendas','filtroRetornoPosVendas','filtroPreenchidoPosVendas'].forEach(id => document.getElementById(id).value = '');
+            ['filtroMesPosVendas','filtroConsultorPosVendas','filtroRazaoPosVendas','filtroCnpjPosVendas','filtroCidadePosVendas','filtroContabilidadePosVendas','filtroDataEntreguePosVendas','filtroRetornoPosVendas','filtroPreenchidoPosVendas'].forEach(id => document.getElementById(id).value = '');
             dadosPosVendaFiltrados = [];
             paginaAtualPV = 1;
             atualizarPaginacaoPV();
@@ -510,7 +536,7 @@
         function renderizarTabelaPosVendas(dados) {
     const tbody = document.getElementById('corpoTabelaPosVendas');
     if (!dados || !dados.length) {
-        tbody.innerHTML = '<tr><td colspan="12">Nenhum registro encontrado.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="13">Nenhum registro encontrado.</td></tr>';
         return;
     }
     tbody.innerHTML = '';
@@ -537,6 +563,7 @@
                 chk.onclick = function() { verificarSelecionadosPV(); };
                 return chk;
             },
+            () => normalizarMes(item.mes || item.mês || item.month || '') || '-',
             () => item.consultor || '-',
             () => item.razao_social || item.razaoSocial || '-',
             () => item.cnpj || '-',
@@ -690,6 +717,7 @@
             const dados = dadosPosVendaFiltrados.length ? dadosPosVendaFiltrados : dadosPosVenda;
             if (!dados || !dados.length) { alert('Não há dados para exportar!'); return; }
             const dadosExcel = dados.map(d => ({
+                'MÊS': normalizarMes(d.mes || d.mês || d.month || ''),
                 'CONSULTOR': d.consultor || '',
                 'RAZAO SOCIAL': d.razao_social || d.razaoSocial || '',
                 'CNPJ': d.cnpj || '',
@@ -776,7 +804,7 @@
 
         // ==================== FUNÇÕES DE MODAIS ====================
         function abrirModalNovoRegistro() {
-            ['modalConsultor','modalRazaoSocial','modalCnpj','modalCidade','modalTelefone','modalResponsavel','modalContabilidade','modalDataEntregue','modalRetorno','modalObservacao'].forEach(id => document.getElementById(id).value = '');
+            ['modalMes','modalConsultor','modalRazaoSocial','modalCnpj','modalCidade','modalTelefone','modalResponsavel','modalContabilidade','modalDataEntregue','modalRetorno','modalObservacao'].forEach(id => document.getElementById(id).value = '');
             document.getElementById('modalNovoRegistro').style.display = 'flex';
         }
         function fecharModalNovoRegistro() { document.getElementById('modalNovoRegistro').style.display = 'none'; }
@@ -787,6 +815,7 @@
             if (!consultor || !razaoSocial) { alert('Preencha consultor e razão social!'); return; }
             const registro = {
                 consultor, razaoSocial,
+                mes: document.getElementById('modalMes').value,
                 cnpj: document.getElementById('modalCnpj').value.trim(),
                 cidade: document.getElementById('modalCidade').value.trim(),
                 telefone: document.getElementById('modalTelefone').value.trim(),
@@ -811,6 +840,7 @@
                 id: itemOriginal.id,
                 consultor: consultor,
                 razaoSocial: razaoSocial,
+                mes: document.getElementById('editMes').value,
                 cnpj: document.getElementById('editCnpj').value.trim(),
                 cidade: document.getElementById('editCidade').value.trim(),
                 telefone: document.getElementById('editTelefone').value.trim(),
@@ -837,6 +867,7 @@
         function abrirModalEditarRegistro(index) {
             indiceEditando = index;
             const item = dadosPosVenda[index];
+            document.getElementById('editMes').value = normalizarMes(item.mes || item.mês || item.month || '');
             document.getElementById('editConsultor').value = item.consultor || '';
             document.getElementById('editRazaoSocial').value = item.razao_social || item.razaoSocial || '';
             document.getElementById('editCnpj').value = item.cnpj || '';
@@ -954,6 +985,7 @@
 
             try {
                 const modelo = [{ 
+                    'MÊS': 'Janeiro',
                     'CONSULTOR': 'Exemplo: João Silva',
                     'RAZAO SOCIAL': 'Empresa Exemplo LTDA',
                     'CNPJ': '12.345.678/0001-99',
@@ -968,7 +1000,7 @@
                 
                 const ws = XLSX.utils.json_to_sheet(modelo);
                 ws['!cols'] = [
-                    { wch: 20 }, { wch: 30 }, { wch: 20 }, { wch: 20 }, 
+                    { wch: 12 }, { wch: 20 }, { wch: 30 }, { wch: 20 }, { wch: 20 }, 
                     { wch: 18 }, { wch: 20 }, { wch: 25 }, { wch: 15 }, 
                     { wch: 15 }, { wch: 40 }
                 ];
@@ -1077,6 +1109,7 @@
                             const novoRegistro = {
                                 consultor: consultor,
                                 razaoSocial: razaoSocial,
+                                mes: normalizarMes(row['MÊS'] || row['MES'] || row['Mes'] || row['Mês'] || row['mes'] || row['MONTH'] || row['Month'] || ''),
                                 cnpj: row['CNPJ'] || row['cnpj'] || row['Cnpj'] || '',
                                 cidade: row['CIDADE'] || row['cidade'] || row['Cidade'] || '',
                                 telefone: row['TELEFONE'] || row['telefone'] || row['Telefone'] || '',

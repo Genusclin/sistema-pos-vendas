@@ -44,6 +44,7 @@ async function initDatabase() {
         await pool.query(`
             CREATE TABLE IF NOT EXISTS pos_vendas (
                 id SERIAL PRIMARY KEY,
+                mes TEXT,
                 consultor TEXT,
                 razao_social TEXT,
                 cnpj TEXT,
@@ -57,6 +58,7 @@ async function initDatabase() {
                 preenchido TEXT DEFAULT 'NÃO'
             )
         `);
+        await pool.query(`ALTER TABLE pos_vendas ADD COLUMN IF NOT EXISTS mes TEXT`);
         
         await pool.query(`
             CREATE TABLE IF NOT EXISTS usuarios (
@@ -170,7 +172,7 @@ app.post('/salvar-todos-dados', async (req, res) => {
 // ==================== ROTAS DE PÓS VENDAS ====================
 app.get('/buscar-pos-vendas', async (req, res) => {
     try {
-        const result = await pool.query('SELECT id, consultor, razao_social, cnpj, cidade, telefone, responsavel, contabilidade, data_entregue, retorno, observacao, preenchido FROM pos_vendas ORDER BY id DESC');
+        const result = await pool.query('SELECT id, mes, consultor, razao_social, cnpj, cidade, telefone, responsavel, contabilidade, data_entregue, retorno, observacao, preenchido FROM pos_vendas ORDER BY id DESC');
         console.log('📊 Registros retornados:', result.rows.length);
         res.json(result.rows);
     } catch (error) {
@@ -184,11 +186,11 @@ app.post('/adicionar-pos-venda', async (req, res) => {
         const { registro } = req.body;
         const result = await pool.query(`
             INSERT INTO pos_vendas (
-                consultor, razao_social, cnpj, cidade, telefone, responsavel,
+                mes, consultor, razao_social, cnpj, cidade, telefone, responsavel,
                 contabilidade, data_entregue, retorno, observacao, preenchido
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
             RETURNING id
-        `, [registro.consultor, registro.razaoSocial, registro.cnpj, registro.cidade,
+        `, [registro.mes || '', registro.consultor, registro.razaoSocial, registro.cnpj, registro.cidade,
             registro.telefone, registro.responsavel, registro.contabilidade,
             registro.dataEntregue, registro.retorno, registro.observacao, 'NÃO']);
         console.log('✅ Registro adicionado com ID:', result.rows[0].id);
@@ -209,20 +211,22 @@ app.post('/salvar-pos-venda', async (req, res) => {
         
         const updateResult = await pool.query(`
             UPDATE pos_vendas SET
-                consultor = $1, 
-                razao_social = $2, 
-                cnpj = $3, 
-                cidade = $4,
-                telefone = $5, 
-                responsavel = $6, 
-                contabilidade = $7,
-                data_entregue = $8, 
-                retorno = $9, 
-                observacao = $10,
-                preenchido = $11
-            WHERE id = $12
-            RETURNING id, consultor, cidade, razao_social, preenchido
+                mes = $1,
+                consultor = $2, 
+                razao_social = $3, 
+                cnpj = $4, 
+                cidade = $5,
+                telefone = $6, 
+                responsavel = $7, 
+                contabilidade = $8,
+                data_entregue = $9, 
+                retorno = $10, 
+                observacao = $11,
+                preenchido = $12
+            WHERE id = $13
+            RETURNING id, mes, consultor, cidade, razao_social, preenchido
         `, [
+            registro.mes || '',
             registro.consultor, 
             registro.razaoSocial, 
             registro.cnpj, 
