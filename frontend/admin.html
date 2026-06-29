@@ -736,9 +736,9 @@
                 'TELEFONE': d.telefone || '',
                 'RESPONSAVEL': d.responsavel || '',
                 'CONTABILIDADE': d.contabilidade || '',
+                'MÊS VIGÊNCIA': normalizarMes(d.mes_vigencia || d.mesVigencia || d['mes vigencia'] || ''),
                 'DATA ENTREGUE': d.data_entregue || d.dataEntregue || '',
                 'RETORNO': d.retorno || '',
-                'PREECHIDO': d.preenchido || '',
                 'OBSERVAÇÃO': d.observacao || ''
             }));
             const ws = XLSX.utils.json_to_sheet(dadosExcel);
@@ -832,6 +832,7 @@
                 telefone: document.getElementById('modalTelefone').value.trim(),
                 responsavel: document.getElementById('modalResponsavel').value.trim(),
                 contabilidade: document.getElementById('modalContabilidade').value.trim(),
+                mesVigencia: document.getElementById('modalMesVigencia').value,
                 dataEntregue: document.getElementById('modalDataEntregue').value,
                 retorno: document.getElementById('modalRetorno').value,
                 observacao: document.getElementById('modalObservacao').value.trim()
@@ -857,6 +858,7 @@
                 telefone: document.getElementById('editTelefone').value.trim(),
                 responsavel: document.getElementById('editResponsavel').value.trim(),
                 contabilidade: document.getElementById('editContabilidade').value.trim(),
+                mesVigencia: document.getElementById('editMesVigencia').value,
                 dataEntregue: document.getElementById('editDataEntregue').value,
                 retorno: document.getElementById('editRetorno').value,
                 observacao: document.getElementById('editObservacao').value.trim(),
@@ -1006,6 +1008,7 @@
                     'TELEFONE': '(11) 99999-9999',
                     'RESPONSAVEL': 'Maria Santos',
                     'CONTABILIDADE': 'Contabilidade Exemplo',
+                    'MÊS VIGÊNCIA': 'Janeiro',
                     'DATA ENTREGUE': '2026-06-19',
                     'RETORNO': '2026-06-26',
                     'OBSERVAÇÃO': 'Observação de exemplo'
@@ -1014,7 +1017,7 @@
                 const ws = XLSX.utils.json_to_sheet(modelo);
                 ws['!cols'] = [
                     { wch: 12 }, { wch: 20 }, { wch: 30 }, { wch: 20 }, { wch: 20 }, 
-                    { wch: 18 }, { wch: 20 }, { wch: 25 }, { wch: 15 }, 
+                    { wch: 18 }, { wch: 20 }, { wch: 25 }, { wch: 18 }, { wch: 15 }, 
                     { wch: 15 }, { wch: 40 }
                 ];
                 
@@ -1128,6 +1131,7 @@
                                 telefone: row['TELEFONE'] || row['telefone'] || row['Telefone'] || '',
                                 responsavel: row['RESPONSAVEL'] || row['responsavel'] || row['Responsavel'] || '',
                                 contabilidade: row['CONTABILIDADE'] || row['contabilidade'] || row['Contabilidade'] || '',
+                                mesVigencia: normalizarMes(row['MÊS VIGÊNCIA'] || row['MES VIGÊNCIA'] || row['Mes Vigencia'] || row['mes vigencia'] || row['mesVigencia'] || ''),
                                 dataEntregue: converterData(row['DATA ENTREGUE'] || row['data entregue'] || row['Data Entregue'] || ''),
                                 retorno: converterData(row['RETORNO'] || row['retorno'] || row['Retorno'] || ''),
                                 observacao: row['OBSERVAÇÃO'] || row['observacao'] || row['OBS'] || row['obs'] || ''
@@ -1139,7 +1143,6 @@
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({ registro: novoRegistro })
                                 });
-                                
                                 const result = await response.json();
                                 if (result.success) {
                                     importados++;

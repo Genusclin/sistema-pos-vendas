@@ -2,11 +2,10 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-size: 11px !important;
 }
 
 html {
-    font-size: 11px !important;
+    font-size: 100%;
 }
 
 body {
@@ -689,7 +688,7 @@ th {
 td {
     padding: 10px;
     border-bottom: 1px solid #eee;
-    font-size: 14px;
+    font-size: 11px;
 }
 
 tr:hover {
