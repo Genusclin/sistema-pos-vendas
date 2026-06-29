@@ -1184,19 +1184,7 @@
         function atualizarDestaquePosVendas() {
             const abaPosVendas = document.querySelector('a[data-tab="posvendas"]');
             if (!abaPosVendas) return;
-            
-            // Verifica se há dados preenchidos
-            const temPreenchido = dadosPosVenda.some(registro => registro.preenchido === 'SIM');
-            
-            if (temPreenchido) {
-                // Adiciona destaque apenas se não estiver ativo
-                if (!abaPosVendas.classList.contains('ativo')) {
-                    abaPosVendas.classList.add('destaque-preenchido');
-                }
-            } else {
-                // Remove destaque se não houver mais dados preenchidos
-                abaPosVendas.classList.remove('destaque-preenchido');
-            }
+            abaPosVendas.classList.remove('destaque-preenchido');
         }
 
         async function carregarPosVendas() {

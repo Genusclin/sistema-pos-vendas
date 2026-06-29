@@ -42,15 +42,15 @@
 }
 
 .nav-link.destaque-preenchido {
-    background: #c6f6d5;
-    color: #22543d;
-    font-weight: 600;
-    border: 2px solid #9ae6b4;
+    background: transparent;
+    color: inherit;
+    font-weight: 500;
+    border: none;
 }
 
 .nav-link.destaque-preenchido:hover {
-    background: #9ae6b4;
-    color: #1b4332;
+    background: #f0f0f0;
+    color: #667eea;
 }
 
 /* Conteúdo de cada aba */
