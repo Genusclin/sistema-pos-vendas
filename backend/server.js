@@ -260,12 +260,25 @@ app.post('/salvar-pos-venda', async (req, res) => {
 
 app.post('/excluir-pos-venda', async (req, res) => {
     try {
-        const { index } = req.body;
-        const result = await pool.query('SELECT id FROM pos_vendas ORDER BY id LIMIT 1 OFFSET $1', [index]);
-        if (result.rows.length > 0) {
-            await pool.query('DELETE FROM pos_vendas WHERE id = $1', [result.rows[0].id]);
-            console.log('✅ Registro excluído, ID:', result.rows[0].id);
+        const { id, index } = req.body || {};
+        const registroId = typeof id === 'string' ? parseInt(id, 10) : id;
+
+        if (Number.isInteger(registroId)) {
+            const deleteResult = await pool.query('DELETE FROM pos_vendas WHERE id = $1', [registroId]);
+            if (deleteResult.rowCount > 0) {
+                console.log('✅ Registro excluído, ID:', registroId);
+            }
+            return res.json({ success: true, deleted: deleteResult.rowCount > 0 });
         }
+
+        if (typeof index === 'number') {
+            const result = await pool.query('SELECT id FROM pos_vendas ORDER BY id DESC LIMIT 1 OFFSET $1', [index]);
+            if (result.rows.length > 0) {
+                await pool.query('DELETE FROM pos_vendas WHERE id = $1', [result.rows[0].id]);
+                console.log('✅ Registro excluído por índice, ID:', result.rows[0].id);
+            }
+        }
+
         res.json({ success: true });
     } catch (error) {
         console.error(error);

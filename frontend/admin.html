@@ -569,6 +569,7 @@
                 const chk = document.createElement('input');
                 chk.type = 'checkbox';
                 chk.className = 'chk-selecionar-pv';
+                chk.setAttribute('data-id', item.id);
                 chk.setAttribute('data-index', realIndex);
                 chk.onclick = function() { verificarSelecionadosPV(); };
                 return chk;
@@ -590,7 +591,7 @@
                 div.className = 'acoes-botoes';
                 div.innerHTML = `
                     <button onclick="abrirModalEditarRegistro(${realIndex})" class="btn-editar">✏️</button>
-                    <button onclick="excluirRegistroPosVenda(${realIndex})" class="btn-excluir">🗑️</button>
+                    <button onclick="excluirRegistroPosVenda(${item.id})" class="btn-excluir">🗑️</button>
                 `;
                 return div;
             }
@@ -801,14 +802,19 @@
 
         async function excluirSelecionadosPV() {
             const checkboxes = document.querySelectorAll('.chk-selecionar-pv:checked');
-            const indices = Array.from(checkboxes).map(chk => parseInt(chk.getAttribute('data-index')));
-            if (indices.length === 0) return;
-            if (!confirm(`⚠️ Tem certeza que deseja excluir ${indices.length} registro(s)?`)) return;
-            indices.sort((a, b) => b - a);
-            for (const idx of indices) {
-                await fetch(`${API_URL}/excluir-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ index: idx }) });
+            const ids = Array.from(checkboxes).map(chk => {
+                const id = parseInt(chk.getAttribute('data-id'), 10);
+                if (!Number.isNaN(id)) return id;
+                const index = parseInt(chk.getAttribute('data-index'), 10);
+                const item = dadosPosVenda[index];
+                return item?.id;
+            }).filter(id => Number.isInteger(id));
+            if (ids.length === 0) return;
+            if (!confirm(`⚠️ Tem certeza que deseja excluir ${ids.length} registro(s)?`)) return;
+            for (const id of ids) {
+                await fetch(`${API_URL}/excluir-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
             }
-            mostrarNotificacao(`✅ ${indices.length} registro(s) excluído(s)!`);
+            mostrarNotificacao(`✅ ${ids.length} registro(s) excluído(s)!`);
             await carregarPosVendas();
             await carregarDashboard();
         }
@@ -898,9 +904,9 @@
         }
         function fecharModalEditarRegistro() { document.getElementById('modalEditarRegistro').style.display = 'none'; indiceEditando = null; }
 
-        async function excluirRegistroPosVenda(idx) {
+        async function excluirRegistroPosVenda(id) {
             if (confirm('Excluir este registro?')) {
-                const response = await fetch(`${API_URL}/excluir-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ index: idx }) });
+                const response = await fetch(`${API_URL}/excluir-pos-venda`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
                 if ((await response.json()).success) { mostrarNotificacao('✅ Excluído!'); await carregarPosVendas(); await carregarDashboard(); }
                 else alert('❌ Erro ao excluir');
             }
